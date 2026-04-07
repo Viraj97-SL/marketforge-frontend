@@ -1,6 +1,4 @@
-"use client";
 import { cn } from "@/lib/utils";
-import { useEffect, useRef, useState } from "react";
 import type { LucideIcon } from "lucide-react";
 
 interface StatCardProps {
@@ -11,7 +9,6 @@ interface StatCardProps {
   trend?: "up" | "down" | "neutral";
   trendValue?: string;
   accent?: "teal" | "blue" | "purple" | "green" | "amber";
-  animate?: boolean;
   delay?: number;
 }
 
@@ -25,31 +22,15 @@ const ACCENTS = {
 
 export function StatCard({
   label, value, sub, icon: Icon, trend, trendValue,
-  accent = "teal", animate = true, delay = 0,
+  accent = "teal", delay = 0,
 }: StatCardProps) {
   const col = ACCENTS[accent];
-  const [visible, setVisible] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const obs = new IntersectionObserver(
-      ([e]) => { if (e.isIntersecting) { setVisible(true); obs.disconnect(); } },
-      { threshold: 0.1 }
-    );
-    if (ref.current) obs.observe(ref.current);
-    return () => obs.disconnect();
-  }, []);
 
   return (
     <div
-      ref={ref}
-      className={cn(
-        "relative rounded-xl border border-b1 bg-s1 p-5 overflow-hidden transition-all duration-500",
-        animate && (visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"),
-      )}
-      style={{ transitionDelay: `${delay}ms` }}
+      className="relative rounded-xl border border-b1 bg-s1 p-5 overflow-hidden animate-fade-up"
+      style={{ animationDelay: `${delay}ms` }}
     >
-      {/* Subtle glow top-right */}
       <div className={cn("absolute -top-6 -right-6 w-20 h-20 rounded-full blur-2xl opacity-30", col.bg)} />
 
       <div className="relative flex items-start justify-between gap-3">

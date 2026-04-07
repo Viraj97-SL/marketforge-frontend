@@ -62,6 +62,34 @@ export interface CareerReport {
   security_warnings: string[];
 }
 
+export interface JobListing {
+  job_id: string;
+  title: string;
+  company: string;
+  location: string | null;
+  salary_min: number | null;
+  salary_max: number | null;
+  work_model: string | null;
+  experience_level: string | null;
+  role_category: string | null;
+  source: string;
+  offers_sponsorship: boolean | null;
+  posted_date: string | null;
+  scraped_at: string | null;
+  url: string | null;
+  is_startup: boolean;
+  company_stage: string | null;
+  skills: string[];
+}
+
+export interface JobsResponse {
+  jobs: JobListing[];
+  total: number;
+  page: number;
+  page_size: number;
+  pages: number;
+}
+
 async function get<T>(path: string): Promise<T> {
   const res = await fetch(`${API}${path}`, { next: { revalidate: 300 } });
   if (!res.ok) throw new Error(`API ${path} → ${res.status}`);
@@ -76,6 +104,13 @@ export const api = {
   salary: (role = "all", level = "mid", location = "London") =>
     get<SalaryData>(`/api/v1/market/salary?role_category=${role}&experience_level=${level}&location=${location}`),
   trending: (days = 7) => get<TrendingData>(`/api/v1/market/trending?days=${days}`),
+  jobs: (opts: { role?: string; work_model?: string; visa_only?: boolean; page?: number; page_size?: number } = {}) => {
+    const p = new URLSearchParams({ page: String(opts.page ?? 1), page_size: String(opts.page_size ?? 20) });
+    if (opts.role && opts.role !== "all") p.set("role_category", opts.role);
+    if (opts.work_model) p.set("work_model", opts.work_model);
+    if (opts.visa_only) p.set("visa_only", "true");
+    return get<JobsResponse>(`/api/v1/jobs?${p}`);
+  },
   analyseCareer: async (profile: CareerProfile): Promise<CareerReport> => {
     const res = await fetch(`${API}/api/v1/career/analyse`, {
       method: "POST",
