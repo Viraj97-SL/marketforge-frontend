@@ -1,15 +1,15 @@
 "use client";
 import { useState } from "react";
 import { api, type CareerProfile, type CareerReport } from "@/lib/api";
-import { fmt, fmtK, pct } from "@/lib/utils";
+import { fmtK, pct } from "@/lib/utils";
 import {
   RadarChart, PolarGrid, PolarAngleAxis, Radar,
   ResponsiveContainer, BarChart, Bar, XAxis, YAxis,
   CartesianGrid, Tooltip, Cell,
 } from "recharts";
 import {
-  Loader2, ChevronRight, Star, TrendingUp,
-  AlertTriangle, CheckCircle, Target, Zap,
+  Loader2, Star, TrendingUp,
+  AlertTriangle, Target, Zap,
 } from "lucide-react";
 
 const LEVELS = ["junior", "mid", "senior", "lead"];

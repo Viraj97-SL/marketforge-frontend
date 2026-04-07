@@ -3,10 +3,9 @@ import { fmt, fmtK, pct } from "@/lib/utils";
 import { SkillBar } from "@/components/charts/skill-bar";
 import { SalaryRange } from "@/components/charts/salary-range";
 import { StatCard } from "@/components/cards/stat-card";
-import { TrendBadge } from "@/components/ui/trend-badge";
 import {
   BarChart3, TrendingUp, TrendingDown, DollarSign,
-  Globe, Activity, Users, Clock,
+  Globe, Activity, Clock,
 } from "lucide-react";
 
 export const revalidate = 300;

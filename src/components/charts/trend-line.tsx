@@ -1,7 +1,7 @@
 "use client";
 import {
-  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
-  ResponsiveContainer, Area, AreaChart, defs, linearGradient, stop,
+  XAxis, YAxis, CartesianGrid, Tooltip,
+  ResponsiveContainer, Area, AreaChart,
 } from "recharts";
 
 interface TrendLineProps {
@@ -22,11 +22,13 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 };
 
 export function TrendLine({ data, color = "#00C6A7", height = 200, gradient = true }: TrendLineProps) {
+  const gradId = `trendGrad_${color.replace("#", "")}`;
   return (
     <ResponsiveContainer width="100%" height={height}>
       <AreaChart data={data} margin={{ left: 0, right: 8, top: 4, bottom: 4 }}>
+        {/* Native SVG defs — valid inside recharts charts */}
         <defs>
-          <linearGradient id="trendGrad" x1="0" y1="0" x2="0" y2="1">
+          <linearGradient id={gradId} x1="0" y1="0" x2="0" y2="1">
             <stop offset="5%"  stopColor={color} stopOpacity={0.25} />
             <stop offset="95%" stopColor={color} stopOpacity={0} />
           </linearGradient>
@@ -50,7 +52,7 @@ export function TrendLine({ data, color = "#00C6A7", height = 200, gradient = tr
           dataKey="value"
           stroke={color}
           strokeWidth={2}
-          fill={gradient ? "url(#trendGrad)" : "transparent"}
+          fill={gradient ? `url(#${gradId})` : "transparent"}
           dot={false}
           activeDot={{ r: 4, fill: color, strokeWidth: 0 }}
         />

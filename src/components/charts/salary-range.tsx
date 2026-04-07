@@ -1,6 +1,6 @@
 "use client";
 import {
-  ComposedChart, Bar, Line, XAxis, YAxis, CartesianGrid,
+  ComposedChart, Bar, Cell, XAxis, YAxis, CartesianGrid,
   Tooltip, ResponsiveContainer, ReferenceLine,
 } from "recharts";
 import { fmtK } from "@/lib/utils";
@@ -23,6 +23,8 @@ const CustomTooltip = ({ active, payload }: any) => {
   );
 };
 
+const BAR_COLORS = ["#3B82F6", "#00C6A7", "#8B5CF6"];
+
 export function SalaryRange({ p25, p50, p75, height = 220 }: SalaryRangeProps) {
   if (!p25 && !p50 && !p75) {
     return (
@@ -33,9 +35,9 @@ export function SalaryRange({ p25, p50, p75, height = 220 }: SalaryRangeProps) {
   }
 
   const data = [
-    { label: "25th percentile", value: p25, fill: "#3B82F6" },
-    { label: "Median (50th)",   value: p50, fill: "#00C6A7" },
-    { label: "75th percentile", value: p75, fill: "#8B5CF6" },
+    { label: "25th percentile", value: p25 },
+    { label: "Median (50th)",   value: p50 },
+    { label: "75th percentile", value: p75 },
   ];
 
   return (
@@ -90,8 +92,8 @@ export function SalaryRange({ p25, p50, p75, height = 220 }: SalaryRangeProps) {
           />
           <Tooltip content={<CustomTooltip />} cursor={{ fill: "rgba(255,255,255,0.03)" }} />
           <Bar dataKey="value" radius={[6, 6, 0, 0]} maxBarSize={56}>
-            {data.map((d, i) => (
-              <rect key={i} fill={d.fill} fillOpacity={0.8} />
+            {data.map((_, i) => (
+              <Cell key={i} fill={BAR_COLORS[i]} fillOpacity={0.85} />
             ))}
           </Bar>
           {p50 != null && (
