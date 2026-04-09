@@ -259,12 +259,19 @@ export default function CareerPage() {
       const r = await api.analyseCV(cvFile, cvRole, consent);
       setCvReport(r);
     } catch (err: any) {
-      if (err.message === "CONSENT_REQUIRED")
-        setCvError("You must give consent to process your CV.");
-      else if (err.message === "FILE_REJECTED")
-        setCvError("Your file was rejected (oversized, wrong type, or unsafe content).");
+      const msg: string = err?.message ?? "";
+      if (msg === "CONSENT_REQUIRED")
+        setCvError("You must give GDPR consent before uploading your CV.");
+      else if (msg.startsWith("FILE_REJECTED"))
+        setCvError(`File rejected: ${msg.replace("FILE_REJECTED: ", "")}`);
+      else if (msg === "RATE_LIMITED")
+        setCvError("Rate limit reached (3 analyses/hour). Please try again later.");
+      else if (msg === "NETWORK_ERROR")
+        setCvError("Cannot reach the API. Start the backend with: PYTHONPATH=src uvicorn api.main:app --reload");
+      else if (msg.startsWith("SERVER_ERROR"))
+        setCvError(`Server error — check the API logs. (${msg})`);
       else
-        setCvError("Analysis failed. Make sure the API is running and try again.");
+        setCvError(`Analysis failed: ${msg || "unknown error"}`);
     } finally {
       setCvLoading(false);
     }

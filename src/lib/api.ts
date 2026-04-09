@@ -154,15 +154,23 @@ export const api = {
     const form = new FormData();
     form.append("cv_file", file);
     const params = new URLSearchParams({ target_role: targetRole, consent: String(consent) });
-    const res = await fetch(`${API}/api/v1/career/cv-analyse?${params}`, {
-      method: "POST",
-      body: form,
-    });
+    let res: Response;
+    try {
+      res = await fetch(`${API}/api/v1/career/cv-analyse?${params}`, {
+        method: "POST",
+        body: form,
+      });
+    } catch {
+      // Network-level failure (API not reachable)
+      throw new Error("NETWORK_ERROR");
+    }
     if (res.status === 403) throw new Error("CONSENT_REQUIRED");
     if (res.status === 422) {
       const body = await res.json().catch(() => ({}));
-      throw new Error(body?.detail ?? "FILE_REJECTED");
+      throw new Error(`FILE_REJECTED: ${body?.detail ?? "file validation failed"}`);
     }
+    if (res.status === 429) throw new Error("RATE_LIMITED");
+    if (res.status >= 500) throw new Error(`SERVER_ERROR: ${res.status}`);
     if (!res.ok) throw new Error(`CV API → ${res.status}`);
     return res.json();
   },
