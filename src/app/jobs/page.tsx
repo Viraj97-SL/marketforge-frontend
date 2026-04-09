@@ -224,60 +224,84 @@ export default async function JobsPage({ searchParams }: PageProps) {
         <>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {jobs.map((job, i) => {
-              const wm = WORK_MODEL_STYLES[job.work_model ?? ""] ?? WORK_MODEL_STYLES.hybrid;
-              const sc = srcColor(job.source);
+              const wm  = WORK_MODEL_STYLES[job.work_model ?? ""];
+              const sc  = srcColor(job.source);
+              const ini = (job.company?.[0] ?? "?").toUpperCase();
 
               return (
                 <div
                   key={job.job_id}
-                  className="group relative rounded-2xl border border-b1 bg-s1 p-5 hover:border-b2 transition-all duration-200 animate-fade-up flex flex-col"
-                  style={{ animationDelay: `${i * 40}ms` }}
+                  className="group relative rounded-2xl border border-b1 bg-gradient-to-br from-s1 to-s2
+                             p-5 flex flex-col animate-fade-up
+                             hover:-translate-y-1 hover:border-accent/30
+                             hover:shadow-[0_8px_32px_rgba(0,0,0,0.4),0_0_0_1px_rgba(0,198,167,0.12)]
+                             transition-all duration-200"
+                  style={{ animationDelay: `${i * 35}ms` }}
                 >
-                  {/* Source + work model */}
-                  <div className="flex items-center justify-between mb-3">
+                  {/* Source + badges row */}
+                  <div className="flex items-center justify-between mb-3.5">
                     <span
                       className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md"
-                      style={{ background: `${sc}15`, color: sc, border: `1px solid ${sc}25` }}
+                      style={{ background: `${sc}18`, color: sc, border: `1px solid ${sc}28` }}
                     >
                       {job.source}
                     </span>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1.5">
                       {job.offers_sponsorship && (
-                        <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-prp/10 text-prp border border-prp/20">
-                          VISA
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-prp/10 text-prp border border-prp/25">
+                          VISA ✓
                         </span>
                       )}
-                      {job.work_model && WORK_MODEL_STYLES[job.work_model] && (
-                        <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-md border ${wm.className}`}>
+                      {job.is_startup && (
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-warn/10 text-warn border border-warn/25">
+                          STARTUP
+                        </span>
+                      )}
+                      {wm && (
+                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md border ${wm.className}`}>
                           {wm.label}
                         </span>
                       )}
                     </div>
                   </div>
 
-                  {/* Title */}
-                  <h3 className="text-sm font-bold text-t1 leading-tight mb-1 group-hover:text-accent transition-colors">
-                    {job.title}
-                  </h3>
-
-                  {/* Company + location */}
-                  <div className="flex items-center gap-3 text-xs text-t2 mb-3">
-                    <div className="flex items-center gap-1">
-                      <Building2 className="w-3 h-3" />
-                      <span className="font-medium">{job.company}</span>
+                  {/* Company avatar + title */}
+                  <div className="flex gap-3 mb-3">
+                    <div
+                      className="w-9 h-9 rounded-xl flex-shrink-0 flex items-center justify-center
+                                 font-black text-sm font-mono border"
+                      style={{
+                        background:  `linear-gradient(135deg, ${sc}20, ${sc}35)`,
+                        borderColor: `${sc}35`,
+                        color:       sc,
+                      }}
+                    >
+                      {ini}
                     </div>
-                    {job.location && (
-                      <div className="flex items-center gap-1">
-                        <MapPin className="w-3 h-3" />
-                        <span>{job.location}</span>
+                    <div className="min-w-0">
+                      <h3 className="text-sm font-bold text-t1 leading-snug mb-0.5
+                                     group-hover:text-accent transition-colors line-clamp-2">
+                        {job.title}
+                      </h3>
+                      <div className="flex items-center gap-2 text-[11px] text-t2">
+                        <span className="font-semibold truncate">{job.company}</span>
+                        {job.location && (
+                          <>
+                            <span className="text-t3">·</span>
+                            <span className="flex items-center gap-0.5">
+                              <MapPin className="w-2.5 h-2.5" />
+                              {job.location}
+                            </span>
+                          </>
+                        )}
                       </div>
-                    )}
+                    </div>
                   </div>
 
                   {/* Salary */}
                   {(job.salary_min || job.salary_max) && (
                     <div className="flex items-center gap-1.5 mb-3">
-                      <DollarSign className="w-3.5 h-3.5 text-ok" />
+                      <DollarSign className="w-3.5 h-3.5 text-ok flex-shrink-0" />
                       <span className="text-sm font-bold text-ok">
                         {job.salary_min && job.salary_max
                           ? `${fmtK(job.salary_min)} – ${fmtK(job.salary_max)}`
@@ -290,7 +314,10 @@ export default async function JobsPage({ searchParams }: PageProps) {
                   {job.skills.length > 0 && (
                     <div className="flex flex-wrap gap-1.5 mb-4 flex-1">
                       {job.skills.slice(0, 5).map((s) => (
-                        <span key={s} className="text-[10px] px-2 py-0.5 rounded-md bg-s3 border border-b1 text-t2 font-medium">
+                        <span key={s}
+                              className="text-[10px] px-2 py-0.5 rounded-md bg-s3 border border-b1
+                                         text-t2 font-medium transition-colors
+                                         group-hover:border-b2">
                           {s}
                         </span>
                       ))}
@@ -308,7 +335,9 @@ export default async function JobsPage({ searchParams }: PageProps) {
                         href={job.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center gap-1 text-[11px] font-semibold text-accent hover:text-blue transition-colors"
+                        className="flex items-center gap-1 text-[11px] font-semibold
+                                   text-accent hover:text-blue transition-colors
+                                   hover:underline underline-offset-2"
                       >
                         Apply <ExternalLink className="w-3 h-3" />
                       </a>
