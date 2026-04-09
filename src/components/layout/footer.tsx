@@ -108,8 +108,8 @@ export function Footer() {
         {/* Bottom bar */}
         <div className="mt-12 pt-6 border-t border-b1 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-xs text-t2">
-            © 2026 MarketForge AI · Built by{" "}
-            <span className="text-accent font-semibold">Viraj Bulugahapitiya</span>
+            © 2026{" "}
+            <span className="text-accent font-semibold">MarketForge.digital</span>
           </p>
           <div className="flex items-center gap-4 text-xs text-t3">
             <span>Data updated twice weekly</span>

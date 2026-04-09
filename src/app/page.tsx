@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { api } from "@/lib/api";
 import { fmt, fmtK } from "@/lib/utils";
 import {
@@ -6,7 +7,10 @@ import {
   Cpu, Database, BarChart3, Zap, Globe, Star,
   ChevronRight, Activity, Users, DollarSign,
   Sparkles, Target, LineChart, BookOpen, Code2,
+  Mail, MapPin, Clock,
 } from "lucide-react";
+import { LogoMarquee } from "@/components/home/logo-marquee";
+import { ContactForm } from "@/components/home/contact-form";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Hero floating data tile
@@ -220,9 +224,26 @@ export default async function HomePage() {
 
       {/* ── Hero ──────────────────────────────────────────────────────────── */}
       <section className="relative min-h-[90vh] flex items-center">
-        {/* Background mesh */}
+        {/* Hero background image */}
+        <div className="absolute inset-0 overflow-hidden">
+          <Image
+            src="/images/hero-bg-base.webp"
+            alt=""
+            fill
+            priority
+            quality={85}
+            className="object-cover object-center"
+            sizes="100vw"
+          />
+          {/* Dark overlay to keep text readable */}
+          <div className="absolute inset-0 bg-bg/80" />
+          {/* Vignette at bottom */}
+          <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-bg to-transparent" />
+        </div>
+
+        {/* Background mesh on top of image */}
         <div className="absolute inset-0 bg-mesh pointer-events-none" />
-        <div className="absolute inset-0 dot-grid opacity-60 pointer-events-none" />
+        <div className="absolute inset-0 dot-grid opacity-30 pointer-events-none" />
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-24 w-full grid lg:grid-cols-2 gap-16 items-center">
           {/* Left copy */}
@@ -306,6 +327,9 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* ── Logo Cloud Marquee ───────────────────────────────────────────── */}
+      <LogoMarquee />
 
       {/* ── Quick nav tiles ───────────────────────────────────────────────── */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 py-6">
@@ -490,6 +514,72 @@ export default async function HomePage() {
               <p className="text-xs text-t2 leading-relaxed">{item.body}</p>
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* ── Get in touch ─────────────────────────────────────────────────── */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 py-16">
+        <div className="grid lg:grid-cols-2 gap-10 items-start">
+          {/* Left — copy */}
+          <div>
+            <p className="text-xs font-bold text-accent uppercase tracking-widest mb-3">Contact us</p>
+            <h2 className="text-4xl sm:text-5xl font-black tracking-tight text-t1 mb-5 leading-tight">
+              Let&apos;s talk about<br />
+              <span className="text-gradient">UK AI market data</span>
+            </h2>
+            <p className="text-t2 leading-relaxed mb-8 max-w-md">
+              Whether you&apos;re a hiring manager, researcher, or developer — get in touch to learn
+              how MarketForge can power your decisions with live AI job market intelligence.
+            </p>
+
+            {/* Contact details */}
+            <div className="space-y-4">
+              {[
+                {
+                  icon: Mail,
+                  label: "Email us",
+                  value: "hello@marketforge.digital",
+                  color: "text-accent",
+                  bg: "bg-accent/10",
+                },
+                {
+                  icon: MapPin,
+                  label: "Based in",
+                  value: "United Kingdom",
+                  color: "text-blue",
+                  bg: "bg-blue/10",
+                },
+                {
+                  icon: Clock,
+                  label: "Response time",
+                  value: "Within 24 hours",
+                  color: "text-ok",
+                  bg: "bg-ok/10",
+                },
+              ].map(({ icon: Icon, label, value, color, bg }) => (
+                <div key={label} className="flex items-center gap-4">
+                  <div className={`w-10 h-10 rounded-xl ${bg} flex items-center justify-center shrink-0`}>
+                    <Icon className={`w-5 h-5 ${color}`} />
+                  </div>
+                  <div>
+                    <p className="text-[11px] text-t3 font-medium uppercase tracking-wide">{label}</p>
+                    <p className="text-sm text-t1 font-semibold">{value}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Right — form */}
+          <div className="relative rounded-3xl border border-b1 bg-gradient-to-br from-s1 to-s2 p-7 sm:p-9">
+            {/* Glow accent */}
+            <div className="absolute -top-16 -right-16 w-48 h-48 rounded-full bg-accent/5 blur-3xl pointer-events-none" />
+            <div className="relative">
+              <h3 className="text-lg font-black text-t1 mb-1">Send us a message</h3>
+              <p className="text-xs text-t2 mb-6">We read every message and respond personally.</p>
+              <ContactForm />
+            </div>
+          </div>
         </div>
       </section>
 
