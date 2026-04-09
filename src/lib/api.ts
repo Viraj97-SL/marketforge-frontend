@@ -62,6 +62,36 @@ export interface CareerReport {
   security_warnings: string[];
 }
 
+export interface CVATSBreakdown {
+  keyword_match: number;
+  structure: number;
+  readability: number;
+  completeness: number;
+  format_safety: number;
+}
+
+export interface CVGapPlan {
+  short_term: string[];
+  mid_term: string[];
+  long_term: string[];
+}
+
+export interface CVAnalysisReport {
+  session_token: string;
+  ats_score: number;
+  ats_grade: string;
+  ats_breakdown: CVATSBreakdown;
+  ats_issues: string[];
+  skills_found: string[];
+  skills_missing: string[];
+  keyword_match_pct: number;
+  market_match_pct: number;
+  gap_plan: CVGapPlan;
+  narrative_summary: string;
+  pii_scrubbed: string[];
+  data_retained: false;
+}
+
 export interface JobListing {
   job_id: string;
   title: string;
@@ -118,6 +148,22 @@ export const api = {
       body: JSON.stringify(profile),
     });
     if (!res.ok) throw new Error(`Career API → ${res.status}`);
+    return res.json();
+  },
+  analyseCV: async (file: File, targetRole: string, consent: boolean): Promise<CVAnalysisReport> => {
+    const form = new FormData();
+    form.append("cv_file", file);
+    const params = new URLSearchParams({ target_role: targetRole, consent: String(consent) });
+    const res = await fetch(`${API}/api/v1/career/cv-analyse?${params}`, {
+      method: "POST",
+      body: form,
+    });
+    if (res.status === 403) throw new Error("CONSENT_REQUIRED");
+    if (res.status === 422) {
+      const body = await res.json().catch(() => ({}));
+      throw new Error(body?.detail ?? "FILE_REJECTED");
+    }
+    if (!res.ok) throw new Error(`CV API → ${res.status}`);
     return res.json();
   },
 };
