@@ -1,3 +1,18 @@
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "AI & ML Salary Guide UK 2026",
+  description:
+    "UK AI/ML salary benchmarks by role: median, P25–P75 ranges, and remote vs on-site comparisons. Real data from live job postings.",
+  alternates: { canonical: "https://marketforge.digital/salary" },
+  openGraph: {
+    title: "AI & ML Salary Guide UK 2026 | MarketForge AI",
+    description:
+      "Data-driven UK AI/ML salary guide — P25, median, P75 ranges for ML Engineers, Data Scientists, AI Researchers, and more.",
+    url: "https://marketforge.digital/salary",
+  },
+};
+
 import { api } from "@/lib/api";
 import { fmtK, pct } from "@/lib/utils";
 import { SalaryRange } from "@/components/charts/salary-range";

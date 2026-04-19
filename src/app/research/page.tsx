@@ -1,3 +1,18 @@
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "AI Research Signals & Emerging Tech UK",
+  description:
+    "Track emerging AI research trends relevant to UK hiring: rising techniques from arXiv, new model families, and techniques gaining traction in job postings.",
+  alternates: { canonical: "https://marketforge.digital/research" },
+  openGraph: {
+    title: "AI Research Signals & Emerging Tech | MarketForge AI",
+    description:
+      "Which AI research directions are becoming job requirements? Track the bridge between arXiv and UK AI hiring.",
+    url: "https://marketforge.digital/research",
+  },
+};
+
 import { ExternalLink, Microscope, Zap, TrendingUp, BookOpen } from "lucide-react";
 
 export const revalidate = 600;

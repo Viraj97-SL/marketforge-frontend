@@ -1,3 +1,18 @@
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "AI & ML Skills Demand UK",
+  description:
+    "Which skills are UK employers hiring for? Ranked demand for Python, LLMs, MLOps, cloud, and more — broken down by AI/ML role category.",
+  alternates: { canonical: "https://marketforge.digital/skills" },
+  openGraph: {
+    title: "AI & ML Skills Demand UK | MarketForge AI",
+    description:
+      "Ranked skill demand across UK AI/ML roles — Python, PyTorch, Kubernetes, LLMs, and rising technologies tracked in real time.",
+    url: "https://marketforge.digital/skills",
+  },
+};
+
 import { api } from "@/lib/api";
 import { SkillBar } from "@/components/charts/skill-bar";
 import { TrendBadge } from "@/components/ui/trend-badge";

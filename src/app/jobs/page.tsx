@@ -1,3 +1,18 @@
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Live UK AI & ML Job Board",
+  description:
+    "Browse live UK AI, ML, and data science job listings — filter by role, location, salary, and visa sponsorship. Updated hourly.",
+  alternates: { canonical: "https://marketforge.digital/jobs" },
+  openGraph: {
+    title: "Live UK AI & ML Job Board | MarketForge AI",
+    description:
+      "Hundreds of live UK AI/ML job listings. Filter by role, salary, location, and visa sponsorship. Find your next AI career move.",
+    url: "https://marketforge.digital/jobs",
+  },
+};
+
 import Link from "next/link";
 import { ExternalLink, MapPin, Building2, DollarSign, Clock, AlertCircle, ChevronLeft, ChevronRight } from "lucide-react";
 import { fmtK } from "@/lib/utils";

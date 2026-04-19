@@ -32,12 +32,15 @@ const BRANDS_ROW2 = [
   { name: "Improbable",         tag: "IMPROBABLE",   color: "text-warn" },
 ];
 
-function BrandPill({ name, tag, color }: { name: string; tag: string; color: string }) {
+function BrandPill({ name, color }: { name: string; tag: string; color: string }) {
+  const initial = name.replace(/^(The |A |An )/, "").charAt(0).toUpperCase();
   return (
-    <div className="mx-4 flex items-center gap-2 px-5 py-2.5 rounded-full border border-b1 bg-s1/80 backdrop-blur-sm
+    <div className="mx-3 flex items-center gap-2.5 px-4 py-2 rounded-full border border-b1 bg-s1/80 backdrop-blur-sm
                     hover:border-b2 hover:bg-s2 transition-all duration-200 select-none group shrink-0">
-      <span className={`text-[10px] font-black tracking-widest ${color} font-mono`}>{tag}</span>
-      <span className="text-[11px] text-t3 font-medium hidden sm:inline">{name}</span>
+      <span className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-black bg-current/10 ${color} ring-1 ring-current/20 shrink-0`}>
+        {initial}
+      </span>
+      <span className="text-[11px] text-t2 font-semibold whitespace-nowrap">{name}</span>
     </div>
   );
 }

@@ -1,3 +1,18 @@
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "UK AI Job Market Overview",
+  description:
+    "Live UK AI & ML hiring dashboard: weekly job counts, top skills, salary percentiles, remote rates, and top hiring cities — updated every 5 minutes.",
+  alternates: { canonical: "https://marketforge.digital/market" },
+  openGraph: {
+    title: "UK AI Job Market Overview | MarketForge AI",
+    description:
+      "Weekly snapshot of UK AI/ML hiring: job counts, top skills, salary benchmarks, sponsorship rates, and city-level data.",
+    url: "https://marketforge.digital/market",
+  },
+};
+
 import { api } from "@/lib/api";
 import { fmt, fmtK, pct } from "@/lib/utils";
 import { SkillBar } from "@/components/charts/skill-bar";

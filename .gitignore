@@ -10,3 +10,6 @@ dist/
 
 .vercel
 .env*.local
+
+# Claude Code private context — never commit
+CLAUDE.md
