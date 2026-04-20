@@ -154,16 +154,21 @@ export const api = {
     const form = new FormData();
     form.append("cv_file", file);
     const params = new URLSearchParams({ target_role: targetRole, consent: String(consent) });
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 90_000);
     let res: Response;
     try {
       res = await fetch(`${API}/api/v1/career/cv-analyse?${params}`, {
         method: "POST",
         body: form,
+        signal: controller.signal,
       });
-    } catch {
-      // Network-level failure (API not reachable)
+    } catch (err: any) {
+      clearTimeout(timeout);
+      if (err?.name === "AbortError") throw new Error("TIMEOUT");
       throw new Error("NETWORK_ERROR");
     }
+    clearTimeout(timeout);
     if (res.status === 403) throw new Error("CONSENT_REQUIRED");
     if (res.status === 422) {
       const body = await res.json().catch(() => ({}));

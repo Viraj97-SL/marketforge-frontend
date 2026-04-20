@@ -266,10 +266,12 @@ export default function CareerPage() {
         setCvError(`File rejected: ${msg.replace("FILE_REJECTED: ", "")}`);
       else if (msg === "RATE_LIMITED")
         setCvError("Rate limit reached (3 analyses/hour). Please try again later.");
+      else if (msg === "TIMEOUT")
+        setCvError("Analysis is taking longer than expected. The server may be warming up — please try again in a moment.");
       else if (msg === "NETWORK_ERROR")
-        setCvError("Cannot reach the API. Start the backend with: PYTHONPATH=src uvicorn api.main:app --reload");
+        setCvError("Cannot reach the server. Please check your connection and try again.");
       else if (msg.startsWith("SERVER_ERROR"))
-        setCvError(`Server error — check the API logs. (${msg})`);
+        setCvError(`Server error — please try again in a moment. (${msg})`);
       else
         setCvError(`Analysis failed: ${msg || "unknown error"}`);
     } finally {
