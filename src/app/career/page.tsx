@@ -16,7 +16,7 @@ import {
 
 const LEVELS = ["junior", "mid", "senior", "lead"];
 const ROLES  = [
-  "Machine Learning Engineer","Data Scientist","AI Research Scientist",
+  "AI Engineer","Machine Learning Engineer","Data Scientist","AI Research Scientist",
   "MLOps Engineer","NLP Engineer","Computer Vision Engineer",
   "Data Engineer","AI Product Manager","AI Safety Researcher",
 ];
