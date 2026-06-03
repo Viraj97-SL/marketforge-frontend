@@ -14,6 +14,7 @@ export const metadata: Metadata = {
 };
 
 import { api } from "@/lib/api";
+import type { SalaryData, SponsorshipSector } from "@/lib/api";
 import { fmtK, pct } from "@/lib/utils";
 import { SalaryRange } from "@/components/charts/salary-range";
 import { PageHero } from "@/components/layout/page-hero";
@@ -24,15 +25,24 @@ import {
 
 export const revalidate = 300;
 
-const ROLE_SALARY_ESTIMATES: Record<string, { p25: number; p50: number; p75: number; label: string }> = {
-  "ML Engineer":    { p25: 65000, p50: 90000, p75: 130000, label: "Machine Learning Engineer" },
-  "Data Scientist": { p25: 55000, p50: 75000, p75: 110000, label: "Data Scientist" },
-  "AI Researcher":  { p25: 70000, p50: 95000, p75: 140000, label: "AI Research Scientist" },
-  "MLOps Engineer": { p25: 65000, p50: 88000, p75: 125000, label: "MLOps / Platform Engineer" },
-  "NLP Engineer":   { p25: 60000, p50: 85000, p75: 120000, label: "NLP Engineer" },
-  "Data Engineer":  { p25: 55000, p50: 78000, p75: 110000, label: "Data Engineer" },
-  "CV Engineer":    { p25: 62000, p50: 88000, p75: 125000, label: "Computer Vision Engineer" },
-};
+// ── Static / editorial data (not derivable from job postings) ─────────────────
+
+const ROLE_CONFIGS = [
+  { key: "ml_engineer",    label: "ML Engineer",              apiSlug: "ml_engineer"    },
+  { key: "data_scientist", label: "Data Scientist",           apiSlug: "data_scientist" },
+  { key: "ai_researcher",  label: "AI Research Scientist",    apiSlug: "ai_researcher"  },
+  { key: "mlops_engineer", label: "MLOps / Platform Engineer",apiSlug: "mlops_engineer" },
+  { key: "nlp_engineer",   label: "NLP Engineer",             apiSlug: "nlp_engineer"   },
+  { key: "data_engineer",  label: "Data Engineer",            apiSlug: "data_engineer"  },
+  { key: "cv_engineer",    label: "Computer Vision Engineer", apiSlug: "cv_engineer"    },
+] as const;
+
+const EXPERIENCE_LEVELS = [
+  { slug: "junior",    label: "Junior",          years: "0–2 years",  color: "text-blue",   bg: "bg-blue/10",   border: "border-blue/20",   note: "Often includes grad schemes & apprenticeships" },
+  { slug: "mid",       label: "Mid-Level",        years: "2–5 years",  color: "text-accent", bg: "bg-accent/10", border: "border-accent/20", note: "Core delivery role; owns full features independently" },
+  { slug: "senior",    label: "Senior",           years: "5–8 years",  color: "text-prp",    bg: "bg-prp/10",    border: "border-prp/20",    note: "Technical leadership; mentors juniors; sets direction" },
+  { slug: "principal", label: "Principal / Staff",years: "8+ years",   color: "text-warn",   bg: "bg-warn/10",   border: "border-warn/20",   note: "Org-wide impact; cross-team architecture; IC track" },
+] as const;
 
 const UK_REGIONS = [
   { region: "London",      multiplier: 1.0,  note: "Highest concentration of AI roles" },
@@ -44,54 +54,11 @@ const UK_REGIONS = [
   { region: "Remote (UK)", multiplier: 0.90, note: "Varies widely by company HQ" },
 ];
 
-const EXPERIENCE_BANDS = [
-  {
-    label: "Junior",
-    years: "0–2 years",
-    range: [42000, 65000],
-    median: 52000,
-    color: "text-blue",
-    bg: "bg-blue/10",
-    border: "border-blue/20",
-    note: "Often includes grad schemes & apprenticeships",
-  },
-  {
-    label: "Mid-Level",
-    years: "2–5 years",
-    range: [65000, 95000],
-    median: 78000,
-    color: "text-accent",
-    bg: "bg-accent/10",
-    border: "border-accent/20",
-    note: "Core delivery role; owns full features independently",
-  },
-  {
-    label: "Senior",
-    years: "5–8 years",
-    range: [95000, 135000],
-    median: 112000,
-    color: "text-prp",
-    bg: "bg-prp/10",
-    border: "border-prp/20",
-    note: "Technical leadership; mentors juniors; sets direction",
-  },
-  {
-    label: "Principal / Staff",
-    years: "8+ years",
-    range: [130000, 200000],
-    median: 155000,
-    color: "text-warn",
-    bg: "bg-warn/10",
-    border: "border-warn/20",
-    note: "Org-wide impact; cross-team architecture; IC track",
-  },
-];
-
 const TOTAL_COMP = [
-  { label: "Base Salary",     pct: 72, color: "bg-accent",  textColor: "text-accent" },
-  { label: "Annual Bonus",    pct: 12, color: "bg-blue",    textColor: "text-blue" },
-  { label: "Equity / Options",pct: 10, color: "bg-prp",     textColor: "text-prp" },
-  { label: "Benefits & Perks",pct: 6,  color: "bg-ok",      textColor: "text-ok" },
+  { label: "Base Salary",      pct: 72, color: "bg-accent", textColor: "text-accent" },
+  { label: "Annual Bonus",     pct: 12, color: "bg-blue",   textColor: "text-blue"   },
+  { label: "Equity / Options", pct: 10, color: "bg-prp",    textColor: "text-prp"    },
+  { label: "Benefits & Perks", pct: 6,  color: "bg-ok",     textColor: "text-ok"     },
 ];
 
 const NEGOTIATION_TIPS = [
@@ -99,41 +66,109 @@ const NEGOTIATION_TIPS = [
     icon: Target,
     title: "Anchor to the upper quartile",
     body: "Open at P75 for your role and region. Employers rarely meet at P25; they negotiate down, not up.",
-    accent: "text-accent",
-    bg: "bg-accent/5",
-    border: "border-accent/15",
+    accent: "text-accent", bg: "bg-accent/5", border: "border-accent/15",
   },
   {
     icon: Lightbulb,
     title: "Skills premium is real",
     body: "Holding in-demand LLM skills (RAG, fine-tuning, agentic AI) commands 15–25% above baseline for otherwise equivalent experience.",
-    accent: "text-blue",
-    bg: "bg-blue/5",
-    border: "border-blue/15",
+    accent: "text-blue", bg: "bg-blue/5", border: "border-blue/15",
   },
   {
     icon: Building2,
     title: "Timing your offer window",
     body: "UK AI hiring peaks in January–March and September–October. Negotiating in peak season gives you the most leverage.",
-    accent: "text-prp",
-    bg: "bg-prp/5",
-    border: "border-prp/15",
+    accent: "text-prp", bg: "bg-prp/5", border: "border-prp/15",
   },
   {
     icon: DollarSign,
     title: "Look beyond the base",
     body: "At scale-ups and frontier labs, equity can 2–5× the total package. Always model the total comp, not just base salary.",
-    accent: "text-warn",
-    bg: "bg-warn/5",
-    border: "border-warn/15",
+    accent: "text-warn", bg: "bg-warn/5", border: "border-warn/15",
   },
 ];
 
-export default async function SalaryPage() {
-  let snapshot = null;
-  try { snapshot = await api.snapshot(); } catch {}
+// ── Fallback salary estimates (editorial, used when API has no data) ──────────
 
-  const medianSalary = snapshot?.salary_p50 ?? 82000;
+const FALLBACK_ROLE_SALARY: Record<string, { p25: number; p50: number; p75: number }> = {
+  ml_engineer:    { p25: 65000, p50: 90000,  p75: 130000 },
+  data_scientist: { p25: 55000, p50: 75000,  p75: 110000 },
+  ai_researcher:  { p25: 70000, p50: 95000,  p75: 140000 },
+  mlops_engineer: { p25: 65000, p50: 88000,  p75: 125000 },
+  nlp_engineer:   { p25: 60000, p50: 85000,  p75: 120000 },
+  data_engineer:  { p25: 55000, p50: 78000,  p75: 110000 },
+  cv_engineer:    { p25: 62000, p50: 88000,  p75: 125000 },
+};
+
+const FALLBACK_EXP_SALARY: Record<string, { range: [number, number]; median: number }> = {
+  junior:    { range: [42000, 65000],  median: 52000  },
+  mid:       { range: [65000, 95000],  median: 78000  },
+  senior:    { range: [95000, 135000], median: 112000 },
+  principal: { range: [130000, 200000],median: 155000 },
+};
+
+function safePct(val: number | null | undefined): string {
+  return val != null ? pct(val) : "—";
+}
+
+export default async function SalaryPage() {
+  // Fetch everything in parallel
+  const [snapshotResult, ...roleResults] = await Promise.allSettled([
+    api.snapshot(),
+    ...ROLE_CONFIGS.map(r => api.salary(r.apiSlug, "all", "all")),
+  ]);
+
+  const expResults = await Promise.allSettled(
+    EXPERIENCE_LEVELS.map(e => api.salary("all", e.slug, "all"))
+  );
+
+  const sponsorshipResult = await Promise.allSettled([api.sponsorshipBySector()]);
+
+  const snapshot   = snapshotResult.status === "fulfilled" ? snapshotResult.value : null;
+  const snap = snapshot as any;
+
+  // Build role salary map (live data with fallback)
+  const roleSalary: Record<string, { p25: number; p50: number; p75: number; live: boolean }> = {};
+  ROLE_CONFIGS.forEach((r, i) => {
+    const res = roleResults[i];
+    const liveData = res.status === "fulfilled" ? (res.value as SalaryData) : null;
+    const fb = FALLBACK_ROLE_SALARY[r.apiSlug];
+    roleSalary[r.apiSlug] = {
+      p25:  liveData?.salary_p25  ?? fb.p25,
+      p50:  liveData?.salary_p50  ?? fb.p50,
+      p75:  liveData?.salary_p75  ?? fb.p75,
+      live: liveData?.salary_p50 != null,
+    };
+  });
+
+  // Build experience salary map (live data with fallback)
+  const expSalary: Record<string, { range: [number, number]; median: number; live: boolean }> = {};
+  EXPERIENCE_LEVELS.forEach((e, i) => {
+    const res = expResults[i];
+    const liveData = res.status === "fulfilled" ? (res.value as SalaryData) : null;
+    const fb = FALLBACK_EXP_SALARY[e.slug];
+    expSalary[e.slug] = {
+      range:  [liveData?.salary_p25 ?? fb.range[0], liveData?.salary_p75 ?? fb.range[1]],
+      median: liveData?.salary_p50  ?? fb.median,
+      live:   liveData?.salary_p50 != null,
+    };
+  });
+
+  // Sponsorship by sector
+  const sponsorRes = sponsorshipResult[0];
+  const sponsorshipData = sponsorRes.status === "fulfilled" ? (sponsorRes.value as any) : null;
+  const sponsorshipSectors: SponsorshipSector[] = sponsorshipData?.sectors?.length
+    ? sponsorshipData.sectors.slice(0, 5)
+    : [
+        { sector: "AI Safety",          sponsorship_rate: 0.45 },
+        { sector: "Autonomous Systems", sponsorship_rate: 0.52 },
+        { sector: "FinTech AI",         sponsorship_rate: 0.35 },
+        { sector: "HealthTech AI",      sponsorship_rate: 0.28 },
+        { sector: "Enterprise AI",      sponsorship_rate: 0.30 },
+      ];
+  const isLiveSponsorship = sponsorshipData?.sectors?.length > 0;
+
+  const medianSalary = snap?.salary_p50 ?? 82000;
 
   return (
     <div className="pt-14 relative">
@@ -158,15 +193,15 @@ export default async function SalaryPage() {
               </div>
             </div>
             <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-s2 border border-b1">
-              <span className="text-lg font-bold text-blue">{fmtK(snapshot?.salary_p25 ?? 55000)}</span>
+              <span className="text-lg font-bold text-blue">{fmtK(snap?.salary_p25 ?? 55000)}</span>
               <span className="text-t3 text-xs">–</span>
-              <span className="text-lg font-bold text-prp">{fmtK(snapshot?.salary_p75 ?? 120000)}</span>
+              <span className="text-lg font-bold text-prp">{fmtK(snap?.salary_p75 ?? 120000)}</span>
               <p className="text-[10px] text-t3">P25 – P75 range</p>
             </div>
           </div>
         </PageHero>
 
-        {/* Hero salary chart card */}
+        {/* Hero salary chart */}
         <div className="rounded-2xl border border-accent/20 bg-gradient-to-br from-accent/5 via-s1 to-blue/5 p-8 mb-8 animate-fade-up animate-delay-100">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 mb-6">
             <div>
@@ -176,21 +211,21 @@ export default async function SalaryPage() {
             </div>
             <div className="grid grid-cols-2 gap-4 sm:text-right">
               <div className="p-4 rounded-xl bg-s2 border border-b1">
-                <p className="text-xl font-bold text-blue">{fmtK(snapshot?.salary_p25 ?? 55000)}</p>
+                <p className="text-xl font-bold text-blue">{fmtK(snap?.salary_p25 ?? 55000)}</p>
                 <p className="text-xs text-t2">25th percentile</p>
                 <p className="text-[10px] text-t3 mt-0.5">Lower quartile</p>
               </div>
               <div className="p-4 rounded-xl bg-s2 border border-b1">
-                <p className="text-xl font-bold text-prp">{fmtK(snapshot?.salary_p75 ?? 120000)}</p>
+                <p className="text-xl font-bold text-prp">{fmtK(snap?.salary_p75 ?? 120000)}</p>
                 <p className="text-xs text-t2">75th percentile</p>
                 <p className="text-[10px] text-t3 mt-0.5">Upper quartile</p>
               </div>
             </div>
           </div>
           <SalaryRange
-            p25={snapshot?.salary_p25 ?? 55000}
-            p50={snapshot?.salary_p50 ?? 82000}
-            p75={snapshot?.salary_p75 ?? 120000}
+            p25={snap?.salary_p25 ?? 55000}
+            p50={snap?.salary_p50 ?? 82000}
+            p75={snap?.salary_p75 ?? 120000}
             height={160}
           />
         </div>
@@ -203,29 +238,32 @@ export default async function SalaryPage() {
             <span className="text-xs text-t2 ml-auto">UK AI/ML · Gross annual · GBP</span>
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {EXPERIENCE_BANDS.map((band) => (
-              <div key={band.label} className={`rounded-xl border p-5 ${band.border} bg-s2`}>
-                <div className="flex items-center justify-between mb-3">
-                  <span className={`text-xs font-bold uppercase tracking-wide ${band.color}`}>{band.label}</span>
-                  <span className="text-[10px] text-t3 bg-s3 px-2 py-0.5 rounded-md border border-b1">{band.years}</span>
+            {EXPERIENCE_LEVELS.map((band) => {
+              const data = expSalary[band.slug];
+              return (
+                <div key={band.label} className={`rounded-xl border p-5 ${band.border} bg-s2`}>
+                  <div className="flex items-center justify-between mb-3">
+                    <span className={`text-xs font-bold uppercase tracking-wide ${band.color}`}>{band.label}</span>
+                    <span className="text-[10px] text-t3 bg-s3 px-2 py-0.5 rounded-md border border-b1">{band.years}</span>
+                  </div>
+                  <div className="mb-3">
+                    <p className={`text-2xl font-black ${band.color}`}>{fmtK(data.median)}</p>
+                    <p className="text-[10px] text-t3 mt-0.5">{data.live ? "live median" : "median"}</p>
+                  </div>
+                  <div className="relative h-1.5 rounded-full bg-b1 overflow-hidden mb-3">
+                    <div
+                      className={`absolute top-0 left-0 h-full rounded-full ${band.bg} border ${band.border}`}
+                      style={{ width: `${((data.range[1] - 40000) / 170000) * 100}%`, background: "currentColor" }}
+                    />
+                  </div>
+                  <div className="flex justify-between text-[10px] text-t3 mb-2">
+                    <span>{fmtK(data.range[0])}</span>
+                    <span>{fmtK(data.range[1])}</span>
+                  </div>
+                  <p className="text-[10px] text-t2 leading-relaxed border-t border-b1 pt-2 mt-1">{band.note}</p>
                 </div>
-                <div className="mb-3">
-                  <p className={`text-2xl font-black ${band.color}`}>{fmtK(band.median)}</p>
-                  <p className="text-[10px] text-t3 mt-0.5">median</p>
-                </div>
-                <div className="relative h-1.5 rounded-full bg-b1 overflow-hidden mb-3">
-                  <div
-                    className={`absolute top-0 left-0 h-full rounded-full ${band.bg} border ${band.border}`}
-                    style={{ width: `${((band.range[1] - 40000) / 170000) * 100}%`, background: "currentColor" }}
-                  />
-                </div>
-                <div className="flex justify-between text-[10px] text-t3 mb-2">
-                  <span>{fmtK(band.range[0])}</span>
-                  <span>{fmtK(band.range[1])}</span>
-                </div>
-                <p className="text-[10px] text-t2 leading-relaxed border-t border-b1 pt-2 mt-1">{band.note}</p>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
 
@@ -237,31 +275,34 @@ export default async function SalaryPage() {
               <h2 className="text-sm font-bold text-t1">Salary by Role</h2>
             </div>
             <div className="space-y-4">
-              {Object.entries(ROLE_SALARY_ESTIMATES).map(([key, s]) => (
-                <div key={key}>
-                  <div className="flex items-center justify-between mb-1.5">
-                    <span className="text-xs text-t1 font-medium">{s.label}</span>
-                    <div className="flex items-center gap-3 text-xs">
-                      <span className="text-blue font-mono">{fmtK(s.p25)}</span>
-                      <span className="text-accent font-bold font-mono">{fmtK(s.p50)}</span>
-                      <span className="text-prp font-mono">{fmtK(s.p75)}</span>
+              {ROLE_CONFIGS.map((r) => {
+                const s = roleSalary[r.apiSlug];
+                return (
+                  <div key={r.key}>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <span className="text-xs text-t1 font-medium">{r.label}</span>
+                      <div className="flex items-center gap-3 text-xs">
+                        <span className="text-blue font-mono">{fmtK(s.p25)}</span>
+                        <span className="text-accent font-bold font-mono">{fmtK(s.p50)}</span>
+                        <span className="text-prp font-mono">{fmtK(s.p75)}</span>
+                      </div>
+                    </div>
+                    <div className="relative h-2 rounded-full bg-b1 overflow-hidden">
+                      <div
+                        className="absolute top-0 h-full rounded-full bg-gradient-to-r from-blue via-accent to-prp opacity-70"
+                        style={{
+                          left:  `${((s.p25 - 40000) / 120000) * 100}%`,
+                          right: `${100 - ((s.p75 - 40000) / 120000) * 100}%`,
+                        }}
+                      />
+                      <div
+                        className="absolute top-0 w-0.5 h-full bg-white"
+                        style={{ left: `${((s.p50 - 40000) / 120000) * 100}%` }}
+                      />
                     </div>
                   </div>
-                  <div className="relative h-2 rounded-full bg-b1 overflow-hidden">
-                    <div
-                      className="absolute top-0 h-full rounded-full bg-gradient-to-r from-blue via-accent to-prp opacity-70"
-                      style={{
-                        left: `${((s.p25 - 40000) / 120000) * 100}%`,
-                        right: `${100 - ((s.p75 - 40000) / 120000) * 100}%`,
-                      }}
-                    />
-                    <div
-                      className="absolute top-0 w-0.5 h-full bg-white"
-                      style={{ left: `${((s.p50 - 40000) / 120000) * 100}%` }}
-                    />
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
             <div className="flex items-center gap-4 mt-4 pt-4 border-t border-b1">
               <div className="flex items-center gap-1.5"><span className="w-3 h-1 rounded bg-blue inline-block" /><span className="text-[10px] text-t2">P25</span></div>
@@ -309,8 +350,6 @@ export default async function SalaryPage() {
 
         {/* Total Comp Breakdown + Remote Premium */}
         <div className="grid lg:grid-cols-2 gap-6 mb-6">
-
-          {/* Total Comp */}
           <div className="rounded-2xl border border-b1 bg-s1 p-6 animate-fade-up animate-delay-350">
             <div className="flex items-center gap-2 mb-6">
               <DollarSign className="w-4 h-4 text-ok" />
@@ -340,7 +379,6 @@ export default async function SalaryPage() {
             </p>
           </div>
 
-          {/* Remote vs On-site */}
           <div className="rounded-2xl border border-b1 bg-s1 p-6 animate-fade-up animate-delay-400">
             <div className="flex items-center gap-2 mb-6">
               <Laptop className="w-4 h-4 text-prp" />
@@ -348,9 +386,9 @@ export default async function SalaryPage() {
             </div>
             <div className="space-y-3 mb-6">
               {[
-                { model: "Fully Remote", salary: Math.round(medianSalary * 0.92), note: "Anchored to company HQ location", color: "text-prp", bar: 92 },
-                { model: "Hybrid (2–3 days)", salary: Math.round(medianSalary * 1.0), note: "Standard in most UK AI roles today", color: "text-accent", bar: 100 },
-                { model: "Fully On-site", salary: Math.round(medianSalary * 0.97), note: "London roles may compensate more", color: "text-blue", bar: 97 },
+                { model: "Fully Remote",       salary: Math.round(medianSalary * 0.92), note: "Anchored to company HQ location", color: "text-prp",   bar: 92  },
+                { model: "Hybrid (2–3 days)",  salary: Math.round(medianSalary * 1.0),  note: "Standard in most UK AI roles today", color: "text-accent", bar: 100 },
+                { model: "Fully On-site",      salary: Math.round(medianSalary * 0.97), note: "London roles may compensate more", color: "text-blue",  bar: 97  },
               ].map((row) => (
                 <div key={row.model} className="p-4 rounded-xl bg-s2 border border-b1">
                   <div className="flex items-center justify-between mb-2">
@@ -371,7 +409,7 @@ export default async function SalaryPage() {
             </div>
             <div className="flex items-start gap-2 text-[10px] text-t3 pt-4 border-t border-b1">
               <Info className="w-3 h-3 shrink-0 mt-0.5" />
-              Hybrid commands a slight premium as employers compete for talent willing to commute. Fully remote may be closer to employer&apos;s non-London base.
+              Hybrid commands a slight premium as employers compete for talent willing to commute.
             </div>
           </div>
         </div>
@@ -400,46 +438,44 @@ export default async function SalaryPage() {
           </div>
         </div>
 
-        {/* Sponsorship insight */}
-        {snapshot?.sponsorship_rate && (
-          <div className="rounded-2xl border border-b1 bg-s1 p-6 animate-fade-up animate-delay-500">
-            <div className="flex items-center gap-2 mb-2">
-              <Globe className="w-4 h-4 text-prp" />
-              <h2 className="text-sm font-bold text-t1">Visa Sponsorship Rates</h2>
-            </div>
-            <p className="text-t2 text-xs mb-6">
-              {pct(snapshot.sponsorship_rate)} of active UK AI/ML job postings include visa sponsorship.
-              Highest in AI safety, autonomous systems, and deep learning roles.
-            </p>
-            <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
-              {[
-                { sector: "AI Safety",          rate: 0.45 },
-                { sector: "Autonomous Systems", rate: 0.52 },
-                { sector: "FinTech AI",         rate: 0.35 },
-                { sector: "HealthTech AI",      rate: 0.28 },
-                { sector: "Enterprise AI",      rate: 0.30 },
-              ].map((s) => (
-                <div key={s.sector} className="text-center p-4 rounded-xl bg-s2 border border-b1">
-                  <div className="relative w-12 h-12 mx-auto mb-2">
-                    <svg viewBox="0 0 36 36" className="w-12 h-12 -rotate-90">
-                      <circle cx="18" cy="18" r="15.9" fill="none" stroke="#1C2A3A" strokeWidth="3" />
-                      <circle
-                        cx="18" cy="18" r="15.9" fill="none"
-                        stroke="#8B5CF6" strokeWidth="3"
-                        strokeDasharray={`${s.rate * 100} ${100 - s.rate * 100}`}
-                        strokeLinecap="round"
-                      />
-                    </svg>
-                    <span className="absolute inset-0 flex items-center justify-center text-xs font-bold text-prp">
-                      {Math.round(s.rate * 100)}%
-                    </span>
-                  </div>
-                  <p className="text-[10px] text-t2 leading-tight">{s.sector}</p>
-                </div>
-              ))}
-            </div>
+        {/* Sponsorship by Sector */}
+        <div className="rounded-2xl border border-b1 bg-s1 p-6 animate-fade-up animate-delay-500">
+          <div className="flex items-center gap-2 mb-2">
+            <Globe className="w-4 h-4 text-prp" />
+            <h2 className="text-sm font-bold text-t1">Visa Sponsorship Rates</h2>
+            {isLiveSponsorship && (
+              <span className="text-[10px] text-ok ml-auto font-semibold">Live</span>
+            )}
           </div>
-        )}
+          <p className="text-t2 text-xs mb-6">
+            {snap?.sponsorship_rate
+              ? `${safePct(snap.sponsorship_rate)} of active UK AI/ML job postings include visa sponsorship.`
+              : "Sponsorship rates by sector, derived from live job posting data."}
+            {" "}Highest in AI safety, autonomous systems, and deep learning roles.
+          </p>
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+            {sponsorshipSectors.map((s) => (
+              <div key={s.sector} className="text-center p-4 rounded-xl bg-s2 border border-b1">
+                <div className="relative w-12 h-12 mx-auto mb-2">
+                  <svg viewBox="0 0 36 36" className="w-12 h-12 -rotate-90">
+                    <circle cx="18" cy="18" r="15.9" fill="none" stroke="#1C2A3A" strokeWidth="3" />
+                    <circle
+                      cx="18" cy="18" r="15.9" fill="none"
+                      stroke="#8B5CF6" strokeWidth="3"
+                      strokeDasharray={`${s.sponsorship_rate * 100} ${100 - s.sponsorship_rate * 100}`}
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                  <span className="absolute inset-0 flex items-center justify-center text-xs font-bold text-prp">
+                    {Math.round(s.sponsorship_rate * 100)}%
+                  </span>
+                </div>
+                <p className="text-[10px] text-t2 leading-tight">{s.sector}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
       </div>
     </div>
   );

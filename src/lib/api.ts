@@ -120,6 +120,46 @@ export interface JobsResponse {
   pages: number;
 }
 
+export interface HiringVelocityItem {
+  role: string;
+  role_category: string;
+  growth_pct: number;
+  direction: "up" | "down" | "neutral";
+}
+
+export interface HiringVelocityData {
+  velocity: HiringVelocityItem[];
+}
+
+export interface CityCount {
+  city: string;
+  job_count: number;
+}
+
+export interface CitiesData {
+  cities: CityCount[];
+  week_start: string;
+}
+
+export interface CompanyMixItem {
+  type: string;
+  pct: number;
+  job_count: number;
+}
+
+export interface CompanyMixData {
+  mix: CompanyMixItem[];
+}
+
+export interface SponsorshipSector {
+  sector: string;
+  sponsorship_rate: number;
+}
+
+export interface SponsorshipBySectorData {
+  sectors: SponsorshipSector[];
+}
+
 async function get<T>(path: string): Promise<T> {
   const res = await fetch(`${API}${path}`, { next: { revalidate: 300 } });
   if (!res.ok) throw new Error(`API ${path} → ${res.status}`);
@@ -131,9 +171,13 @@ export const api = {
   snapshot: (week?: string) =>
     get<SnapshotData>(`/api/v1/market/snapshot${week ? `?week=${week}` : ""}`),
   skills: (role = "all") => get<SkillsData>(`/api/v1/market/skills?role_category=${role}`),
-  salary: (role = "all", level = "mid", location = "London") =>
+  salary: (role = "all", level = "all", location = "all") =>
     get<SalaryData>(`/api/v1/market/salary?role_category=${role}&experience_level=${level}&location=${location}`),
   trending: (days = 7) => get<TrendingData>(`/api/v1/market/trending?days=${days}`),
+  hiringVelocity: () => get<HiringVelocityData>("/api/v1/market/hiring-velocity"),
+  cities: () => get<CitiesData>("/api/v1/market/cities"),
+  companyMix: () => get<CompanyMixData>("/api/v1/market/company-mix"),
+  sponsorshipBySector: () => get<SponsorshipBySectorData>("/api/v1/market/sponsorship-by-sector"),
   jobs: (opts: { role?: string; work_model?: string; visa_only?: boolean; page?: number; page_size?: number } = {}) => {
     const p = new URLSearchParams({ page: String(opts.page ?? 1), page_size: String(opts.page_size ?? 20) });
     if (opts.role && opts.role !== "all") p.set("role_category", opts.role);
