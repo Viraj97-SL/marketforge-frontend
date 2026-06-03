@@ -3,16 +3,20 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { useState, useEffect } from "react";
-import { Menu, X, Zap, Activity } from "lucide-react";
+import {
+  Menu, X, Zap,
+  LayoutDashboard, BarChart2, Layers, Banknote,
+  Briefcase, Sparkles, FlaskConical,
+} from "lucide-react";
 
 const links = [
-  { href: "/",        label: "Overview" },
-  { href: "/market",  label: "Market" },
-  { href: "/skills",  label: "Skills" },
-  { href: "/salary",  label: "Salary" },
-  { href: "/jobs",    label: "Job Board" },
-  { href: "/career",  label: "Career AI" },
-  { href: "/research",label: "Research" },
+  { href: "/",         label: "Overview",  Icon: LayoutDashboard },
+  { href: "/market",   label: "Market",    Icon: BarChart2 },
+  { href: "/skills",   label: "Skills",    Icon: Layers },
+  { href: "/salary",   label: "Salary",    Icon: Banknote },
+  { href: "/jobs",     label: "Job Board", Icon: Briefcase },
+  { href: "/career",   label: "Career AI", Icon: Sparkles },
+  { href: "/research", label: "Research",  Icon: FlaskConical },
 ];
 
 export function Nav() {
@@ -56,16 +60,17 @@ export function Nav() {
                 key={l.href}
                 href={l.href}
                 className={cn(
-                  "relative px-3 py-1.5 rounded-md text-xs font-medium transition-all duration-200",
+                  "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200",
                   active
-                    ? "text-accent bg-accent/10"
+                    ? "text-accent bg-accent/10 shadow-[inset_0_0_0_1px_rgba(0,198,167,0.18)]"
                     : "text-t2 hover:text-t1 hover:bg-white/5"
                 )}
               >
+                <l.Icon
+                  className={cn("w-3.5 h-3.5 shrink-0", active ? "text-accent" : "text-t3")}
+                  strokeWidth={active ? 2.5 : 2}
+                />
                 {l.label}
-                {active && (
-                  <span className="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-accent" />
-                )}
               </Link>
             );
           })}
@@ -108,10 +113,14 @@ export function Nav() {
                 href={l.href}
                 onClick={() => setOpen(false)}
                 className={cn(
-                  "px-3 py-2.5 rounded-xl text-sm font-medium transition-colors",
+                  "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors",
                   active ? "text-accent bg-accent/10" : "text-t2 hover:text-t1 hover:bg-white/5"
                 )}
               >
+                <l.Icon
+                  className={cn("w-4 h-4 shrink-0", active ? "text-accent" : "text-t3")}
+                  strokeWidth={active ? 2.5 : 2}
+                />
                 {l.label}
               </Link>
             );
