@@ -246,10 +246,8 @@ export default async function JobsPage({ searchParams }: PageProps) {
               return (
                 <div
                   key={job.job_id}
-                  className="group relative rounded-2xl border border-b1 bg-gradient-to-br from-s1 to-s2
-                             p-5 flex flex-col animate-fade-up
-                             hover:-translate-y-1 hover:border-accent/30
-                             hover:shadow-[0_8px_32px_rgba(0,0,0,0.4),0_0_0_1px_rgba(0,198,167,0.12)]
+                  className="group relative rounded-2xl border border-b1 bg-s1
+                             p-5 flex flex-col animate-fade-up card-hover shadow-card
                              transition-all duration-200"
                   style={{ animationDelay: `${i * 35}ms` }}
                 >

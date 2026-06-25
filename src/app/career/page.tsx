@@ -39,12 +39,12 @@ function GradeBadge({ grade }: { grade: string }) {
 
 // ── ATS score gauge (simple arc-style progress) ───────────────────────────────
 function ATSGauge({ score, grade }: { score: number; grade: string }) {
-  const colour = score >= 80 ? "#22C55E" : score >= 60 ? "#00C6A7" : score >= 40 ? "#F59E0B" : "#EF4444";
+  const colour = score >= 80 ? "#059669" : score >= 60 ? "#4F46E5" : score >= 40 ? "#D97706" : "#DC2626";
   return (
     <div className="flex flex-col items-center gap-3">
       <div className="relative w-36 h-36">
         <svg viewBox="0 0 120 120" className="w-full h-full -rotate-90">
-          <circle cx="60" cy="60" r="50" fill="none" stroke="#1C2A3A" strokeWidth="10" />
+          <circle cx="60" cy="60" r="50" fill="none" stroke="#E2E8F0" strokeWidth="10" />
           <circle
             cx="60" cy="60" r="50" fill="none"
             stroke={colour} strokeWidth="10"
@@ -75,9 +75,9 @@ function ATSRadar({ breakdown }: { breakdown: CVAnalysisReport["ats_breakdown"] 
   return (
     <ResponsiveContainer width="100%" height={200}>
       <RadarChart data={data}>
-        <PolarGrid stroke="#1C2A3A" />
-        <PolarAngleAxis dataKey="subject" tick={{ fill: "#64748B", fontSize: 11 }} />
-        <Radar dataKey="A" stroke="#00C6A7" fill="#00C6A7" fillOpacity={0.15} strokeWidth={2} />
+        <PolarGrid stroke="#E2E8F0" />
+        <PolarAngleAxis dataKey="subject" tick={{ fill: "#94A3B8", fontSize: 11 }} />
+        <Radar dataKey="A" stroke="#4F46E5" fill="#4F46E5" fillOpacity={0.12} strokeWidth={2} />
       </RadarChart>
     </ResponsiveContainer>
   );
@@ -126,9 +126,9 @@ function MatchRadar({ dist }: { dist: CareerReport["match_distribution"] }) {
   return (
     <ResponsiveContainer width="100%" height={200}>
       <RadarChart data={data}>
-        <PolarGrid stroke="#1C2A3A" />
-        <PolarAngleAxis dataKey="subject" tick={{ fill: "#64748B", fontSize: 11 }} />
-        <Radar dataKey="A" stroke="#00C6A7" fill="#00C6A7" fillOpacity={0.15} strokeWidth={2} />
+        <PolarGrid stroke="#E2E8F0" />
+        <PolarAngleAxis dataKey="subject" tick={{ fill: "#94A3B8", fontSize: 11 }} />
+        <Radar dataKey="A" stroke="#4F46E5" fill="#4F46E5" fillOpacity={0.12} strokeWidth={2} />
       </RadarChart>
     </ResponsiveContainer>
   );
@@ -140,12 +140,12 @@ function GapChart({ gaps }: { gaps: CareerReport["top_skill_gaps"] }) {
   return (
     <ResponsiveContainer width="100%" height={220}>
       <BarChart data={data} layout="vertical" margin={{ left: 0, right: 20 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke="#1C2A3A" horizontal={false} />
-        <XAxis type="number" tick={{ fill: "#64748B", fontSize: 11 }} axisLine={false} tickLine={false} />
-        <YAxis type="category" dataKey="display" width={130} tick={{ fill: "#64748B", fontSize: 11 }} axisLine={false} tickLine={false} />
+        <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" horizontal={false} />
+        <XAxis type="number" tick={{ fill: "#94A3B8", fontSize: 11 }} axisLine={false} tickLine={false} />
+        <YAxis type="category" dataKey="display" width={130} tick={{ fill: "#475569", fontSize: 11 }} axisLine={false} tickLine={false} />
         <Tooltip
-          contentStyle={{ background: "#141C28", border: "1px solid #1C2A3A", borderRadius: 10, color: "#E2E8F2", fontSize: 12 }}
-          cursor={{ fill: "rgba(255,255,255,0.03)" }}
+          contentStyle={{ background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: 10, color: "#0F172A", fontSize: 12, boxShadow: "0 4px 16px rgba(0,0,0,0.08)" }}
+          cursor={{ fill: "rgba(79,70,229,0.04)" }}
         />
         <Bar dataKey="market_demand" radius={[0, 6, 6, 0]} maxBarSize={18}>
           {data.map((d, i) => (
@@ -396,7 +396,7 @@ export default function CareerPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-gradient-to-r from-accent to-blue text-bg font-bold text-sm hover:opacity-90 disabled:opacity-50 transition-opacity"
+                className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-gradient-to-r from-accent to-blue text-white font-bold text-sm hover:opacity-90 disabled:opacity-50 transition-opacity"
               >
                 {loading ? (
                   <><Loader2 className="w-4 h-4 animate-spin" />Analysing…</>
@@ -606,7 +606,7 @@ export default function CareerPage() {
               <button
                 type="submit"
                 disabled={cvLoading || !cvFile || !consent}
-                className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-gradient-to-r from-accent to-blue text-bg font-bold text-sm hover:opacity-90 disabled:opacity-50 transition-opacity"
+                className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-gradient-to-r from-accent to-blue text-white font-bold text-sm hover:opacity-90 disabled:opacity-50 transition-opacity"
               >
                 {cvLoading ? (
                   <><Loader2 className="w-4 h-4 animate-spin" />Scanning & Scoring…</>

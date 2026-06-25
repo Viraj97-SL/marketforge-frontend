@@ -128,10 +128,8 @@ const TIMELINE_STATUS: Record<string, string> = {
 
 export default function ResearchPage() {
   return (
-    <div className="pt-14 relative">
-      <div className="absolute inset-0 h-72 bg-mesh opacity-50 pointer-events-none" />
-
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-10">
+    <div className="pt-14">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10">
 
         {/* Hero */}
         <PageHero
@@ -139,7 +137,7 @@ export default function ResearchPage() {
           title="Emerging Tech"
           titleAccent="Signals"
           subtitle="Technologies tracked from arXiv, GitHub trending, and funding announcements — before they appear in UK job descriptions."
-          imageSrc="/images/page-research-hero.jpg"
+          imageSrc="/images/illustrations/hero-research.webp"
         >
           <div className="flex flex-wrap gap-2">
             {[

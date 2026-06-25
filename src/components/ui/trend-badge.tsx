@@ -11,9 +11,9 @@ export function TrendBadge({ direction, value, className }: TrendBadgeProps) {
     <span
       className={cn(
         "inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full",
-        direction === "up"      ? "bg-ok/10 text-ok" :
-        direction === "down"    ? "bg-err/10 text-err" :
-                                  "bg-t2/10 text-t2",
+        direction === "up"   ? "bg-ok/10 text-ok"   :
+        direction === "down" ? "bg-err/10 text-err" :
+                               "bg-s2 text-t2",
         className
       )}
     >

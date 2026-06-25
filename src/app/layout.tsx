@@ -88,7 +88,7 @@ const jsonLd = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en-GB" className="dark">
+    <html lang="en-GB">
       <head>
         <script
           type="application/ld+json"
@@ -96,7 +96,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body className="min-h-screen bg-bg text-t1 font-sans antialiased">
-        <div className="fixed inset-0 bg-hero-glow pointer-events-none" aria-hidden />
         <Nav />
         <main className="relative">{children}</main>
         <Footer />
