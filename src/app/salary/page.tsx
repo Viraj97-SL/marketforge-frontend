@@ -18,7 +18,7 @@ import type { SalaryData } from "@/lib/api";
 import { fmtK } from "@/lib/utils";
 import { SalaryRange } from "@/components/charts/salary-range";
 import { PageHero } from "@/components/layout/page-hero";
-import { DollarSign, Globe, TrendingUp, Info, Laptop } from "lucide-react";
+import { DollarSign, Globe, TrendingUp, Info, Laptop, GraduationCap, Code2, Layers, Star } from "lucide-react";
 
 export const revalidate = 300;
 
@@ -33,10 +33,10 @@ const ROLE_CONFIGS = [
 ] as const;
 
 const EXPERIENCE_LEVELS = [
-  { slug: "junior",    label: "Junior",           years: "0–2 yrs",  color: "text-blue",   bg: "bg-blue/8",   border: "border-blue/20",   note: "Grad schemes & apprenticeships included" },
-  { slug: "mid",       label: "Mid-Level",        years: "2–5 yrs",  color: "text-accent", bg: "bg-accent/8", border: "border-accent/20", note: "Owns features independently" },
-  { slug: "senior",    label: "Senior",           years: "5–8 yrs",  color: "text-prp",    bg: "bg-prp/8",    border: "border-prp/20",    note: "Technical leadership & mentoring" },
-  { slug: "principal", label: "Principal / Staff",years: "8+ yrs",   color: "text-warn",   bg: "bg-warn/8",   border: "border-warn/20",   note: "Org-wide impact, IC track" },
+  { slug: "junior",    label: "Junior",           years: "0–2 yrs", Icon: GraduationCap, color: "text-blue",   bg: "bg-blue/8",   border: "border-blue/20",   note: "Grad schemes & apprenticeships included" },
+  { slug: "mid",       label: "Mid-Level",        years: "2–5 yrs", Icon: Code2,         color: "text-accent", bg: "bg-accent/8", border: "border-accent/20", note: "Owns features independently" },
+  { slug: "senior",    label: "Senior",           years: "5–8 yrs", Icon: Layers,        color: "text-prp",    bg: "bg-prp/8",    border: "border-prp/20",    note: "Technical leadership & mentoring" },
+  { slug: "principal", label: "Principal / Staff",years: "8+ yrs",  Icon: Star,          color: "text-warn",   bg: "bg-warn/8",   border: "border-warn/20",   note: "Org-wide impact, IC track" },
 ] as const;
 
 const UK_REGIONS = [
@@ -162,35 +162,6 @@ export default async function SalaryPage() {
           />
         </div>
 
-        {/* Career progression illustration */}
-        <div className="bg-s1 rounded-2xl border border-b1 p-6 mb-6 shadow-card animate-fade-up animate-delay-100">
-          <h2 className="text-sm font-bold text-t1 mb-6">Your Salary Journey in UK AI</h2>
-          <div className="relative">
-            {/* Connecting line */}
-            <div className="absolute top-8 left-[12.5%] right-[12.5%] h-0.5 bg-gradient-to-r from-blue via-accent to-prp hidden sm:block" />
-
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 relative">
-              {[
-                { stage: "Graduate",      years: "0–1 yr",  salary: "£42–55k",  icon: "🎓", accent: "text-blue",   bg: "bg-blue/8",   border: "border-blue/20",   note: "Grad schemes, apprenticeships" },
-                { stage: "Junior",        years: "1–3 yrs", salary: "£55–70k",  icon: "🌱", accent: "text-accent", bg: "bg-accent/8", border: "border-accent/20", note: "First independent role" },
-                { stage: "Mid / Senior",  years: "3–7 yrs", salary: "£75–115k", icon: "🚀", accent: "text-prp",    bg: "bg-prp/8",    border: "border-prp/20",    note: "Tech lead, specialisation" },
-                { stage: "Principal",     years: "7+ yrs",  salary: "£120–200k",icon: "⭐", accent: "text-warn",   bg: "bg-warn/8",   border: "border-warn/20",   note: "Org-wide impact, IC track" },
-              ].map((s, i) => (
-                <div key={s.stage} className={`rounded-xl border p-4 ${s.border} ${s.bg} flex flex-col items-center text-center relative`}>
-                  <div className="w-10 h-10 rounded-full bg-white border-2 border-current flex items-center justify-center text-xl mb-3 shadow-sm z-10"
-                    style={{ borderColor: "currentColor" }}>
-                    <span>{s.icon}</span>
-                  </div>
-                  <p className={`text-xs font-bold ${s.accent} mb-1`}>{s.stage}</p>
-                  <p className={`text-lg font-black ${s.accent} mb-1`}>{s.salary}</p>
-                  <p className="text-[9px] text-t3 mb-1 font-mono">{s.years}</p>
-                  <p className="text-[9px] text-t2 leading-tight">{s.note}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
         {/* Experience Bands */}
         <div className="bg-s1 rounded-2xl border border-b1 p-6 mb-6 shadow-card animate-fade-up animate-delay-150">
           <div className="flex items-center gap-2 mb-6">
@@ -204,7 +175,12 @@ export default async function SalaryPage() {
               return (
                 <div key={band.label} className={`rounded-xl border p-5 ${band.border} ${band.bg}`}>
                   <div className="flex items-center justify-between mb-3">
-                    <span className={`text-xs font-bold uppercase tracking-wide ${band.color}`}>{band.label}</span>
+                    <div className="flex items-center gap-2">
+                      <div className={`w-7 h-7 rounded-lg bg-white/60 flex items-center justify-center`}>
+                        <band.Icon className={`w-4 h-4 ${band.color}`} strokeWidth={1.8} />
+                      </div>
+                      <span className={`text-xs font-bold uppercase tracking-wide ${band.color}`}>{band.label}</span>
+                    </div>
                     <span className="text-[10px] text-t3 bg-s1 px-2 py-0.5 rounded-md border border-b1">{band.years}</span>
                   </div>
                   <p className={`text-2xl font-black ${band.color} mb-0.5`}>{fmtK(data.median)}</p>

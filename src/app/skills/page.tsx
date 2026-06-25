@@ -17,60 +17,7 @@ import { api } from "@/lib/api";
 import { SkillBar } from "@/components/charts/skill-bar";
 import { PageHero } from "@/components/layout/page-hero";
 import { SkillNetwork } from "@/components/illustrations/skill-network";
-import { TrendingUp, TrendingDown, Code2, Database, Brain, Cpu, Layers } from "lucide-react";
-
-export const revalidate = 300;
-
-const SKILL_CATEGORIES = [
-  {
-    label: "Languages & Frameworks",
-    skills: [
-      { name: "Python",      rank: 1, note: "Ubiquitous"           },
-      { name: "PyTorch",     rank: 2, note: "Deep learning #1"     },
-      { name: "TensorFlow",  rank: 3, note: "Enterprise staple"    },
-      { name: "SQL",         rank: 4, note: "Every role"           },
-      { name: "R",           rank: 5, note: "Data Science / Stats" },
-      { name: "Scala",       rank: 6, note: "Big data pipelines"   },
-    ],
-    accent: "text-accent", bg: "bg-accent/8",
-  },
-  {
-    label: "LLMs & Agents",
-    skills: [
-      { name: "LangChain",    rank: 1, note: "Agent orchestration"  },
-      { name: "LlamaIndex",   rank: 2, note: "RAG pipelines"        },
-      { name: "OpenAI API",   rank: 3, note: "GPT-4 / Assistants"  },
-      { name: "RAG",          rank: 4, note: "Retrieval-augmented"  },
-      { name: "Hugging Face", rank: 5, note: "Model hub + PEFT"     },
-      { name: "Anthropic",    rank: 6, note: "Claude API usage"     },
-    ],
-    accent: "text-blue", bg: "bg-blue/8",
-  },
-  {
-    label: "MLOps & Infra",
-    skills: [
-      { name: "MLflow",     rank: 1, note: "Experiment tracking"    },
-      { name: "Kubernetes", rank: 2, note: "Model serving"          },
-      { name: "Docker",     rank: 3, note: "Containerisation"       },
-      { name: "Airflow",    rank: 4, note: "Pipeline orchestration" },
-      { name: "Kubeflow",   rank: 5, note: "ML platform"            },
-      { name: "DVC",        rank: 6, note: "Data versioning"        },
-    ],
-    accent: "text-prp", bg: "bg-prp/8",
-  },
-  {
-    label: "Cloud Platforms",
-    skills: [
-      { name: "AWS SageMaker", rank: 1, note: "ML platform leader" },
-      { name: "GCP Vertex AI", rank: 2, note: "Google Cloud ML"    },
-      { name: "Azure ML",      rank: 3, note: "Enterprise AI"      },
-      { name: "Databricks",    rank: 4, note: "Lakehouse + ML"     },
-      { name: "Snowflake",     rank: 5, note: "Data cloud"         },
-      { name: "AWS Lambda",    rank: 6, note: "Serverless inference"},
-    ],
-    accent: "text-ok", bg: "bg-ok/8",
-  },
-];
+import { TrendingUp, TrendingDown } from "lucide-react";
 
 export default async function SkillsPage() {
   let skills   = null;
@@ -84,7 +31,7 @@ export default async function SkillsPage() {
   const topSkillsList = Object.entries((skills as any)?.top_skills ?? {})
     .map(([skill, count]) => ({ skill, count: count as number }))
     .sort((a, b) => b.count - a.count)
-    .slice(0, 20);
+    .slice(0, 30);
 
   const risingSkills    = (trending as any)?.rising    ?? [];
   const decliningSkills = (trending as any)?.declining ?? [];
@@ -129,19 +76,58 @@ export default async function SkillsPage() {
           <SkillNetwork height={320} />
         </div>
 
-        {/* Live top-20 bar chart */}
+        {/* Live top-30 ranked list + bar chart */}
         {hasLiveSkills && (
           <div className="bg-s1 rounded-2xl border border-b1 p-6 mb-6 shadow-card animate-fade-up animate-delay-100">
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h2 className="text-sm font-bold text-t1">Top 20 Most In-Demand Skills</h2>
-                <p className="text-xs text-t2 mt-0.5">Live · ranked by job posting frequency</p>
+                <h2 className="text-sm font-bold text-t1">Top 30 Most In-Demand Skills</h2>
+                <p className="text-xs text-t2 mt-0.5">Live · ranked by job posting frequency this week</p>
               </div>
               <span className="text-xs px-2.5 py-1 rounded-full bg-accent/8 text-accent font-semibold border border-accent/20">
-                {topSkillsList.length} skills
+                {topSkillsList.length} skills tracked
               </span>
             </div>
-            <SkillBar data={topSkillsList} height={420} />
+
+            {/* Bar chart (top 15) */}
+            <SkillBar data={topSkillsList.slice(0, 15)} height={340} />
+
+            {/* Ranked full list (all 30) */}
+            <div className="mt-8 border-t border-b1 pt-6">
+              <h3 className="text-xs font-bold text-t1 mb-4">Full Top 30 Ranking</h3>
+              <div className="grid sm:grid-cols-2 gap-x-8 gap-y-1.5">
+                {topSkillsList.map((s, i) => {
+                  const pct = Math.round((s.count / topSkillsList[0].count) * 100);
+                  const tier = i < 5 ? "accent" : i < 15 ? "blue" : "prp";
+                  const tierColor = tier === "accent" ? "text-accent" : tier === "blue" ? "text-blue" : "text-prp";
+                  const tierBg   = tier === "accent" ? "from-accent to-blue" : tier === "blue" ? "from-blue to-prp" : "from-prp to-err";
+                  return (
+                    <div key={s.skill} className="flex items-center gap-3 py-1.5 group">
+                      {/* Rank badge */}
+                      <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 text-[10px] font-black
+                        ${i < 3 ? `bg-gradient-to-br ${tierBg} text-white` : "bg-s2 text-t3"}`}>
+                        {i + 1}
+                      </div>
+                      {/* Skill name */}
+                      <span className={`text-xs font-semibold flex-1 ${i < 5 ? "text-t1" : "text-t1"} group-hover:${tierColor} transition-colors`}>
+                        {s.skill}
+                      </span>
+                      {/* Bar */}
+                      <div className="w-20 h-1.5 rounded-full bg-s2 overflow-hidden shrink-0">
+                        <div
+                          className={`h-full rounded-full bg-gradient-to-r ${tierBg}`}
+                          style={{ width: `${pct}%` }}
+                        />
+                      </div>
+                      {/* Count */}
+                      <span className={`text-[10px] font-mono w-10 text-right shrink-0 ${tierColor} font-bold`}>
+                        {s.count.toLocaleString()}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
           </div>
         )}
 
@@ -193,34 +179,6 @@ export default async function SkillsPage() {
                 <p className="text-xs text-t2 py-8 text-center">Trend data available after 2 pipeline runs</p>
               )}
             </div>
-          </div>
-        </div>
-
-        {/* Skill categories */}
-        <div className="mb-6">
-          <div className="flex items-center gap-2 mb-5">
-            <h2 className="text-base font-bold text-t1">Skills by Category</h2>
-            <span className="text-xs text-t3">Curated reference · not live ranked</span>
-          </div>
-          <div className="grid sm:grid-cols-2 gap-4">
-            {SKILL_CATEGORIES.map((cat) => (
-              <div key={cat.label} className="bg-s1 rounded-2xl border border-b1 p-5 shadow-card animate-fade-up">
-                <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg ${cat.bg} mb-4`}>
-                  <span className={`text-xs font-bold ${cat.accent}`}>{cat.label}</span>
-                </div>
-                <div className="space-y-2">
-                  {cat.skills.map((s) => (
-                    <div key={s.name} className="flex items-center justify-between">
-                      <div className="flex items-center gap-2.5">
-                        <span className={`text-[10px] font-bold font-mono ${cat.accent} w-5`}>{s.rank}</span>
-                        <span className="text-xs text-t1 font-medium">{s.name}</span>
-                      </div>
-                      <span className="text-[10px] text-t3 text-right">{s.note}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ))}
           </div>
         </div>
 

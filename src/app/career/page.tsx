@@ -12,6 +12,7 @@ import {
   AlertTriangle, Target, Zap,
   Upload, FileText, Shield, CheckCircle, XCircle,
   Clock, Calendar, BookOpen,
+  PenLine, BarChart2, ClipboardList,
 } from "lucide-react";
 
 const LEVELS = ["junior", "mid", "senior", "lead"];
@@ -190,6 +191,12 @@ function Dropzone({ onFile }: { onFile: (f: File) => void }) {
 }
 
 // ═════════════════════════════════════════════════════════════════════════════
+const careerSteps = [
+  { n: "01", Icon: PenLine,      label: "Enter your skills",  sub: "Paste skills or upload your CV",         accent: "text-accent", bg: "bg-accent/8", border: "border-accent/20", iconBg: "bg-accent/15" },
+  { n: "02", Icon: BarChart2,    label: "Run AI analysis",    sub: "SBERT matches you to 4,800+ live roles", accent: "text-blue",   bg: "bg-blue/8",   border: "border-blue/20",   iconBg: "bg-blue/15"   },
+  { n: "03", Icon: ClipboardList,label: "Get your report",    sub: "Score, gaps, 90-day plan",               accent: "text-prp",    bg: "bg-prp/8",    border: "border-prp/20",    iconBg: "bg-prp/15"    },
+];
+
 // Main page
 // ═════════════════════════════════════════════════════════════════════════════
 export default function CareerPage() {
@@ -295,11 +302,7 @@ export default function CareerPage() {
 
       {/* How it works — 3 steps visual */}
       <div className="grid grid-cols-3 gap-3 mb-8 animate-fade-up animate-delay-50">
-        {[
-          { n: "01", icon: "✏️",  label: "Enter your skills",    sub: "Paste skills or upload your CV",          accent: "text-accent", bg: "bg-accent/8", border: "border-accent/20" },
-          { n: "02", icon: "⚡",  label: "Run AI analysis",       sub: "SBERT matches you to 4,800+ live roles", accent: "text-blue",   bg: "bg-blue/8",   border: "border-blue/20"   },
-          { n: "03", icon: "🎯",  label: "Get your report",       sub: "Score, gaps, 90-day plan",               accent: "text-prp",    bg: "bg-prp/8",    border: "border-prp/20"    },
-        ].map((s, i) => (
+        {careerSteps.map((s, i) => (
           <div key={s.n} className={`rounded-2xl border p-4 ${s.border} ${s.bg} flex flex-col items-center text-center relative`}>
             {i < 2 && (
               <div className="absolute -right-1.5 top-1/2 -translate-y-1/2 z-10 hidden sm:flex items-center">
@@ -308,7 +311,9 @@ export default function CareerPage() {
                 </svg>
               </div>
             )}
-            <div className="text-2xl mb-2">{s.icon}</div>
+            <div className={`w-10 h-10 rounded-xl ${s.iconBg} flex items-center justify-center mb-2`}>
+              <s.Icon className={`w-5 h-5 ${s.accent}`} strokeWidth={1.8} />
+            </div>
             <p className={`text-[9px] font-mono font-bold mb-1 ${s.accent}`}>{s.n}</p>
             <p className={`text-xs font-bold ${s.accent} mb-1`}>{s.label}</p>
             <p className="text-[10px] text-t2 leading-tight">{s.sub}</p>

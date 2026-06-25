@@ -1,52 +1,93 @@
+import {
+  Download, Zap, FlaskConical, BarChart2, Database, LayoutDashboard,
+} from "lucide-react";
+import { type LucideIcon } from "lucide-react";
+
 interface Step {
-  n: string;
-  label: string;
-  sub: string;
-  icon: string;
-  accent: string;
-  bg: string;
-  border: string;
+  n: string; label: string; sub: string;
+  Icon: LucideIcon;
+  accent: string; bg: string; border: string; ring: string;
 }
 
 const STEPS: Step[] = [
-  { n: "01", label: "Scrape",     sub: "Adzuna · Reed · Specialist boards",       icon: "⬇", accent: "#4F46E5", bg: "#EEF2FF", border: "#818CF8" },
-  { n: "02", label: "Deduplicate",sub: "Title + company + location fingerprint",   icon: "⚡", accent: "#2563EB", bg: "#EFF6FF", border: "#93C5FD" },
-  { n: "03", label: "Extract",    sub: "flashtext → BM25 → SBERT skill pipeline",  icon: "🔬", accent: "#7C3AED", bg: "#F5F3FF", border: "#A78BFA" },
-  { n: "04", label: "Analyse",    sub: "Salary normalise · NLP scoring · Geo",     icon: "📊", accent: "#059669", bg: "#ECFDF5", border: "#6EE7B7" },
-  { n: "05", label: "Snapshot",   sub: "Weekly aggregate saved to DB",             icon: "💾", accent: "#D97706", bg: "#FFFBEB", border: "#FCD34D" },
-  { n: "06", label: "Dashboard",  sub: "You see this page",                        icon: "✨", accent: "#4F46E5", bg: "#EEF2FF", border: "#818CF8" },
+  {
+    n: "01", label: "Scrape",       sub: "Adzuna · Reed · Boards",
+    Icon: Download,
+    accent: "text-blue",   bg: "bg-blue/8",   border: "border-blue/20",   ring: "ring-blue/20",
+  },
+  {
+    n: "02", label: "Deduplicate",  sub: "MinHash + exact title hash",
+    Icon: Zap,
+    accent: "text-accent", bg: "bg-accent/8", border: "border-accent/20", ring: "ring-accent/20",
+  },
+  {
+    n: "03", label: "Extract",      sub: "flashtext → BM25 → SBERT",
+    Icon: FlaskConical,
+    accent: "text-prp",    bg: "bg-prp/8",    border: "border-prp/20",    ring: "ring-prp/20",
+  },
+  {
+    n: "04", label: "Analyse",      sub: "Salary NLP · skills ranking",
+    Icon: BarChart2,
+    accent: "text-ok",     bg: "bg-ok/8",     border: "border-ok/20",     ring: "ring-ok/20",
+  },
+  {
+    n: "05", label: "Snapshot",     sub: "Weekly DB write · ISR cache",
+    Icon: Database,
+    accent: "text-warn",   bg: "bg-warn/8",   border: "border-warn/20",   ring: "ring-warn/20",
+  },
+  {
+    n: "06", label: "Dashboard",    sub: "Vercel edge · live data",
+    Icon: LayoutDashboard,
+    accent: "text-accent", bg: "bg-accent/8", border: "border-accent/20", ring: "ring-accent/20",
+  },
 ];
 
-interface PipelineFlowProps {
-  className?: string;
-  variant?: "horizontal" | "vertical";
+function Arrow({ horizontal }: { horizontal: boolean }) {
+  return horizontal ? (
+    <div className="hidden sm:flex items-center shrink-0 px-1">
+      <svg width="24" height="12" viewBox="0 0 24 12" fill="none">
+        <path d="M0 6 H20 M16 2 L22 6 L16 10" stroke="#CBD5E1" strokeWidth="1.5"
+          strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    </div>
+  ) : (
+    <div className="flex justify-center my-1">
+      <svg width="12" height="24" viewBox="0 0 12 24" fill="none">
+        <path d="M6 0 V20 M2 16 L6 22 L10 16" stroke="#CBD5E1" strokeWidth="1.5"
+          strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    </div>
+  );
 }
 
-export function PipelineFlow({ className = "", variant = "horizontal" }: PipelineFlowProps) {
+export function PipelineFlow({
+  variant = "horizontal",
+  className = "",
+}: {
+  variant?: "horizontal" | "vertical";
+  className?: string;
+}) {
   if (variant === "vertical") {
     return (
-      <div className={`flex flex-col gap-0 ${className}`}>
+      <div className={`flex flex-col ${className}`}>
         {STEPS.map((s, i) => (
-          <div key={s.n} className="flex items-stretch gap-0">
-            {/* Connector column */}
-            <div className="flex flex-col items-center w-10 shrink-0">
-              <div
-                className="w-9 h-9 rounded-full flex items-center justify-center shrink-0 text-base border-2 shadow-sm"
-                style={{ background: s.bg, borderColor: s.border }}
-              >
-                {s.icon}
+          <div key={s.n}>
+            <div className="flex items-start gap-4">
+              <div className="flex flex-col items-center">
+                <div className={`w-10 h-10 rounded-xl ${s.bg} border ${s.border} flex items-center justify-center shrink-0`}>
+                  <s.Icon className={`w-5 h-5 ${s.accent}`} strokeWidth={1.8} />
+                </div>
+                {i < STEPS.length - 1 && (
+                  <div className="w-px h-6 bg-gradient-to-b from-b1 to-transparent mt-1" />
+                )}
               </div>
-              {i < STEPS.length - 1 && (
-                <div className="flex-1 w-px my-1" style={{ background: `${s.border}60` }} />
-              )}
-            </div>
-            {/* Content */}
-            <div className={`pl-4 ${i < STEPS.length - 1 ? "pb-5" : ""}`}>
-              <div className="flex items-center gap-2 mb-0.5">
-                <span className="text-[10px] font-mono font-bold" style={{ color: s.accent }}>{s.n}</span>
-                <span className="text-sm font-bold text-t1">{s.label}</span>
+              <div className="pb-4">
+                <div className="flex items-center gap-2 mb-0.5">
+                  <span className={`text-[9px] font-mono font-bold ${s.accent} opacity-70`}>{s.n}</span>
+                  <span className="text-xs font-bold text-t1">{s.label}</span>
+                </div>
+                <p className="text-[11px] text-t2">{s.sub}</p>
               </div>
-              <p className="text-[11px] text-t2">{s.sub}</p>
             </div>
           </div>
         ))}
@@ -56,32 +97,26 @@ export function PipelineFlow({ className = "", variant = "horizontal" }: Pipelin
 
   return (
     <div className={`overflow-x-auto ${className}`}>
-      <div className="flex items-center gap-0 min-w-[680px] py-4">
+      <div className="flex items-center min-w-[640px] py-3 px-1 gap-0">
         {STEPS.map((s, i) => (
-          <div key={s.n} className="flex items-center flex-1">
-            {/* Step card */}
-            <div className="flex-1 flex flex-col items-center gap-2 px-2">
-              <div
-                className="w-12 h-12 rounded-2xl flex items-center justify-center text-xl border-2 shadow-sm"
-                style={{ background: s.bg, borderColor: s.border }}
-              >
-                {s.icon}
-              </div>
-              <div className="text-center">
-                <p className="text-[9px] font-mono font-bold mb-0.5" style={{ color: s.accent }}>{s.n}</p>
-                <p className="text-[11px] font-bold text-t1 leading-tight">{s.label}</p>
-                <p className="text-[9px] text-t2 mt-0.5 leading-tight max-w-[90px] mx-auto">{s.sub}</p>
+          <div key={s.n} className="flex items-center flex-1 min-w-0">
+            <div className="flex flex-col items-center flex-1 group">
+              {/* Step card */}
+              <div className={`
+                w-full max-w-[100px] mx-auto
+                rounded-2xl border ${s.border} ${s.bg}
+                p-3 flex flex-col items-center text-center
+                transition-all duration-200 hover:shadow-md hover:scale-105
+              `}>
+                <div className={`w-9 h-9 rounded-xl bg-white/70 border ${s.border} flex items-center justify-center mb-2 shadow-sm`}>
+                  <s.Icon className={`w-5 h-5 ${s.accent}`} strokeWidth={1.8} />
+                </div>
+                <span className={`text-[8px] font-mono font-bold ${s.accent} mb-0.5 opacity-70`}>{s.n}</span>
+                <span className={`text-[10px] font-bold ${s.accent} leading-tight`}>{s.label}</span>
+                <span className="text-[8px] text-t3 leading-tight mt-0.5">{s.sub}</span>
               </div>
             </div>
-            {/* Arrow */}
-            {i < STEPS.length - 1 && (
-              <div className="flex items-center shrink-0 px-1">
-                <svg width="28" height="14" viewBox="0 0 28 14" fill="none">
-                  <line x1="0" y1="7" x2="22" y2="7" stroke="#C7D2FE" strokeWidth="1.5" />
-                  <path d="M18 3 L26 7 L18 11" stroke="#818CF8" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </div>
-            )}
+            {i < STEPS.length - 1 && <Arrow horizontal />}
           </div>
         ))}
       </div>

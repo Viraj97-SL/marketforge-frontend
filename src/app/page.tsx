@@ -5,9 +5,10 @@ import {
   ArrowRight, Brain, TrendingUp, Shield,
   Database, BarChart3, Globe,
   ChevronRight, Activity, DollarSign,
-  Sparkles, Target, BookOpen, Code2,
-  Mail, MapPin, Clock, LineChart,
+  Sparkles, Target, BookOpen,
+  Mail, MapPin, Clock,
   Users, Briefcase, GraduationCap,
+  CalendarDays, Bot, ScanSearch, FlagTriangleRight,
 } from "lucide-react";
 import { LogoMarquee }      from "@/components/home/logo-marquee";
 import { ContactForm }      from "@/components/home/contact-form";
@@ -46,12 +47,12 @@ function HeroStats({ jobsTotal, statusOk, freshness }: {
 
 // ─── Feature list ─────────────────────────────────────────────────────────────
 const FEATURES = [
-  { icon: Brain,    title: "AI-Powered Scraping",        body: "9 autonomous agents collect from Adzuna, Reed, and specialist boards. Dedup + NLP validation baked in.", href: "/market",   accent: "text-accent", bg: "bg-accent/8", visual: "📡" },
-  { icon: BarChart3,title: "Skill Demand Intelligence",  body: "Real-time ranking of 500+ tech skills by job count, co-occurrence, and week-over-week velocity.",          href: "/skills",   accent: "text-blue",   bg: "bg-blue/8",   visual: "🧠" },
-  { icon: DollarSign,title:"Salary Benchmarks",          body: "P25/P50/P75 percentiles by role, experience level, and UK region — updated every pipeline run.",           href: "/salary",   accent: "text-prp",    bg: "bg-prp/8",    visual: "💷" },
-  { icon: Globe,    title: "Visa Sponsorship Tracker",   body: "Which companies sponsor Skilled Worker visas for AI/ML roles — verified via NLP on job descriptions.",      href: "/jobs",     accent: "text-ok",     bg: "bg-ok/8",     visual: "🌍" },
-  { icon: Target,   title: "Career Gap Analysis",        body: "Upload your CV. Get a personalised market-match score, skill gap report, and 90-day action plan.",          href: "/career",   accent: "text-warn",   bg: "bg-warn/8",   visual: "🎯" },
-  { icon: BookOpen, title: "Research Signals",           body: "Emerging tech tracked from arXiv, funding announcements, and GitHub trending — before it hits job boards.", href: "/research", accent: "text-blue",   bg: "bg-blue/8",   visual: "🔬" },
+  { icon: Brain,     title: "AI-Powered Scraping",       body: "9 autonomous agents collect from Adzuna, Reed, and specialist boards. Dedup + NLP validation baked in.", href: "/market",   accent: "text-accent", bg: "bg-accent/8", iconBg: "bg-accent/15" },
+  { icon: BarChart3, title: "Skill Demand Intelligence", body: "Real-time ranking of 500+ tech skills by job count, co-occurrence, and week-over-week velocity.",          href: "/skills",   accent: "text-blue",   bg: "bg-blue/8",   iconBg: "bg-blue/15"   },
+  { icon: DollarSign,title: "Salary Benchmarks",         body: "P25/P50/P75 percentiles by role, experience level, and UK region — updated every pipeline run.",           href: "/salary",   accent: "text-prp",    bg: "bg-prp/8",    iconBg: "bg-prp/15"    },
+  { icon: Globe,     title: "Visa Sponsorship Tracker",  body: "Which companies sponsor Skilled Worker visas for AI/ML roles — verified via NLP on job descriptions.",      href: "/jobs",     accent: "text-ok",     bg: "bg-ok/8",     iconBg: "bg-ok/15"     },
+  { icon: Target,    title: "Career Gap Analysis",       body: "Upload your CV. Get a personalised market-match score, skill gap report, and 90-day action plan.",          href: "/career",   accent: "text-warn",   bg: "bg-warn/8",   iconBg: "bg-warn/15"   },
+  { icon: BookOpen,  title: "Research Signals",          body: "Emerging tech tracked from arXiv, funding announcements, and GitHub trending — before it hits job boards.", href: "/research", accent: "text-blue",   bg: "bg-blue/8",   iconBg: "bg-blue/15"   },
 ];
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
@@ -125,13 +126,15 @@ export default async function HomePage() {
             </p>
             <div className="space-y-3 mb-8">
               {[
-                { icon: "📊", label: "Weekly snapshots, not stale annual reports"   },
-                { icon: "🤖", label: "9 AI agents, zero manual data entry"          },
-                { icon: "🔍", label: "3-gate NLP skill extraction — high precision" },
-                { icon: "🇬🇧", label: "UK-specific — not US salary data relabelled"  },
+                { Icon: CalendarDays,     label: "Weekly snapshots, not stale annual reports",   accent: "text-accent", bg: "bg-accent/10" },
+                { Icon: Bot,              label: "9 AI agents, zero manual data entry",          accent: "text-blue",   bg: "bg-blue/10"   },
+                { Icon: ScanSearch,       label: "3-gate NLP skill extraction — high precision", accent: "text-prp",    bg: "bg-prp/10"    },
+                { Icon: FlagTriangleRight,label: "UK-specific — not US salary data relabelled",  accent: "text-ok",     bg: "bg-ok/10"     },
               ].map((pt) => (
                 <div key={pt.label} className="flex items-center gap-3">
-                  <span className="text-lg shrink-0">{pt.icon}</span>
+                  <div className={`w-8 h-8 rounded-lg ${pt.bg} flex items-center justify-center shrink-0`}>
+                    <pt.Icon className={`w-4 h-4 ${pt.accent}`} strokeWidth={1.8} />
+                  </div>
                   <span className="text-sm text-t1 font-medium">{pt.label}</span>
                 </div>
               ))}
@@ -172,11 +175,13 @@ export default async function HomePage() {
                 className="group bg-s1 rounded-2xl border border-b1 p-6 card-hover shadow-card animate-fade-up flex flex-col"
                 style={{ animationDelay: `${i * 80}ms` }}
               >
-                {/* Visual top strip */}
-                <div className={`w-full h-20 rounded-xl ${f.bg} flex items-center justify-center mb-5 relative overflow-hidden`}>
-                  <span className="text-4xl opacity-40 absolute right-3 bottom-1 select-none">{f.visual}</span>
-                  <div className={`w-10 h-10 rounded-xl bg-white/60 flex items-center justify-center shadow-sm z-10`}>
-                    <f.icon className={`w-5 h-5 ${f.accent}`} />
+                {/* Icon panel — no emoji, single large icon */}
+                <div className={`w-full h-24 rounded-xl ${f.bg} flex items-center justify-center mb-5 relative overflow-hidden`}>
+                  {/* Subtle background grid */}
+                  <div className="absolute inset-0 opacity-[0.07]"
+                    style={{ backgroundImage: "radial-gradient(circle,#000 1px,transparent 1px)", backgroundSize: "16px 16px" }} />
+                  <div className={`w-14 h-14 rounded-2xl ${f.iconBg} border border-white/40 flex items-center justify-center shadow-sm z-10`}>
+                    <f.icon className={`w-7 h-7 ${f.accent}`} strokeWidth={1.6} />
                   </div>
                 </div>
                 <div className="flex items-start justify-between">
@@ -243,7 +248,6 @@ export default async function HomePage() {
               {
                 icon: GraduationCap,
                 persona: "Job Seekers",
-                emoji: "🎓",
                 accent: "text-accent", bg: "bg-accent/8", border: "border-accent/15",
                 points: [
                   "Know which skills to learn next",
@@ -256,7 +260,6 @@ export default async function HomePage() {
               {
                 icon: Briefcase,
                 persona: "Hiring Managers",
-                emoji: "💼",
                 accent: "text-blue", bg: "bg-blue/8", border: "border-blue/15",
                 points: [
                   "See competitive salary ranges",
@@ -269,7 +272,6 @@ export default async function HomePage() {
               {
                 icon: Users,
                 persona: "Researchers & Analysts",
-                emoji: "📊",
                 accent: "text-prp", bg: "bg-prp/8", border: "border-prp/15",
                 points: [
                   "Track research → job market pipeline",
@@ -281,11 +283,12 @@ export default async function HomePage() {
               },
             ].map((p) => (
               <div key={p.persona} className={`bg-s1 rounded-2xl border ${p.border} p-6 shadow-card animate-fade-up flex flex-col`}>
-                {/* Header with emoji illustration */}
+                {/* Icon header — single large Lucide icon, no emoji */}
                 <div className={`w-full h-24 rounded-xl ${p.bg} flex items-center justify-center mb-5 relative overflow-hidden`}>
-                  <span className="text-5xl opacity-25 absolute right-2 bottom-0 select-none">{p.emoji}</span>
-                  <div className={`w-12 h-12 rounded-xl bg-white/60 flex items-center justify-center shadow-sm z-10`}>
-                    <p.icon className={`w-6 h-6 ${p.accent}`} />
+                  <div className="absolute inset-0 opacity-[0.07]"
+                    style={{ backgroundImage: "radial-gradient(circle,#000 1px,transparent 1px)", backgroundSize: "14px 14px" }} />
+                  <div className={`w-14 h-14 rounded-2xl bg-white/60 border border-white/40 flex items-center justify-center shadow-sm z-10`}>
+                    <p.icon className={`w-8 h-8 ${p.accent}`} strokeWidth={1.5} />
                   </div>
                 </div>
                 <h3 className={`text-base font-bold mb-4 ${p.accent}`}>{p.persona}</h3>
