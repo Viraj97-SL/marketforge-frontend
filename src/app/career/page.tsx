@@ -293,6 +293,29 @@ export default function CareerPage() {
         </p>
       </div>
 
+      {/* How it works — 3 steps visual */}
+      <div className="grid grid-cols-3 gap-3 mb-8 animate-fade-up animate-delay-50">
+        {[
+          { n: "01", icon: "✏️",  label: "Enter your skills",    sub: "Paste skills or upload your CV",          accent: "text-accent", bg: "bg-accent/8", border: "border-accent/20" },
+          { n: "02", icon: "⚡",  label: "Run AI analysis",       sub: "SBERT matches you to 4,800+ live roles", accent: "text-blue",   bg: "bg-blue/8",   border: "border-blue/20"   },
+          { n: "03", icon: "🎯",  label: "Get your report",       sub: "Score, gaps, 90-day plan",               accent: "text-prp",    bg: "bg-prp/8",    border: "border-prp/20"    },
+        ].map((s, i) => (
+          <div key={s.n} className={`rounded-2xl border p-4 ${s.border} ${s.bg} flex flex-col items-center text-center relative`}>
+            {i < 2 && (
+              <div className="absolute -right-1.5 top-1/2 -translate-y-1/2 z-10 hidden sm:flex items-center">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                  <path d="M4 8h8M10 5l3 3-3 3" stroke="#CBD5E1" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </div>
+            )}
+            <div className="text-2xl mb-2">{s.icon}</div>
+            <p className={`text-[9px] font-mono font-bold mb-1 ${s.accent}`}>{s.n}</p>
+            <p className={`text-xs font-bold ${s.accent} mb-1`}>{s.label}</p>
+            <p className="text-[10px] text-t2 leading-tight">{s.sub}</p>
+          </div>
+        ))}
+      </div>
+
       {/* Tab toggle */}
       <div className="flex gap-1 p-1 rounded-xl bg-s1 border border-b1 w-fit mb-8 animate-fade-up animate-delay-50">
         {(["skills", "cv"] as const).map((tab) => (

@@ -16,6 +16,7 @@ export const metadata: Metadata = {
 import { api } from "@/lib/api";
 import { SkillBar } from "@/components/charts/skill-bar";
 import { PageHero } from "@/components/layout/page-hero";
+import { SkillNetwork } from "@/components/illustrations/skill-network";
 import { TrendingUp, TrendingDown, Code2, Database, Brain, Cpu, Layers } from "lucide-react";
 
 export const revalidate = 300;
@@ -111,6 +112,22 @@ export default async function SkillsPage() {
             <span>flashtext → BM25 → SBERT</span>
           </div>
         </PageHero>
+
+        {/* Skill network illustration */}
+        <div className="bg-s1 rounded-2xl border border-b1 p-6 mb-6 shadow-card animate-fade-up animate-delay-50">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h2 className="text-sm font-bold text-t1">UK AI Skill Ecosystem</h2>
+              <p className="text-xs text-t2 mt-0.5">How in-demand skills connect and co-occur in job postings</p>
+            </div>
+            <div className="flex items-center gap-3 text-[10px] text-t3">
+              <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-accent inline-block" />Core</span>
+              <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-indigo-200 inline-block" />Primary</span>
+              <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-s3 border border-b1 inline-block" />Secondary</span>
+            </div>
+          </div>
+          <SkillNetwork height={320} />
+        </div>
 
         {/* Live top-20 bar chart */}
         {hasLiveSkills && (

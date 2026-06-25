@@ -15,6 +15,7 @@ export const metadata: Metadata = {
 
 import { ExternalLink, Microscope, Zap, TrendingUp, BookOpen, ArrowRight, CheckCircle2, Search, Network, Clock4 } from "lucide-react";
 import { PageHero } from "@/components/layout/page-hero";
+import { PipelineFlow } from "@/components/illustrations/pipeline-flow";
 
 export const revalidate = 600;
 
@@ -208,7 +209,7 @@ export default function ResearchPage() {
           </div>
         </div>
 
-        {/* Methodology */}
+        {/* Methodology — with pipeline flow illustration */}
         <div className="rounded-2xl border border-b1 bg-s1 p-8 mb-8 animate-fade-up animate-delay-150">
           <div className="flex items-center gap-2 mb-6">
             <Microscope className="w-4 h-4 text-accent" />
@@ -216,6 +217,12 @@ export default function ResearchPage() {
             <span className="text-[10px] px-2 py-0.5 rounded-full bg-s2 border border-b1 text-t2 ml-auto">Methodology</span>
           </div>
 
+          {/* Visual pipeline */}
+          <div className="bg-s2 rounded-xl border border-b1 p-5 mb-6">
+            <PipelineFlow variant="horizontal" />
+          </div>
+
+          {/* Detail cards */}
           <div className="grid sm:grid-cols-3 gap-5">
             {METHODOLOGY_STEPS.map((m) => (
               <div key={m.step} className={`rounded-xl border p-5 ${m.border} bg-s2`}>

@@ -20,6 +20,7 @@ import { SkillBar } from "@/components/charts/skill-bar";
 import { SalaryRange } from "@/components/charts/salary-range";
 import { StatCard } from "@/components/cards/stat-card";
 import { PageHero } from "@/components/layout/page-hero";
+import { UKMap } from "@/components/illustrations/uk-map";
 import {
   BarChart3, TrendingUp, TrendingDown, DollarSign,
   Globe, Activity, Clock, Sparkles, MapPin,
@@ -230,7 +231,7 @@ export default async function MarketPage() {
           </div>
         </div>
 
-        {/* UK Cities */}
+        {/* UK Cities — map + list */}
         <div className="bg-s1 rounded-2xl border border-b1 p-6 mb-5 shadow-card animate-fade-up animate-delay-400">
           <div className="flex items-center gap-2 mb-6">
             <MapPin className="w-4 h-4 text-blue" />
@@ -239,36 +240,43 @@ export default async function MarketPage() {
               {isLiveCities ? "Live data this week" : "Illustrative · live data when available"}
             </span>
           </div>
-          <div className="space-y-3">
-            {cityList.map((city, i) => {
-              const barPct = Math.round((city.job_count / cityMax) * 100);
-              return (
-                <div key={city.city} className="flex items-center gap-4">
-                  <span className="text-[10px] font-mono text-t3 w-5 shrink-0">{String(i + 1).padStart(2, "0")}</span>
-                  <span className="text-base shrink-0">{CITY_FLAGS[city.city] ?? "📍"}</span>
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="text-xs font-semibold text-t1">{city.city}</span>
-                      <div className="flex items-center gap-2 text-[10px]">
-                        <span className="text-accent font-bold">{city.job_count.toLocaleString()}</span>
-                        <span className="text-t3">jobs</span>
-                        <span className="text-t3 font-mono w-8 text-right">{barPct}%</span>
+
+          <div className="grid lg:grid-cols-2 gap-8 items-center">
+            {/* UK map illustration */}
+            <UKMap className="h-80 lg:h-96" showLabels animated />
+
+            {/* City bar list */}
+            <div className="space-y-3">
+              {cityList.map((city, i) => {
+                const barPct = Math.round((city.job_count / cityMax) * 100);
+                return (
+                  <div key={city.city} className="flex items-center gap-4">
+                    <span className="text-[10px] font-mono text-t3 w-5 shrink-0">{String(i + 1).padStart(2, "0")}</span>
+                    <span className="text-base shrink-0">{CITY_FLAGS[city.city] ?? "📍"}</span>
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-xs font-semibold text-t1">{city.city}</span>
+                        <div className="flex items-center gap-2 text-[10px]">
+                          <span className="text-accent font-bold">{city.job_count.toLocaleString()}</span>
+                          <span className="text-t3">jobs</span>
+                          <span className="text-t3 font-mono w-8 text-right">{barPct}%</span>
+                        </div>
+                      </div>
+                      <div className="h-1.5 rounded-full bg-s2 overflow-hidden">
+                        <div
+                          className="h-full rounded-full bg-gradient-to-r from-accent to-blue"
+                          style={{ width: `${barPct}%`, transition: "width 0.8s ease" }}
+                        />
                       </div>
                     </div>
-                    <div className="h-1.5 rounded-full bg-s2 overflow-hidden">
-                      <div
-                        className="h-full rounded-full bg-gradient-to-r from-accent to-blue"
-                        style={{ width: `${barPct}%`, transition: "width 0.8s ease" }}
-                      />
-                    </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              })}
+              <p className="text-[10px] text-t3 mt-4 pt-4 border-t border-b1">
+                London dominates UK AI hiring. Strong hubs in Cambridge (biotech AI), Edinburgh (NLP/fintech), Bristol (robotics).
+              </p>
+            </div>
           </div>
-          <p className="text-[10px] text-t3 mt-5 pt-4 border-t border-b1">
-            London dominates UK AI hiring. Strong hubs in Cambridge (biotech AI), Edinburgh (NLP/fintech), Bristol (robotics).
-          </p>
         </div>
 
         {/* Hiring Velocity */}

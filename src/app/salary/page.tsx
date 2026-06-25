@@ -162,6 +162,35 @@ export default async function SalaryPage() {
           />
         </div>
 
+        {/* Career progression illustration */}
+        <div className="bg-s1 rounded-2xl border border-b1 p-6 mb-6 shadow-card animate-fade-up animate-delay-100">
+          <h2 className="text-sm font-bold text-t1 mb-6">Your Salary Journey in UK AI</h2>
+          <div className="relative">
+            {/* Connecting line */}
+            <div className="absolute top-8 left-[12.5%] right-[12.5%] h-0.5 bg-gradient-to-r from-blue via-accent to-prp hidden sm:block" />
+
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 relative">
+              {[
+                { stage: "Graduate",      years: "0–1 yr",  salary: "£42–55k",  icon: "🎓", accent: "text-blue",   bg: "bg-blue/8",   border: "border-blue/20",   note: "Grad schemes, apprenticeships" },
+                { stage: "Junior",        years: "1–3 yrs", salary: "£55–70k",  icon: "🌱", accent: "text-accent", bg: "bg-accent/8", border: "border-accent/20", note: "First independent role" },
+                { stage: "Mid / Senior",  years: "3–7 yrs", salary: "£75–115k", icon: "🚀", accent: "text-prp",    bg: "bg-prp/8",    border: "border-prp/20",    note: "Tech lead, specialisation" },
+                { stage: "Principal",     years: "7+ yrs",  salary: "£120–200k",icon: "⭐", accent: "text-warn",   bg: "bg-warn/8",   border: "border-warn/20",   note: "Org-wide impact, IC track" },
+              ].map((s, i) => (
+                <div key={s.stage} className={`rounded-xl border p-4 ${s.border} ${s.bg} flex flex-col items-center text-center relative`}>
+                  <div className="w-10 h-10 rounded-full bg-white border-2 border-current flex items-center justify-center text-xl mb-3 shadow-sm z-10"
+                    style={{ borderColor: "currentColor" }}>
+                    <span>{s.icon}</span>
+                  </div>
+                  <p className={`text-xs font-bold ${s.accent} mb-1`}>{s.stage}</p>
+                  <p className={`text-lg font-black ${s.accent} mb-1`}>{s.salary}</p>
+                  <p className="text-[9px] text-t3 mb-1 font-mono">{s.years}</p>
+                  <p className="text-[9px] text-t2 leading-tight">{s.note}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
         {/* Experience Bands */}
         <div className="bg-s1 rounded-2xl border border-b1 p-6 mb-6 shadow-card animate-fade-up animate-delay-150">
           <div className="flex items-center gap-2 mb-6">
