@@ -1,0 +1,272 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 800" fill="none">
+  <defs>
+    <!-- Radial glow at composition center -->
+    <radialGradient id="centreGlow" cx="72%" cy="52%" r="40%">
+      <stop offset="0%"   stop-color="white" stop-opacity="0.08"/>
+      <stop offset="100%" stop-color="white" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- City dot glow -->
+    <filter id="cityGlow" x="-80%" y="-80%" width="260%" height="260%">
+      <feGaussianBlur stdDeviation="6" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="londonGlow" x="-100%" y="-100%" width="300%" height="300%">
+      <feGaussianBlur stdDeviation="12" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="nodeGlow" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="4" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+
+    <!-- Data stream gradient (left-flowing) -->
+    <linearGradient id="streamL" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%"   stop-color="white" stop-opacity="0"/>
+      <stop offset="100%" stop-color="white" stop-opacity="0.3"/>
+    </linearGradient>
+    <linearGradient id="streamR" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%"   stop-color="white" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="white" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+
+  <!-- ── Atmospheric glow behind UK ── -->
+  <ellipse cx="1040" cy="400" rx="380" ry="360" fill="url(#centreGlow)"/>
+
+  <!-- ── Orbital / orbit rings ── -->
+  <ellipse cx="1040" cy="400" rx="340" ry="320" stroke="white" stroke-opacity="0.06" stroke-width="1"/>
+  <ellipse cx="1040" cy="400" rx="280" ry="260" stroke="white" stroke-opacity="0.08" stroke-width="1"/>
+  <ellipse cx="1040" cy="400" rx="220" ry="200" stroke="white" stroke-opacity="0.07" stroke-width="0.8"/>
+
+  <!-- Dashed accent ring -->
+  <ellipse cx="1040" cy="400" rx="340" ry="320" stroke="white" stroke-opacity="0.12"
+    stroke-width="1.5" stroke-dasharray="8 16"/>
+
+  <!-- ── Grid lines (subtle, angled) ── -->
+  <line x1="400" y1="0"   x2="400" y2="800" stroke="white" stroke-opacity="0.025" stroke-width="1"/>
+  <line x1="700" y1="0"   x2="700" y2="800" stroke="white" stroke-opacity="0.025" stroke-width="1"/>
+  <line x1="1000" y1="0"  x2="1000" y2="800" stroke="white" stroke-opacity="0.025" stroke-width="1"/>
+  <line x1="1300" y1="0"  x2="1300" y2="800" stroke="white" stroke-opacity="0.025" stroke-width="1"/>
+  <line x1="0"   y1="200" x2="1440" y2="200" stroke="white" stroke-opacity="0.025" stroke-width="1"/>
+  <line x1="0"   y1="400" x2="1440" y2="400" stroke="white" stroke-opacity="0.025" stroke-width="1"/>
+  <line x1="0"   y1="600" x2="1440" y2="600" stroke="white" stroke-opacity="0.025" stroke-width="1"/>
+
+  <!-- ── UK country outline ── -->
+  <!-- Main England + Wales + Scotland body -->
+  <path d="
+    M 1040,92
+    C 1052,82 1068,84 1080,92
+    C 1094,102 1106,118 1112,136
+    C 1118,154 1122,174 1120,194
+    C 1118,212 1124,230 1122,250
+    C 1120,268 1114,286 1118,306
+    C 1122,326 1118,346 1110,362
+    C 1102,378 1104,396 1094,412
+    C 1084,428 1070,440 1054,444
+    C 1038,448 1022,444 1008,434
+    C 994,424 982,410 976,394
+    C 970,378 970,362 974,346
+    C 978,330 972,312 970,294
+    C 968,276 972,258 968,240
+    C 964,222 968,204 972,186
+    C 976,168 986,152 982,134
+    C 978,116 982,98  994,86
+    C 1006,74 1028,82 1040,92 Z
+  " fill="white" fill-opacity="0.07" stroke="white" stroke-opacity="0.22" stroke-width="1.8" stroke-linejoin="round"/>
+
+  <!-- Scotland western islands (decorative) -->
+  <ellipse cx="944" cy="188" rx="18" ry="28" fill="white" fill-opacity="0.05" stroke="white" stroke-opacity="0.15" stroke-width="1"/>
+  <ellipse cx="930" cy="152" rx="12" ry="18" fill="white" fill-opacity="0.04" stroke="white" stroke-opacity="0.12" stroke-width="0.8"/>
+
+  <!-- Region text watermarks -->
+  <text x="1044" y="168" text-anchor="middle" font-family="ui-sans-serif,system-ui,sans-serif"
+    font-size="9" font-weight="700" fill="white" fill-opacity="0.12" letter-spacing="4"
+    transform="rotate(-5,1044,168)">SCOTLAND</text>
+  <text x="984"  y="330" text-anchor="middle" font-family="ui-sans-serif,system-ui,sans-serif"
+    font-size="8" font-weight="700" fill="white" fill-opacity="0.1" letter-spacing="2"
+    transform="rotate(-3,984,330)">WALES</text>
+  <text x="1060" y="320" text-anchor="middle" font-family="ui-sans-serif,system-ui,sans-serif"
+    font-size="9" font-weight="700" fill="white" fill-opacity="0.1" letter-spacing="2">ENGLAND</text>
+
+  <!-- ── City dots ── -->
+  <!-- London (largest) -->
+  <circle cx="1072" cy="404" r="18" fill="white" fill-opacity="0.06"/>
+  <circle cx="1072" cy="404" r="12" fill="white" fill-opacity="0.12"/>
+  <circle cx="1072" cy="404" r="7"  fill="white" fill-opacity="0.8" filter="url(#londonGlow)"/>
+  <circle cx="1072" cy="404" r="3"  fill="white" fill-opacity="1"/>
+
+  <!-- Cambridge -->
+  <circle cx="1098" cy="364" r="5" fill="white" fill-opacity="0.75" filter="url(#cityGlow)"/>
+  <circle cx="1098" cy="364" r="2" fill="white" fill-opacity="1"/>
+
+  <!-- Oxford -->
+  <circle cx="1056" cy="378" r="4.5" fill="white" fill-opacity="0.7" filter="url(#cityGlow)"/>
+
+  <!-- Manchester -->
+  <circle cx="1020" cy="280" r="6"  fill="white" fill-opacity="0.75" filter="url(#cityGlow)"/>
+  <circle cx="1020" cy="280" r="2.5" fill="white" fill-opacity="1"/>
+
+  <!-- Edinburgh -->
+  <circle cx="1016" cy="178" r="5.5" fill="white" fill-opacity="0.7" filter="url(#cityGlow)"/>
+  <circle cx="1016" cy="178" r="2"   fill="white" fill-opacity="1"/>
+
+  <!-- Bristol -->
+  <circle cx="992"  cy="374" r="4"  fill="white" fill-opacity="0.65" filter="url(#cityGlow)"/>
+
+  <!-- Leeds -->
+  <circle cx="1034" cy="296" r="4"  fill="white" fill-opacity="0.65" filter="url(#cityGlow)"/>
+
+  <!-- Birmingham -->
+  <circle cx="1032" cy="336" r="4.5" fill="white" fill-opacity="0.7" filter="url(#cityGlow)"/>
+
+  <!-- Glasgow -->
+  <circle cx="1000" cy="190" r="4"  fill="white" fill-opacity="0.6" filter="url(#cityGlow)"/>
+
+  <!-- ── City connection lines ── -->
+  <line x1="1072" y1="404" x2="1098" y2="364" stroke="white" stroke-opacity="0.2" stroke-width="0.8" stroke-dasharray="3 5"/>
+  <line x1="1072" y1="404" x2="1056" y2="378" stroke="white" stroke-opacity="0.2" stroke-width="0.8" stroke-dasharray="3 5"/>
+  <line x1="1072" y1="404" x2="1020" y2="280" stroke="white" stroke-opacity="0.18" stroke-width="0.8" stroke-dasharray="3 5"/>
+  <line x1="1072" y1="404" x2="992"  y2="374" stroke="white" stroke-opacity="0.15" stroke-width="0.8" stroke-dasharray="3 5"/>
+  <line x1="1020" y1="280" x2="1016" y2="178" stroke="white" stroke-opacity="0.15" stroke-width="0.8" stroke-dasharray="3 5"/>
+  <line x1="1020" y1="280" x2="1034" y2="296" stroke="white" stroke-opacity="0.15" stroke-width="0.8" stroke-dasharray="2 4"/>
+  <line x1="1020" y1="280" x2="1032" y2="336" stroke="white" stroke-opacity="0.15" stroke-width="0.8" stroke-dasharray="2 4"/>
+  <line x1="1016" y1="178" x2="1000" y2="190" stroke="white" stroke-opacity="0.12" stroke-width="0.8" stroke-dasharray="2 4"/>
+
+  <!-- ── Data streams flowing LEFT from UK ── -->
+  <!-- Stream 1: London → centre-left -->
+  <path d="M 1065,404 C 940,390 820,370 660,310 C 560,272 480,250 380,240"
+    stroke="url(#streamL)" stroke-width="1.5" stroke-linecap="round"/>
+  <!-- Stream 2: Manchester → left -->
+  <path d="M 1012,280 C 900,265 800,255 680,248 C 600,244 530,250 450,262"
+    stroke="url(#streamL)" stroke-width="1" stroke-linecap="round"/>
+  <!-- Stream 3: Edinburgh → top-left -->
+  <path d="M 1008,178 C 900,165 800,152 700,148 C 620,145 540,150 460,160"
+    stroke="url(#streamL)" stroke-width="1" stroke-linecap="round"/>
+  <!-- Stream 4: London → bottom-left -->
+  <path d="M 1068,412 C 950,440 840,455 720,462 C 620,468 540,465 450,460"
+    stroke="url(#streamL)" stroke-width="1" stroke-linecap="round"/>
+  <!-- Stream 5: subtle wide beam -->
+  <path d="M 980,350 C 860,360 740,368 620,372 C 540,375 470,372 400,366"
+    stroke="url(#streamL)" stroke-width="0.8" stroke-linecap="round" stroke-opacity="0.5"/>
+
+  <!-- ── Floating skill / data nodes (left + centre) ── -->
+  <!-- Node: Python -->
+  <rect x="300" y="220" width="84" height="28" rx="14" fill="white" fill-opacity="0.07" stroke="white" stroke-opacity="0.2" stroke-width="1"/>
+  <circle cx="316" cy="234" r="5" fill="white" fill-opacity="0.5" filter="url(#nodeGlow)"/>
+  <text x="330" y="238" font-family="ui-sans-serif,system-ui,sans-serif" font-size="10" font-weight="700" fill="white" fill-opacity="0.6">Python</text>
+
+  <!-- Node: £82k -->
+  <rect x="380" y="340" width="76" height="28" rx="14" fill="white" fill-opacity="0.07" stroke="white" stroke-opacity="0.2" stroke-width="1"/>
+  <circle cx="396" cy="354" r="5" fill="white" fill-opacity="0.5" filter="url(#nodeGlow)"/>
+  <text x="410" y="358" font-family="ui-sans-serif,system-ui,sans-serif" font-size="10" font-weight="700" fill="white" fill-opacity="0.6">£82k</text>
+
+  <!-- Node: LangChain -->
+  <rect x="270" y="450" width="96" height="28" rx="14" fill="white" fill-opacity="0.07" stroke="white" stroke-opacity="0.2" stroke-width="1"/>
+  <circle cx="286" cy="464" r="5" fill="white" fill-opacity="0.5" filter="url(#nodeGlow)"/>
+  <text x="300" y="468" font-family="ui-sans-serif,system-ui,sans-serif" font-size="10" font-weight="700" fill="white" fill-opacity="0.6">LangChain</text>
+
+  <!-- Node: 4,820 roles -->
+  <rect x="500" y="160" width="100" height="28" rx="14" fill="white" fill-opacity="0.07" stroke="white" stroke-opacity="0.2" stroke-width="1"/>
+  <circle cx="516" cy="174" r="5" fill="white" fill-opacity="0.55" filter="url(#nodeGlow)"/>
+  <text x="530" y="178" font-family="ui-sans-serif,system-ui,sans-serif" font-size="9" font-weight="700" fill="white" fill-opacity="0.6">4,820 roles</text>
+
+  <!-- Node: MLflow -->
+  <rect x="560" y="480" width="76" height="28" rx="14" fill="white" fill-opacity="0.06" stroke="white" stroke-opacity="0.15" stroke-width="1"/>
+  <circle cx="576" cy="494" r="4" fill="white" fill-opacity="0.4" filter="url(#nodeGlow)"/>
+  <text x="588" y="498" font-family="ui-sans-serif,system-ui,sans-serif" font-size="9" font-weight="600" fill="white" fill-opacity="0.5">MLflow</text>
+
+  <!-- Node: PyTorch -->
+  <rect x="160" y="360" width="80" height="26" rx="13" fill="white" fill-opacity="0.05" stroke="white" stroke-opacity="0.13" stroke-width="1"/>
+  <text x="188" y="378" text-anchor="middle" font-family="ui-sans-serif,system-ui,sans-serif" font-size="9" font-weight="600" fill="white" fill-opacity="0.45">PyTorch</text>
+
+  <!-- Node: ML Engineer -->
+  <rect x="430" y="570" width="104" height="28" rx="14" fill="white" fill-opacity="0.06" stroke="white" stroke-opacity="0.14" stroke-width="1"/>
+  <text x="482" y="588" text-anchor="middle" font-family="ui-sans-serif,system-ui,sans-serif" font-size="9" font-weight="600" fill="white" fill-opacity="0.45">ML Engineer</text>
+
+  <!-- Node: Kubernetes -->
+  <rect x="640" y="260" width="96" height="26" rx="13" fill="white" fill-opacity="0.05" stroke="white" stroke-opacity="0.13" stroke-width="1"/>
+  <text x="688" y="278" text-anchor="middle" font-family="ui-sans-serif,system-ui,sans-serif" font-size="9" font-weight="600" fill="white" fill-opacity="0.4">Kubernetes</text>
+
+  <!-- Node: 34% visa -->
+  <rect x="740" y="510" width="82" height="26" rx="13" fill="white" fill-opacity="0.05" stroke="white" stroke-opacity="0.13" stroke-width="1"/>
+  <text x="781" y="528" text-anchor="middle" font-family="ui-sans-serif,system-ui,sans-serif" font-size="9" font-weight="600" fill="white" fill-opacity="0.4">34% Visa</text>
+
+  <!-- ── Mini bar chart (right of UK, floating) ── -->
+  <rect x="1160" y="340" width="140" height="100" rx="10" fill="white" fill-opacity="0.04" stroke="white" stroke-opacity="0.1" stroke-width="1"/>
+  <rect x="1174" y="398" width="14" height="32" rx="2" fill="white" fill-opacity="0.25"/>
+  <rect x="1194" y="378" width="14" height="52" rx="2" fill="white" fill-opacity="0.35"/>
+  <rect x="1214" y="358" width="14" height="72" rx="2" fill="white" fill-opacity="0.5"/>
+  <rect x="1234" y="348" width="14" height="82" rx="2" fill="white" fill-opacity="0.65"/>
+  <rect x="1254" y="360" width="14" height="70" rx="2" fill="white" fill-opacity="0.45"/>
+  <rect x="1274" y="372" width="14" height="58" rx="2" fill="white" fill-opacity="0.3"/>
+  <!-- mini trend line -->
+  <polyline points="1181,406 1201,386 1221,366 1241,355 1261,368 1281,380"
+    stroke="white" stroke-opacity="0.5" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="1174" y="350" width="70" height="10" rx="4" fill="white" fill-opacity="0.15"/>
+
+  <!-- ── Mini stat chips (far right) ── -->
+  <rect x="1200" y="200" width="130" height="44" rx="10" fill="white" fill-opacity="0.05" stroke="white" stroke-opacity="0.1" stroke-width="1"/>
+  <rect x="1212" y="212" width="40"  height="8"  rx="4" fill="white" fill-opacity="0.2"/>
+  <rect x="1212" y="226" width="72"  height="10" rx="4" fill="white" fill-opacity="0.35"/>
+
+  <rect x="1200" y="460" width="130" height="44" rx="10" fill="white" fill-opacity="0.05" stroke="white" stroke-opacity="0.1" stroke-width="1"/>
+  <rect x="1212" y="472" width="40"  height="8"  rx="4" fill="white" fill-opacity="0.2"/>
+  <rect x="1212" y="486" width="90"  height="10" rx="4" fill="white" fill-opacity="0.35"/>
+
+  <!-- ── Scattered particles ── -->
+  <!-- Left zone (very faint — text area) -->
+  <circle cx="80"  cy="120" r="2"   fill="white" fill-opacity="0.1"/>
+  <circle cx="140" cy="240" r="1.5" fill="white" fill-opacity="0.08"/>
+  <circle cx="60"  cy="460" r="2"   fill="white" fill-opacity="0.1"/>
+  <circle cx="200" cy="600" r="1.5" fill="white" fill-opacity="0.08"/>
+  <circle cx="120" cy="700" r="2"   fill="white" fill-opacity="0.1"/>
+  <circle cx="300" cy="100" r="1.5" fill="white" fill-opacity="0.1"/>
+  <circle cx="340" cy="680" r="2"   fill="white" fill-opacity="0.08"/>
+
+  <!-- Mid zone -->
+  <circle cx="480" cy="80"  r="2.5" fill="white" fill-opacity="0.15"/>
+  <circle cx="520" cy="720" r="2"   fill="white" fill-opacity="0.12"/>
+  <circle cx="620" cy="60"  r="2"   fill="white" fill-opacity="0.12"/>
+  <circle cx="660" cy="740" r="2.5" fill="white" fill-opacity="0.1"/>
+  <circle cx="740" cy="100" r="2"   fill="white" fill-opacity="0.12"/>
+  <circle cx="780" cy="680" r="2"   fill="white" fill-opacity="0.1"/>
+  <circle cx="820" cy="60"  r="1.5" fill="white" fill-opacity="0.1"/>
+  <circle cx="860" cy="720" r="2"   fill="white" fill-opacity="0.1"/>
+
+  <!-- Right zone / around UK -->
+  <circle cx="920"  cy="80"  r="2"   fill="white" fill-opacity="0.15"/>
+  <circle cx="950"  cy="700" r="2.5" fill="white" fill-opacity="0.12"/>
+  <circle cx="1140" cy="80"  r="2"   fill="white" fill-opacity="0.18"/>
+  <circle cx="1160" cy="720" r="2"   fill="white" fill-opacity="0.15"/>
+  <circle cx="1320" cy="160" r="2"   fill="white" fill-opacity="0.12"/>
+  <circle cx="1360" cy="600" r="2.5" fill="white" fill-opacity="0.1"/>
+  <circle cx="1400" cy="300" r="2"   fill="white" fill-opacity="0.12"/>
+  <circle cx="1420" cy="500" r="1.5" fill="white" fill-opacity="0.1"/>
+
+  <!-- ── Neural net cluster (top-right corner) ── -->
+  <circle cx="1320" cy="80"  r="8" fill="white" fill-opacity="0.15" stroke="white" stroke-opacity="0.25" stroke-width="1"/>
+  <circle cx="1370" cy="130" r="6" fill="white" fill-opacity="0.12" stroke="white" stroke-opacity="0.2"  stroke-width="1"/>
+  <circle cx="1310" cy="150" r="5" fill="white" fill-opacity="0.1"  stroke="white" stroke-opacity="0.18" stroke-width="0.8"/>
+  <circle cx="1400" cy="80"  r="5" fill="white" fill-opacity="0.1"  stroke="white" stroke-opacity="0.18" stroke-width="0.8"/>
+  <circle cx="1430" cy="150" r="4" fill="white" fill-opacity="0.08" stroke="white" stroke-opacity="0.14" stroke-width="0.8"/>
+  <line x1="1328" y1="84"  x2="1364" y2="126" stroke="white" stroke-opacity="0.12" stroke-width="0.8"/>
+  <line x1="1328" y1="84"  x2="1314" y2="146" stroke="white" stroke-opacity="0.1"  stroke-width="0.8"/>
+  <line x1="1376" y1="126" x2="1314" y2="146" stroke="white" stroke-opacity="0.1"  stroke-width="0.8"/>
+  <line x1="1376" y1="130" x2="1404" y2="84"  stroke="white" stroke-opacity="0.1"  stroke-width="0.8"/>
+  <line x1="1404" y1="84"  x2="1430" y2="146" stroke="white" stroke-opacity="0.08" stroke-width="0.8"/>
+
+  <!-- ── Neural net cluster (bottom-left) ── -->
+  <circle cx="120" cy="640" r="7"  fill="white" fill-opacity="0.12" stroke="white" stroke-opacity="0.2"  stroke-width="1"/>
+  <circle cx="80"  cy="700" r="5"  fill="white" fill-opacity="0.1"  stroke="white" stroke-opacity="0.16" stroke-width="0.8"/>
+  <circle cx="160" cy="700" r="5"  fill="white" fill-opacity="0.1"  stroke="white" stroke-opacity="0.16" stroke-width="0.8"/>
+  <circle cx="200" cy="650" r="4"  fill="white" fill-opacity="0.08" stroke="white" stroke-opacity="0.14" stroke-width="0.8"/>
+  <line x1="125" y1="645" x2="84"  y2="695" stroke="white" stroke-opacity="0.1"  stroke-width="0.8"/>
+  <line x1="125" y1="645" x2="156" y2="695" stroke="white" stroke-opacity="0.1"  stroke-width="0.8"/>
+  <line x1="84"  y1="700" x2="156" y2="700" stroke="white" stroke-opacity="0.08" stroke-width="0.8"/>
+  <line x1="127" y1="644" x2="198" y2="652" stroke="white" stroke-opacity="0.08" stroke-width="0.8"/>
+
+  <!-- ── London pulse rings (animated feel — concentric dashed) ── -->
+  <circle cx="1072" cy="404" r="24" stroke="white" stroke-opacity="0.12" stroke-width="1" stroke-dasharray="5 8" fill="none"/>
+  <circle cx="1072" cy="404" r="40" stroke="white" stroke-opacity="0.07" stroke-width="1" stroke-dasharray="4 10" fill="none"/>
+</svg>

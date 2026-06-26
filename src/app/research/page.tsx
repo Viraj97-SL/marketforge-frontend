@@ -138,7 +138,7 @@ export default function ResearchPage() {
           title="Emerging Tech"
           titleAccent="Signals"
           subtitle="Technologies tracked from arXiv, GitHub trending, and funding announcements — before they appear in UK job descriptions."
-          imageSrc="/images/illustrations/hero-research.svg"
+          imageSrc="https://images.unsplash.com/photo-aTWKwJllPOA?w=1920&q=80&auto=format&fit=crop"
         >
           <div className="flex flex-wrap gap-2">
             {[

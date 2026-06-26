@@ -16,18 +16,18 @@ export function PageHero({ badge, title, titleAccent, subtitle, imageSrc, childr
       className="relative rounded-2xl overflow-hidden mb-10 animate-fade-up"
       style={{ background: "linear-gradient(135deg, #0F172A 0%, #1E293B 60%, #0F172A 100%)" }}
     >
-      {/* Optional illustration — right side only */}
+      {/* Full-bleed photo background */}
       {imageSrc && (
         <div
-          className="absolute inset-y-0 right-0 w-1/2 bg-cover bg-center opacity-15"
+          className="absolute inset-0 bg-cover bg-center opacity-[0.22]"
           style={{ backgroundImage: `url('${imageSrc}')` }}
           aria-hidden="true"
         />
       )}
 
-      {/* Right gradient fade for readability */}
+      {/* Text-protection gradient: opaque left, transparent right */}
       {imageSrc && (
-        <div className="absolute inset-y-0 right-0 w-2/3 bg-gradient-to-l from-transparent to-slate-900/80 pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-r from-slate-900 via-slate-900/80 to-slate-900/30 pointer-events-none" />
       )}
 
       {/* Subtle dot texture */}
