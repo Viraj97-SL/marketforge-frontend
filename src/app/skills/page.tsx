@@ -47,7 +47,7 @@ export default async function SkillsPage() {
           title="UK AI Skills"
           titleAccent="Demand"
           subtitle="Which skills are UK AI employers actually hiring for right now? Ranked by job posting frequency, derived from live NLP analysis of job descriptions."
-          imageSrc="/images/illustrations/hero-skills.webp"
+          imageSrc="/images/illustrations/hero-skills.svg"
         >
           <div className="flex flex-wrap items-center gap-2 text-xs text-slate-400">
             <span className="px-2.5 py-1 rounded-full bg-white/10 border border-white/20 font-semibold">

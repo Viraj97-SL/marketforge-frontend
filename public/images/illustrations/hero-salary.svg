@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 420" fill="none">
+  <!-- Background grid -->
+  <line x1="0"   y1="100" x2="900" y2="100" stroke="white" stroke-opacity="0.05" stroke-width="1"/>
+  <line x1="0"   y1="200" x2="900" y2="200" stroke="white" stroke-opacity="0.05" stroke-width="1"/>
+  <line x1="0"   y1="300" x2="900" y2="300" stroke="white" stroke-opacity="0.05" stroke-width="1"/>
+  <line x1="200" y1="0"   x2="200" y2="420" stroke="white" stroke-opacity="0.04" stroke-width="1"/>
+  <line x1="450" y1="0"   x2="450" y2="420" stroke="white" stroke-opacity="0.04" stroke-width="1"/>
+  <line x1="700" y1="0"   x2="700" y2="420" stroke="white" stroke-opacity="0.04" stroke-width="1"/>
+
+  <!-- Main salary bar chart — 4 experience levels -->
+  <!-- Junior -->
+  <rect x="80"  y="280" width="80" height="100" rx="6" fill="white" fill-opacity="0.25"/>
+  <rect x="80"  y="270" width="80" height="12"  rx="4" fill="white" fill-opacity="0.5"/>
+  <text x="120" y="396" text-anchor="middle" font-family="system-ui" font-size="11" fill="white" fill-opacity="0.5">Junior</text>
+
+  <!-- Mid -->
+  <rect x="220" y="220" width="80" height="160" rx="6" fill="white" fill-opacity="0.35"/>
+  <rect x="220" y="210" width="80" height="12"  rx="4" fill="white" fill-opacity="0.6"/>
+  <text x="260" y="396" text-anchor="middle" font-family="system-ui" font-size="11" fill="white" fill-opacity="0.5">Mid</text>
+
+  <!-- Senior -->
+  <rect x="360" y="140" width="80" height="240" rx="6" fill="white" fill-opacity="0.55"/>
+  <rect x="360" y="130" width="80" height="12"  rx="4" fill="white" fill-opacity="0.75"/>
+  <text x="400" y="396" text-anchor="middle" font-family="system-ui" font-size="11" fill="white" fill-opacity="0.5">Senior</text>
+
+  <!-- Principal -->
+  <rect x="500" y="70"  width="80" height="310" rx="6" fill="white" fill-opacity="0.8"/>
+  <rect x="500" y="60"  width="80" height="12"  rx="4" fill="white" fill-opacity="1"/>
+  <text x="540" y="396" text-anchor="middle" font-family="system-ui" font-size="11" fill="white" fill-opacity="0.5">Principal</text>
+
+  <!-- Trend arrow overlay -->
+  <polyline points="120,326 260,296 400,166 540,96"
+    stroke="white" stroke-opacity="0.5" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none" stroke-dasharray="6 3"/>
+
+  <!-- Salary value labels -->
+  <rect x="65"  y="248" width="56" height="18" rx="9" fill="white" fill-opacity="0.12"/>
+  <text x="93"  y="261" text-anchor="middle" font-family="system-ui" font-size="9" font-weight="700" fill="white" fill-opacity="0.7">£52k</text>
+
+  <rect x="205" y="188" width="56" height="18" rx="9" fill="white" fill-opacity="0.12"/>
+  <text x="233" y="201" text-anchor="middle" font-family="system-ui" font-size="9" font-weight="700" fill="white" fill-opacity="0.7">£78k</text>
+
+  <rect x="345" y="108" width="60" height="18" rx="9" fill="white" fill-opacity="0.12"/>
+  <text x="375" y="121" text-anchor="middle" font-family="system-ui" font-size="9" font-weight="700" fill="white" fill-opacity="0.7">£112k</text>
+
+  <rect x="485" y="38"  width="66" height="18" rx="9" fill="white" fill-opacity="0.15"/>
+  <text x="518" y="51"  text-anchor="middle" font-family="system-ui" font-size="9" font-weight="700" fill="white" fill-opacity="0.9">£155k</text>
+
+  <!-- Currency symbol decoration — large £ -->
+  <text x="720" y="280" font-family="Georgia,serif" font-size="220" fill="white" fill-opacity="0.04" font-weight="700">£</text>
+
+  <!-- P25–P75 range bands (horizontal) -->
+  <rect x="660" y="80"  width="200" height="18" rx="9" fill="white" fill-opacity="0.06"/>
+  <rect x="660" y="80"  width="80"  height="18" rx="9" fill="white" fill-opacity="0.2"/>
+  <text x="666" y="94"  font-family="system-ui" font-size="9" fill="white" fill-opacity="0.5">P25</text>
+  <text x="848" y="94"  text-anchor="end" font-family="system-ui" font-size="9" fill="white" fill-opacity="0.5">P75</text>
+
+  <rect x="660" y="112" width="200" height="18" rx="9" fill="white" fill-opacity="0.06"/>
+  <rect x="660" y="112" width="120" height="18" rx="9" fill="white" fill-opacity="0.2"/>
+
+  <rect x="660" y="144" width="200" height="18" rx="9" fill="white" fill-opacity="0.06"/>
+  <rect x="660" y="144" width="160" height="18" rx="9" fill="white" fill-opacity="0.2"/>
+
+  <rect x="660" y="176" width="200" height="18" rx="9" fill="white" fill-opacity="0.06"/>
+  <rect x="660" y="176" width="200" height="18" rx="9" fill="white" fill-opacity="0.3"/>
+
+  <!-- Labels left of range bars -->
+  <text x="650" y="94"  text-anchor="end" font-family="system-ui" font-size="9" fill="white" fill-opacity="0.4">Junior</text>
+  <text x="650" y="126" text-anchor="end" font-family="system-ui" font-size="9" fill="white" fill-opacity="0.4">Mid</text>
+  <text x="650" y="158" text-anchor="end" font-family="system-ui" font-size="9" fill="white" fill-opacity="0.4">Senior</text>
+  <text x="650" y="190" text-anchor="end" font-family="system-ui" font-size="9" fill="white" fill-opacity="0.4">Principal</text>
+
+  <!-- Remote premium chip -->
+  <rect x="660" y="230" width="200" height="52" rx="12" fill="white" fill-opacity="0.06" stroke="white" stroke-opacity="0.12" stroke-width="1"/>
+  <rect x="676" y="242" width="70" height="8"  rx="4" fill="white" fill-opacity="0.3"/>
+  <rect x="676" y="256" width="110" height="6" rx="3" fill="white" fill-opacity="0.18"/>
+
+  <!-- Dotted upward arrow -->
+  <line x1="830" y1="370" x2="830" y2="40" stroke="white" stroke-opacity="0.1" stroke-width="1.5" stroke-dasharray="4 5"/>
+  <polygon points="820,50 830,30 840,50" fill="white" fill-opacity="0.2"/>
+
+  <!-- Scatter decorations -->
+  <circle cx="40"  cy="80"  r="3" fill="white" fill-opacity="0.15"/>
+  <circle cx="610" cy="330" r="4" fill="white" fill-opacity="0.1"/>
+  <circle cx="640" cy="380" r="3" fill="white" fill-opacity="0.1"/>
+</svg>
