@@ -98,7 +98,7 @@ export default async function MarketPage() {
           title="UK AI Job Market"
           titleAccent="Overview"
           subtitle="Real-time aggregate view of the UK AI/ML hiring landscape. Data refreshed twice weekly from Adzuna, Reed, and specialist boards."
-          imageSrc="https://images.unsplash.com/photo-HKatXPny9Hc?w=1920&q=80&auto=format&fit=crop"
+          imageSrc="https://images.unsplash.com/photo-1506501139174-099022df5260?w=1920&q=80&auto=format&fit=crop"
         >
           <div className="flex flex-wrap items-center gap-3">
             <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-emerald-400/30 bg-emerald-400/10">

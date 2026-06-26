@@ -116,7 +116,7 @@ export default async function SalaryPage() {
           title="UK AI Salary"
           titleAccent="Benchmarks"
           subtitle="Salary percentiles derived from live job postings with stated compensation. All figures are gross annual salary in GBP. Updated each pipeline run."
-          imageSrc="https://images.unsplash.com/photo-PnxiOm35jsM?w=1920&q=80&auto=format&fit=crop"
+          imageSrc="https://images.unsplash.com/photo-1781430014493-2346ad564a7a?w=1920&q=80&auto=format&fit=crop"
         >
           <div className="flex flex-wrap gap-3">
             <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/10 border border-white/20">
