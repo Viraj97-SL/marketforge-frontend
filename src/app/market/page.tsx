@@ -14,10 +14,11 @@ export const metadata: Metadata = {
 };
 
 import { api } from "@/lib/api";
-import type { HiringVelocityItem, CityCount } from "@/lib/api";
+import type { HiringVelocityItem, CityCount, VacancyTrendData } from "@/lib/api";
 import { fmt, fmtK, pct } from "@/lib/utils";
 import { SkillBar } from "@/components/charts/skill-bar";
 import { SalaryRange } from "@/components/charts/salary-range";
+import { TrendLine } from "@/components/charts/trend-line";
 import { StatCard } from "@/components/cards/stat-card";
 import { PageHero } from "@/components/layout/page-hero";
 import { UKMap } from "@/components/illustrations/uk-map";
@@ -39,15 +40,6 @@ const FALLBACK_CITIES: CityCount[] = [
   { city: "Leeds",      job_count: 160  },
 ];
 
-const FALLBACK_VELOCITY: HiringVelocityItem[] = [
-  { role: "AI / LLM Engineer",  growth_pct: 62,  direction: "up",   role_category: "ai_engineer"    },
-  { role: "MLOps / Platform",   growth_pct: 44,  direction: "up",   role_category: "mlops_engineer" },
-  { role: "AI Safety Engineer", growth_pct: 38,  direction: "up",   role_category: "ai_safety"      },
-  { role: "ML Engineer",        growth_pct: 18,  direction: "up",   role_category: "ml_engineer"    },
-  { role: "Data Scientist",     growth_pct: 6,   direction: "up",   role_category: "data_scientist" },
-  { role: "Data Analyst",       growth_pct: -4,  direction: "down", role_category: "data_analyst"   },
-];
-
 const CITY_FLAGS: Record<string, string> = {
   London: "🏙️", Manchester: "🌃", Cambridge: "🎓", Edinburgh: "🏰",
   Bristol: "🌉", Oxford: "📚", Birmingham: "🏢", Leeds: "🌆",
@@ -59,27 +51,36 @@ const VELOCITY_COLORS = [
 ];
 
 export default async function MarketPage() {
-  let snapshot    = null;
-  let skills      = null;
-  let trending    = null;
-  let velocityRaw = null;
-  let citiesRaw   = null;
+  let snapshot     = null;
+  let skills       = null;
+  let trending     = null;
+  let velocityRaw  = null;
+  let citiesRaw    = null;
+  let vacancyTrendRaw = null;
 
   await Promise.allSettled([
-    api.snapshot()       .then(d => { snapshot    = d; }),
-    api.skills()         .then(d => { skills      = d; }),
-    api.trending(7)      .then(d => { trending    = d; }),
-    api.hiringVelocity() .then(d => { velocityRaw = d; }),
-    api.cities()         .then(d => { citiesRaw   = d; }),
+    api.snapshot()          .then(d => { snapshot        = d; }),
+    api.skills()            .then(d => { skills          = d; }),
+    api.trending(7)         .then(d => { trending        = d; }),
+    api.hiringVelocity()    .then(d => { velocityRaw     = d; }),
+    api.cities()            .then(d => { citiesRaw       = d; }),
+    api.vacancyTrend()      .then(d => { vacancyTrendRaw = d; }),
   ]);
 
   const topSkillsList = Object.entries((skills as any)?.top_skills ?? {})
     .map(([skill, count]) => ({ skill, count: count as number }))
     .sort((a, b) => b.count - a.count);
 
-  const velocityItems: HiringVelocityItem[] =
-    (velocityRaw as any)?.velocity?.length ? (velocityRaw as any).velocity.slice(0, 6) : FALLBACK_VELOCITY;
-  const isLiveVelocity = (velocityRaw as any)?.velocity?.length > 0;
+  const velocityItems: HiringVelocityItem[] = (velocityRaw as any)?.velocity?.length
+    ? (velocityRaw as any).velocity.slice(0, 6)
+    : [];
+  const isLiveVelocity = velocityItems.length > 0 && velocityItems.some((v) => v.direction !== "neutral");
+
+  const vacancyTrend = vacancyTrendRaw as VacancyTrendData | null;
+  const vacancyTrendPoints = (vacancyTrend?.trend ?? []).slice(-12).map((p) => ({
+    label: p.month.slice(2),
+    value: p.vacancies_index,
+  }));
 
   const cityList: CityCount[] =
     (citiesRaw as any)?.cities?.length ? (citiesRaw as any).cities : FALLBACK_CITIES;
@@ -285,42 +286,52 @@ export default async function MarketPage() {
             <Activity className="w-4 h-4 text-accent" />
             <h2 className="text-sm font-bold text-t1">Hiring Velocity by Role</h2>
             <p className="text-xs text-t2 ml-auto">
-              {isLiveVelocity ? "Week-over-week change" : "Year-over-year growth"}
+              {isLiveVelocity ? "Week-over-week change" : vacancyTrend ? "ONS national trend" : ""}
             </p>
           </div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
-            {velocityItems.map((row, i) => {
-              const colorClass = VELOCITY_COLORS[Math.min(i, VELOCITY_COLORS.length - 1)];
-              const isDown = row.direction === "down";
-              const displayGrowth = row.growth_pct === 0
-                ? "—"
-                : `${row.growth_pct > 0 ? "+" : ""}${row.growth_pct}%`;
-              return (
-                <div
-                  key={row.role}
-                  className="flex items-center justify-between p-4 rounded-xl bg-s2 border border-b1"
-                >
-                  <div>
-                    <p className="text-xs font-semibold text-t1">{row.role}</p>
-                    <p className="text-[10px] text-t3 mt-0.5">
-                      {isLiveVelocity ? "WoW change" : "YoY change"}
-                    </p>
+
+          {isLiveVelocity ? (
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {velocityItems.map((row, i) => {
+                const colorClass = VELOCITY_COLORS[Math.min(i, VELOCITY_COLORS.length - 1)];
+                const isDown = row.direction === "down";
+                const displayGrowth = row.growth_pct === 0
+                  ? "—"
+                  : `${row.growth_pct > 0 ? "+" : ""}${row.growth_pct}%`;
+                return (
+                  <div
+                    key={row.role}
+                    className="flex items-center justify-between p-4 rounded-xl bg-s2 border border-b1"
+                  >
+                    <div>
+                      <p className="text-xs font-semibold text-t1">{row.role}</p>
+                      <p className="text-[10px] text-t3 mt-0.5">WoW change</p>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      {isDown
+                        ? <TrendingDown className={`w-4 h-4 ${colorClass}`} />
+                        : <TrendingUp className={`w-4 h-4 ${colorClass}`} />
+                      }
+                      <span className={`text-lg font-black ${colorClass}`}>{displayGrowth}</span>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-1.5">
-                    {isDown
-                      ? <TrendingDown className={`w-4 h-4 ${colorClass}`} />
-                      : <TrendingUp className={`w-4 h-4 ${colorClass}`} />
-                    }
-                    <span className={`text-lg font-black ${colorClass}`}>{displayGrowth}</span>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-          {!isLiveVelocity && (
-            <p className="text-[10px] text-t3 mt-4 pt-4 border-t border-b1">
-              Illustrative pending live YoY data. Based on sector reporting and MarketForge internal estimates.
-            </p>
+                );
+              })}
+            </div>
+          ) : vacancyTrendPoints.length > 0 ? (
+            <>
+              <TrendLine data={vacancyTrendPoints} height={220} />
+              <p className="text-[10px] text-t3 mt-4 pt-4 border-t border-b1">
+                {vacancyTrend?.series_label} · {vacancyTrend?.source}. {vacancyTrend?.methodology}
+                {" "}Our own per-role week-over-week figures will appear here once the sample has enough
+                weekly history to compare.
+              </p>
+            </>
+          ) : (
+            <div className="flex flex-col items-center justify-center h-40 text-t2 text-sm gap-2">
+              <Sparkles className="w-8 h-8 text-t3" />
+              No velocity data yet — pipeline hasn&apos;t run
+            </div>
           )}
         </div>
 

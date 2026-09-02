@@ -160,6 +160,41 @@ export interface SponsorshipBySectorData {
   sectors: SponsorshipSector[];
 }
 
+export interface VacancyTrendPoint {
+  month: string;
+  vacancies_index: number;
+}
+
+export interface VacancyTrendData {
+  source: string;
+  series_label: string;
+  methodology: string;
+  trend: VacancyTrendPoint[];
+}
+
+export interface SponsorVerificationData {
+  source: string;
+  methodology: string;
+  sample_size: number;
+  verified_pct: number | null;
+}
+
+export interface SalaryBenchmarkRow {
+  role_category: string;
+  soc_code: string;
+  soc_title: string;
+  year: number;
+  salary_p25: number | null;
+  salary_p50: number | null;
+  salary_p75: number | null;
+}
+
+export interface SalaryBenchmarkData {
+  source: string;
+  methodology: string;
+  benchmarks: SalaryBenchmarkRow[];
+}
+
 async function get<T>(path: string): Promise<T> {
   const res = await fetch(`${API}${path}`, { next: { revalidate: 300 } });
   if (!res.ok) throw new Error(`API ${path} → ${res.status}`);
@@ -178,6 +213,9 @@ export const api = {
   cities: () => get<CitiesData>("/api/v1/market/cities"),
   companyMix: () => get<CompanyMixData>("/api/v1/market/company-mix"),
   sponsorshipBySector: () => get<SponsorshipBySectorData>("/api/v1/market/sponsorship-by-sector"),
+  vacancyTrend: () => get<VacancyTrendData>("/api/v1/market/external/vacancy-trend"),
+  sponsorVerification: () => get<SponsorVerificationData>("/api/v1/market/external/sponsor-verification"),
+  salaryBenchmark: () => get<SalaryBenchmarkData>("/api/v1/market/external/salary-benchmark"),
   jobs: (opts: { role?: string; work_model?: string; visa_only?: boolean; page?: number; page_size?: number } = {}) => {
     const p = new URLSearchParams({ page: String(opts.page ?? 1), page_size: String(opts.page_size ?? 20) });
     if (opts.role && opts.role !== "all") p.set("role_category", opts.role);
