@@ -267,7 +267,7 @@ export default async function MarketPage() {
 
           <div className="grid lg:grid-cols-2 gap-8 items-center">
             {/* UK map illustration */}
-            <UKMap className="h-80 lg:h-96" showLabels animated />
+            <UKMap className="h-80 lg:h-96" showLabels animated cities={isLiveCities ? cityList : undefined} />
 
             {/* City bar list */}
             <div className="space-y-3">
