@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -176,3 +176,22 @@ body {
   letter-spacing: 0.1em;
   color: #4F46E5;
 }
+
+/* ── Editorial / scrollytelling mode (Data-Storytelling-Workshop style) ──
+   Dark, greyscale + one amber accent. No rounded corners, no shadows, no
+   gradients — scoped entirely to .story-editorial so it never leaks into
+   the rest of the site's design tokens. */
+.story-editorial {
+  --story-bg:        #0A0A0B;
+  --story-bg-alt:    #131315;
+  --story-line:      #2A2A2D;
+  --story-text:      #F2F2EF;
+  --story-text-dim:  #8C8C88;
+  --story-text-mute: #575754;
+  --story-accent:    #E8A33D;
+  font-family: 'IBM Plex Sans', system-ui, sans-serif;
+  background: var(--story-bg);
+  color: var(--story-text);
+}
+.story-editorial * { border-radius: 0 !important; box-shadow: none !important; }
+.story-editorial ::selection { background: rgba(232,163,61,0.25); color: var(--story-text); }

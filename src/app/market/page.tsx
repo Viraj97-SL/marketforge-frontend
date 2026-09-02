@@ -14,7 +14,10 @@ export const metadata: Metadata = {
 };
 
 import { api } from "@/lib/api";
-import type { HiringVelocityItem, CityCount, VacancyTrendData } from "@/lib/api";
+import type {
+  HiringVelocityItem, CityCount, VacancyTrendData,
+  SponsorVerificationData, SalaryBenchmarkData,
+} from "@/lib/api";
 import { fmt, fmtK, pct } from "@/lib/utils";
 import { SkillBar } from "@/components/charts/skill-bar";
 import { SalaryRange } from "@/components/charts/salary-range";
@@ -22,6 +25,7 @@ import { TrendLine } from "@/components/charts/trend-line";
 import { StatCard } from "@/components/cards/stat-card";
 import { PageHero } from "@/components/layout/page-hero";
 import { UKMap } from "@/components/illustrations/uk-map";
+import { MarketStory } from "@/components/market-story/market-story";
 import {
   BarChart3, TrendingUp, TrendingDown, DollarSign,
   Globe, Activity, Clock, Sparkles, MapPin,
@@ -57,6 +61,8 @@ export default async function MarketPage() {
   let velocityRaw  = null;
   let citiesRaw    = null;
   let vacancyTrendRaw = null;
+  let sponsorVerifRaw = null;
+  let salaryBenchRaw  = null;
 
   await Promise.allSettled([
     api.snapshot()          .then(d => { snapshot        = d; }),
@@ -65,6 +71,8 @@ export default async function MarketPage() {
     api.hiringVelocity()    .then(d => { velocityRaw     = d; }),
     api.cities()            .then(d => { citiesRaw       = d; }),
     api.vacancyTrend()      .then(d => { vacancyTrendRaw = d; }),
+    api.sponsorVerification().then(d => { sponsorVerifRaw = d; }),
+    api.salaryBenchmark()   .then(d => { salaryBenchRaw  = d; }),
   ]);
 
   const topSkillsList = Object.entries((skills as any)?.top_skills ?? {})
@@ -88,6 +96,10 @@ export default async function MarketPage() {
   const isLiveCities = (citiesRaw as any)?.cities?.length > 0;
 
   const snap = snapshot as any;
+
+  const sponsorVerification = sponsorVerifRaw as SponsorVerificationData | null;
+  const salaryBenchmark = salaryBenchRaw as SalaryBenchmarkData | null;
+  const asheBenchmark = salaryBenchmark?.benchmarks?.[0] ?? null;
 
   return (
     <div className="pt-14">
@@ -151,6 +163,27 @@ export default async function MarketPage() {
             accent="green"
             delay={240}
           />
+        </div>
+
+        {/* Scrollytelling narrative */}
+        <MarketStory
+          topSkills={topSkillsList}
+          cityList={cityList}
+          vacancyTrendPoints={vacancyTrendPoints}
+          isLiveVelocity={isLiveVelocity}
+          velocityItems={velocityItems}
+          velocitySource={vacancyTrend?.source ?? null}
+          velocityMethodology={vacancyTrend?.methodology ?? null}
+          salaryP50={snap?.salary_p50 ?? null}
+          asheBenchmark={asheBenchmark}
+          sponsorVerification={sponsorVerification}
+        />
+
+        {/* Full breakdown */}
+        <div className="flex items-center gap-3 mb-6 mt-10">
+          <div className="h-px flex-1 bg-b1" />
+          <span className="text-[11px] font-semibold uppercase tracking-[0.15em] text-t3">Full breakdown</span>
+          <div className="h-px flex-1 bg-b1" />
         </div>
 
         {/* Skills chart + Trending sidebar */}
