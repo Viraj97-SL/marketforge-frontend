@@ -137,17 +137,12 @@ export function MarketStory(props: MarketStoryProps) {
 
   // Brand-bridge bar: the site's own indigo accent fading into the story's
   // amber, so the transition into editorial mode reads as this site's own
-  // section rather than a different product pasted in. The wrapper below
-  // deliberately has no overflow-hidden — that would make it a new
-  // scroll-container ancestor and break position:sticky in StickyVisual
-  // (the panel would stick relative to this box instead of the viewport
-  // and appear frozen on the first scene). Round only this bar's own top
-  // corners to match the wrapper's rounded-2xl instead.
+  // section rather than a different product pasted in. Corner clipping for
+  // the whole wrapper is handled by .story-editorial's clip-path (see
+  // globals.css) rather than overflow-hidden, which would break
+  // position:sticky in StickyVisual.
   const bridgeBar = (
-    <div
-      className="h-1 rounded-t-2xl"
-      style={{ background: "linear-gradient(90deg, #4F46E5 0%, #E8A33D 100%)" }}
-    />
+    <div className="h-1" style={{ background: "linear-gradient(90deg, #4F46E5 0%, #E8A33D 100%)" }} />
   );
 
   if (prefersReducedMotion) {

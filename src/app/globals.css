@@ -194,6 +194,14 @@ body {
   font-family: 'IBM Plex Sans', system-ui, sans-serif;
   background: var(--story-bg);
   color: var(--story-text);
+  /* Clip to the rounded shape WITHOUT `overflow: hidden` — that property
+     turns this box into a scroll container and breaks position:sticky for
+     the StickyVisual panel inside it (content gets stuck relative to this
+     box instead of the viewport). clip-path clips visually but doesn't
+     affect the sticky containing-block chain, so tall content (e.g. the
+     100-icon pictogram) no longer pokes past the rounded corner into the
+     page background, and the sticky panel still switches per act. */
+  clip-path: inset(0 round 1rem);
 }
 .story-editorial-inner * { border-radius: 0 !important; box-shadow: none !important; }
 .story-editorial ::selection { background: rgba(232,163,61,0.25); color: var(--story-text); }
