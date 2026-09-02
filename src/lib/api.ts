@@ -247,6 +247,18 @@ export interface EntryLevelCompanyMixData {
   mix: CompanyMixItem[];
 }
 
+export interface SnapshotHistoryWeek {
+  week_start: string;
+  job_count: number;
+  salary_p50: number | null;
+  sponsorship_rate: number;
+}
+
+export interface SnapshotHistoryData {
+  role_category: string;
+  weeks: SnapshotHistoryWeek[];
+}
+
 async function get<T>(path: string): Promise<T> {
   const res = await fetch(`${API}${path}`, { next: { revalidate: 300 } });
   if (!res.ok) throw new Error(`API ${path} → ${res.status}`);
@@ -257,6 +269,8 @@ export const api = {
   health: () => get<HealthData>("/api/v1/health"),
   snapshot: (week?: string) =>
     get<SnapshotData>(`/api/v1/market/snapshot${week ? `?week=${week}` : ""}`),
+  snapshotHistory: (weeks = 26) =>
+    get<SnapshotHistoryData>(`/api/v1/market/snapshot-history?weeks=${weeks}`),
   skills: (role = "all") => get<SkillsData>(`/api/v1/market/skills?role_category=${role}`),
   salary: (role = "all", level = "all", location = "all") =>
     get<SalaryData>(`/api/v1/market/salary?role_category=${role}&experience_level=${level}&location=${location}`),

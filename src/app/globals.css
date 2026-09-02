@@ -178,9 +178,11 @@ body {
 }
 
 /* ── Editorial / scrollytelling mode (Data-Storytelling-Workshop style) ──
-   Dark, greyscale + one amber accent. No rounded corners, no shadows, no
-   gradients — scoped entirely to .story-editorial so it never leaks into
-   the rest of the site's design tokens. */
+   Dark, greyscale + one amber accent. Sharp corners / no shadows apply to
+   everything INSIDE the section (.story-editorial-inner), but the outer
+   .story-editorial frame keeps the site's own rounded-2xl + shadow-card +
+   brand-accent top border, so it reads as a section of this site rather
+   than a bolted-on separate product. */
 .story-editorial {
   --story-bg:        #0A0A0B;
   --story-bg-alt:    #131315;
@@ -193,5 +195,5 @@ body {
   background: var(--story-bg);
   color: var(--story-text);
 }
-.story-editorial * { border-radius: 0 !important; box-shadow: none !important; }
+.story-editorial-inner * { border-radius: 0 !important; box-shadow: none !important; }
 .story-editorial ::selection { background: rgba(232,163,61,0.25); color: var(--story-text); }

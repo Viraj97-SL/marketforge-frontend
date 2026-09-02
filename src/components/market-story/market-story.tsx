@@ -135,32 +135,45 @@ export function MarketStory(props: MarketStoryProps) {
     },
   ];
 
+  // Brand-bridge bar: the site's own indigo accent fading into the story's
+  // amber, so the transition into editorial mode reads as this site's own
+  // section rather than a different product pasted in.
+  const bridgeBar = (
+    <div className="h-1" style={{ background: "linear-gradient(90deg, #4F46E5 0%, #E8A33D 100%)" }} />
+  );
+
   if (prefersReducedMotion) {
     return (
-      <div className="story-editorial my-10">
-        {steps.map((s, i) => (
-          <div key={i} className="px-6 lg:px-12 py-14" style={{ borderBottom: i < steps.length - 1 ? "1px solid var(--story-line)" : undefined }}>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.2em]" style={{ color: "var(--story-accent)" }}>{s.eyebrow}</p>
-            <h3 className="text-2xl font-semibold mt-3 mb-4 max-w-xl">{s.title}</h3>
-            <p className="text-sm leading-relaxed max-w-lg mb-8" style={{ color: "var(--story-text-dim)" }}>{s.body}</p>
-            {s.scene}
-          </div>
-        ))}
+      <div className="story-editorial my-10 rounded-2xl shadow-card overflow-hidden">
+        {bridgeBar}
+        <div className="story-editorial-inner">
+          {steps.map((s, i) => (
+            <div key={i} className="px-6 lg:px-12 py-14" style={{ borderBottom: i < steps.length - 1 ? "1px solid var(--story-line)" : undefined }}>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.2em]" style={{ color: "var(--story-accent)" }}>{s.eyebrow}</p>
+              <h3 className="text-2xl font-semibold mt-3 mb-4 max-w-xl">{s.title}</h3>
+              <p className="text-sm leading-relaxed max-w-lg mb-8" style={{ color: "var(--story-text-dim)" }}>{s.body}</p>
+              {s.scene}
+            </div>
+          ))}
+        </div>
       </div>
     );
   }
 
   return (
     <StoryProvider>
-      <div className="story-editorial my-10 grid lg:grid-cols-2">
-        <div>
-          {steps.map((s, i) => (
-            <StoryStep key={i} index={i} eyebrow={s.eyebrow} title={s.title}>
-              {s.body}
-            </StoryStep>
-          ))}
+      <div className="story-editorial my-10 rounded-2xl shadow-card overflow-hidden">
+        {bridgeBar}
+        <div className="story-editorial-inner grid lg:grid-cols-2">
+          <div>
+            {steps.map((s, i) => (
+              <StoryStep key={i} index={i} eyebrow={s.eyebrow} title={s.title}>
+                {s.body}
+              </StoryStep>
+            ))}
+          </div>
+          <StickyVisual scenes={steps.map((s) => s.scene)} captions={steps.map((s) => s.caption)} />
         </div>
-        <StickyVisual scenes={steps.map((s) => s.scene)} captions={steps.map((s) => s.caption)} />
       </div>
     </StoryProvider>
   );
