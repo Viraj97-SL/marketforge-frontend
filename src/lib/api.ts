@@ -195,6 +195,58 @@ export interface SalaryBenchmarkData {
   benchmarks: SalaryBenchmarkRow[];
 }
 
+export interface GraduateOutcomesData {
+  source: string;
+  methodology: string;
+  employment: {
+    year: number;
+    employment_rate: number;
+    hs_employment_rate: number;
+    unemployment_rate: number;
+    inactivity_rate: number;
+  } | null;
+  computing_qualifiers: {
+    academic_year: string;
+    qualifiers_count: number;
+  } | null;
+}
+
+export interface SkillShift {
+  skill: string;
+  overall_rank: number;
+  junior_rank: number;
+  rank_delta: number;
+}
+
+export interface EntryLevelSkillShiftData {
+  methodology: string;
+  shifts: SkillShift[];
+  sample_size_junior: number;
+}
+
+export interface UniversalSkill {
+  skill: string;
+  role_span: number;
+  total: number;
+}
+
+export interface UniversalSkillMatrixCell {
+  skill: string;
+  role_category: string;
+  count: number;
+}
+
+export interface EntryLevelUniversalSkillsData {
+  methodology: string;
+  skills: UniversalSkill[];
+  matrix: UniversalSkillMatrixCell[];
+}
+
+export interface EntryLevelCompanyMixData {
+  sample_size: number;
+  mix: CompanyMixItem[];
+}
+
 async function get<T>(path: string): Promise<T> {
   const res = await fetch(`${API}${path}`, { next: { revalidate: 300 } });
   if (!res.ok) throw new Error(`API ${path} → ${res.status}`);
@@ -216,6 +268,10 @@ export const api = {
   vacancyTrend: () => get<VacancyTrendData>("/api/v1/market/external/vacancy-trend"),
   sponsorVerification: () => get<SponsorVerificationData>("/api/v1/market/external/sponsor-verification"),
   salaryBenchmark: () => get<SalaryBenchmarkData>("/api/v1/market/external/salary-benchmark"),
+  graduateOutcomes: () => get<GraduateOutcomesData>("/api/v1/market/external/graduate-outcomes"),
+  entryLevelSkillShift: () => get<EntryLevelSkillShiftData>("/api/v1/market/entry-level/skill-shift"),
+  entryLevelUniversalSkills: () => get<EntryLevelUniversalSkillsData>("/api/v1/market/entry-level/universal-skills"),
+  entryLevelCompanyMix: () => get<EntryLevelCompanyMixData>("/api/v1/market/entry-level/company-mix"),
   jobs: (opts: { role?: string; work_model?: string; visa_only?: boolean; page?: number; page_size?: number } = {}) => {
     const p = new URLSearchParams({ page: String(opts.page ?? 1), page_size: String(opts.page_size ?? 20) });
     if (opts.role && opts.role !== "all") p.set("role_category", opts.role);

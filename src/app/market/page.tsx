@@ -16,7 +16,9 @@ export const metadata: Metadata = {
 import { api } from "@/lib/api";
 import type {
   HiringVelocityItem, CityCount, VacancyTrendData,
-  SponsorVerificationData, SalaryBenchmarkData,
+  SalaryBenchmarkData,
+  GraduateOutcomesData, EntryLevelSkillShiftData,
+  EntryLevelUniversalSkillsData, EntryLevelCompanyMixData, SalaryData,
 } from "@/lib/api";
 import { fmt, fmtK, pct } from "@/lib/utils";
 import { SkillBar } from "@/components/charts/skill-bar";
@@ -61,8 +63,12 @@ export default async function MarketPage() {
   let velocityRaw  = null;
   let citiesRaw    = null;
   let vacancyTrendRaw = null;
-  let sponsorVerifRaw = null;
   let salaryBenchRaw  = null;
+  let graduateOutcomesRaw = null;
+  let skillShiftRaw       = null;
+  let universalSkillsRaw  = null;
+  let entryCompanyMixRaw  = null;
+  let juniorSalaryRaw     = null;
 
   await Promise.allSettled([
     api.snapshot()          .then(d => { snapshot        = d; }),
@@ -71,8 +77,12 @@ export default async function MarketPage() {
     api.hiringVelocity()    .then(d => { velocityRaw     = d; }),
     api.cities()            .then(d => { citiesRaw       = d; }),
     api.vacancyTrend()      .then(d => { vacancyTrendRaw = d; }),
-    api.sponsorVerification().then(d => { sponsorVerifRaw = d; }),
     api.salaryBenchmark()   .then(d => { salaryBenchRaw  = d; }),
+    api.graduateOutcomes()  .then(d => { graduateOutcomesRaw = d; }),
+    api.entryLevelSkillShift()      .then(d => { skillShiftRaw      = d; }),
+    api.entryLevelUniversalSkills() .then(d => { universalSkillsRaw = d; }),
+    api.entryLevelCompanyMix()      .then(d => { entryCompanyMixRaw = d; }),
+    api.salary("all", "junior", "all") .then(d => { juniorSalaryRaw = d; }),
   ]);
 
   const topSkillsList = Object.entries((skills as any)?.top_skills ?? {})
@@ -97,9 +107,14 @@ export default async function MarketPage() {
 
   const snap = snapshot as any;
 
-  const sponsorVerification = sponsorVerifRaw as SponsorVerificationData | null;
   const salaryBenchmark = salaryBenchRaw as SalaryBenchmarkData | null;
   const asheBenchmark = salaryBenchmark?.benchmarks?.[0] ?? null;
+
+  const graduateOutcomes = graduateOutcomesRaw as GraduateOutcomesData | null;
+  const skillShift = skillShiftRaw as EntryLevelSkillShiftData | null;
+  const universalSkills = universalSkillsRaw as EntryLevelUniversalSkillsData | null;
+  const entryCompanyMix = entryCompanyMixRaw as EntryLevelCompanyMixData | null;
+  const juniorSalary = juniorSalaryRaw as SalaryData | null;
 
   return (
     <div className="pt-14">
@@ -165,18 +180,14 @@ export default async function MarketPage() {
           />
         </div>
 
-        {/* Scrollytelling narrative */}
+        {/* Graduate-reality narrative */}
         <MarketStory
-          topSkills={topSkillsList}
-          cityList={cityList}
-          vacancyTrendPoints={vacancyTrendPoints}
-          isLiveVelocity={isLiveVelocity}
-          velocityItems={velocityItems}
-          velocitySource={vacancyTrend?.source ?? null}
-          velocityMethodology={vacancyTrend?.methodology ?? null}
-          salaryP50={snap?.salary_p50 ?? null}
+          graduateOutcomes={graduateOutcomes}
+          skillShift={skillShift}
+          universalSkills={universalSkills}
+          entryCompanyMix={entryCompanyMix}
+          juniorSalaryP25={juniorSalary?.salary_p25 ?? null}
           asheBenchmark={asheBenchmark}
-          sponsorVerification={sponsorVerification}
         />
 
         {/* Full breakdown */}
