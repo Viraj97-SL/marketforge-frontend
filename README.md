@@ -31,12 +31,24 @@ The UI is built for **technical depth over aesthetics**: every data point on scr
 
 ---
 
+## Recent Updates
+
+### 2026-09-02 — Graduate-reality scrollytelling narrative on `/market`
+
+- Rebuilt the `/market` page's story section as a genuine 5-act editorial scrollytelling narrative (`market-story.tsx`): hiring pipeline pictogram, entry-level skill-shift slope chart, skill-floor heatmap, who-opens-the-door donut, pay-reality gap plot — each backed by real data (own dataset per act, not the same 4 numbers reskinned).
+- Added a real time-series chart (`charts/market-trend.tsx`, dual-axis job count + salary) wired to the new `/api/v1/market/snapshot-history` endpoint; compacted the old skill-bar/salary-range breakdown into teaser cards that link out to `/skills` and `/salary` instead of duplicating them.
+- Replaced the hand-drawn UK hiring-cities map (`illustrations/uk-map.tsx`) with one built from a real traced coastline (public-domain Wikimedia Commons data) and made it data-driven from live city counts instead of hardcoded.
+- Fixed a CSS bug where `overflow-hidden` (added for rounded card corners) silently broke `position: sticky` scroll panels, freezing the story on its first scene; switched to `clip-path: inset(0 round 1rem)`, which clips without creating a scroll container — also fixed a related corner-bleed regression from the same root cause.
+- Theme-glued the story section's dark editorial palette with the site's existing light theme so it reads as one continuous page rather than a visually separate embed.
+
+---
+
 ## Pages
 
 | Route | Title | What it shows |
 |---|---|---|
 | `/` | Home | Live hero metrics (job count, top skill, median salary), feature overview, tech stack marquee, contact form |
-| `/market` | Market Overview | Weekly snapshot: job count, skill demand bar chart, salary percentiles (p25/p50/p75), sponsorship rate, top skills radar |
+| `/market` | Market Overview | Weekly snapshot + real time-series chart, a 5-act graduate-reality scrollytelling narrative, and a real data-driven UK hiring-cities map |
 | `/skills` | Skills Intelligence | Full skill demand index, role-category breakdown, trending skills (rising / declining week-on-week) |
 | `/salary` | Salary Benchmarks | Salary p25/p50/p75 by role category and experience level; London vs national comparison |
 | `/jobs` | Live Jobs | Paginated job listings with filter by role, work model (remote/hybrid/on-site), and visa sponsorship |
