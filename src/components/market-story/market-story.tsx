@@ -170,7 +170,7 @@ export function MarketStory(props: MarketStoryProps) {
         <div className="story-editorial-inner grid lg:grid-cols-2">
           <div>
             {steps.map((s, i) => (
-              <StoryStep key={i} index={i} eyebrow={s.eyebrow} title={s.title}>
+              <StoryStep key={i} index={i} eyebrow={s.eyebrow} title={s.title} scene={s.scene} caption={s.caption}>
                 {s.body}
               </StoryStep>
             ))}

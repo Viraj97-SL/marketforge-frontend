@@ -7,6 +7,8 @@ interface StoryStepProps {
   index: number;
   eyebrow: string;
   title: string;
+  scene: React.ReactNode;
+  caption?: string;
   children: React.ReactNode;
 }
 
@@ -15,8 +17,13 @@ interface StoryStepProps {
  * crosses the vertical centre of the viewport — the standard "scrollama"
  * step-activation pattern, done with IntersectionObserver instead of a
  * dedicated library since react-intersection-observer already covers it.
+ *
+ * Below the `lg` breakpoint StickyVisual is hidden entirely (there's no
+ * room for a fixed side panel next to scrolling text on a phone), so each
+ * step renders its own scene inline here instead — otherwise mobile
+ * readers get the narrative text with none of the five charts at all.
  */
-export function StoryStep({ index, eyebrow, title, children }: StoryStepProps) {
+export function StoryStep({ index, eyebrow, title, scene, caption, children }: StoryStepProps) {
   const { setActiveStep } = useStory();
   const { ref, inView } = useInView({
     rootMargin: "-45% 0px -45% 0px",
@@ -37,6 +44,12 @@ export function StoryStep({ index, eyebrow, title, children }: StoryStepProps) {
       </h3>
       <div className="text-sm lg:text-[15px] leading-relaxed max-w-lg" style={{ color: "var(--story-text-dim)" }}>
         {children}
+      </div>
+      <div className="lg:hidden mt-8 w-full">
+        {scene}
+        {caption && (
+          <p className="text-[10px] mt-6" style={{ color: "var(--story-text-mute)" }}>{caption}</p>
+        )}
       </div>
     </div>
   );
