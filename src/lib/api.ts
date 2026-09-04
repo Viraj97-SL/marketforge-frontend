@@ -272,8 +272,8 @@ export const api = {
   snapshotHistory: (weeks = 26) =>
     get<SnapshotHistoryData>(`/api/v1/market/snapshot-history?weeks=${weeks}`),
   skills: (role = "all") => get<SkillsData>(`/api/v1/market/skills?role_category=${role}`),
-  salary: (role = "all", level = "all", location = "all") =>
-    get<SalaryData>(`/api/v1/market/salary?role_category=${role}&experience_level=${level}&location=${location}`),
+  salary: (role = "all", level = "all", location = "all", workModel = "all") =>
+    get<SalaryData>(`/api/v1/market/salary?role_category=${role}&experience_level=${level}&location=${location}&work_model=${workModel}`),
   trending: (days = 7) => get<TrendingData>(`/api/v1/market/trending?days=${days}`),
   hiringVelocity: () => get<HiringVelocityData>("/api/v1/market/hiring-velocity"),
   cities: () => get<CitiesData>("/api/v1/market/cities"),

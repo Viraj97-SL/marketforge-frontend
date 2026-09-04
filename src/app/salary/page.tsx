@@ -16,21 +16,12 @@ export const metadata: Metadata = {
 import { api } from "@/lib/api";
 import type { SalaryData } from "@/lib/api";
 import { fmtK } from "@/lib/utils";
+import { ROLE_CONFIGS } from "@/lib/roles";
 import { SalaryRange } from "@/components/charts/salary-range";
 import { PageHero } from "@/components/layout/page-hero";
 import { DollarSign, Globe, TrendingUp, Info, Laptop, GraduationCap, Code2, Layers, Star } from "lucide-react";
 
 export const revalidate = 300;
-
-const ROLE_CONFIGS = [
-  { key: "ml_engineer",    label: "ML Engineer",               apiSlug: "ml_engineer"    },
-  { key: "data_scientist", label: "Data Scientist",            apiSlug: "data_scientist" },
-  { key: "ai_researcher",  label: "AI Research Scientist",     apiSlug: "ai_researcher"  },
-  { key: "mlops_engineer", label: "MLOps / Platform Engineer", apiSlug: "mlops_engineer" },
-  { key: "nlp_engineer",   label: "NLP Engineer",              apiSlug: "nlp_engineer"   },
-  { key: "data_engineer",  label: "Data Engineer",             apiSlug: "data_engineer"  },
-  { key: "cv_engineer",    label: "Computer Vision Engineer",  apiSlug: "cv_engineer"    },
-] as const;
 
 const EXPERIENCE_LEVELS = [
   { slug: "junior",    label: "Junior",           years: "0–2 yrs", Icon: GraduationCap, color: "text-blue",   bg: "bg-blue/8",   border: "border-blue/20",   note: "Grad schemes & apprenticeships included" },
@@ -39,32 +30,23 @@ const EXPERIENCE_LEVELS = [
   { slug: "principal", label: "Principal / Staff",years: "8+ yrs",  Icon: Star,          color: "text-warn",   bg: "bg-warn/8",   border: "border-warn/20",   note: "Org-wide impact, IC track" },
 ] as const;
 
+// Real UK AI hiring hubs — queried live against market.jobs.location, not a
+// hardcoded multiplier table. A region only renders if it clears
+// MIN_SALARY_SAMPLE_SIZE live GBP-denominated postings this run.
 const UK_REGIONS = [
-  { region: "London",      multiplier: 1.0,  note: "Highest concentration of AI roles" },
-  { region: "Cambridge",   multiplier: 0.95, note: "Strong research & biotech sector"  },
-  { region: "Oxford",      multiplier: 0.92, note: "Academic + deep tech spin-outs"    },
-  { region: "Manchester",  multiplier: 0.82, note: "Growing Northern Powerhouse hub"   },
-  { region: "Edinburgh",   multiplier: 0.80, note: "Strong in fintech & NLP research"  },
-  { region: "Bristol",     multiplier: 0.83, note: "Robotics & autonomous systems"     },
-  { region: "Remote (UK)", multiplier: 0.90, note: "Varies widely by company HQ"       },
-];
+  { region: "London",      apiSlug: "London"     },
+  { region: "Cambridge",   apiSlug: "Cambridge"  },
+  { region: "Oxford",      apiSlug: "Oxford"     },
+  { region: "Manchester",  apiSlug: "Manchester" },
+  { region: "Edinburgh",   apiSlug: "Edinburgh"  },
+  { region: "Bristol",     apiSlug: "Bristol"    },
+] as const;
 
-const FALLBACK_ROLE_SALARY: Record<string, { p25: number; p50: number; p75: number }> = {
-  ml_engineer:    { p25: 65000, p50: 90000,  p75: 130000 },
-  data_scientist: { p25: 55000, p50: 75000,  p75: 110000 },
-  ai_researcher:  { p25: 70000, p50: 95000,  p75: 140000 },
-  mlops_engineer: { p25: 65000, p50: 88000,  p75: 125000 },
-  nlp_engineer:   { p25: 60000, p50: 85000,  p75: 120000 },
-  data_engineer:  { p25: 55000, p50: 78000,  p75: 110000 },
-  cv_engineer:    { p25: 62000, p50: 88000,  p75: 125000 },
-};
-
-const FALLBACK_EXP_SALARY: Record<string, { range: [number, number]; median: number }> = {
-  junior:    { range: [42000, 65000],  median: 52000  },
-  mid:       { range: [65000, 95000],  median: 78000  },
-  senior:    { range: [95000, 135000], median: 112000 },
-  principal: { range: [130000, 200000],median: 155000 },
-};
+const WORK_MODELS = [
+  { model: "remote", label: "Fully Remote",      note: "Anchored to company HQ location",    color: "text-prp",   border: "border-prp/20",   bg: "bg-prp/5"   },
+  { model: "hybrid", label: "Hybrid",             note: "Standard in most UK AI roles today", color: "text-accent", border: "border-accent/20", bg: "bg-accent/5" },
+  { model: "onsite", label: "Fully On-site",      note: "London roles may compensate more",   color: "text-blue",  border: "border-blue/20",   bg: "bg-blue/5"  },
+] as const;
 
 export default async function SalaryPage() {
   const [snapshotResult, ...roleResults] = await Promise.allSettled([
@@ -72,39 +54,43 @@ export default async function SalaryPage() {
     ...ROLE_CONFIGS.map(r => api.salary(r.apiSlug, "all", "all")),
   ]);
 
-  const expResults = await Promise.allSettled(
-    EXPERIENCE_LEVELS.map(e => api.salary("all", e.slug, "all"))
-  );
+  const [expResults, regionResults, workModelResults] = await Promise.all([
+    Promise.allSettled(EXPERIENCE_LEVELS.map(e => api.salary("all", e.slug, "all"))),
+    Promise.allSettled(UK_REGIONS.map(r => api.salary("all", "all", r.apiSlug))),
+    Promise.allSettled(WORK_MODELS.map(w => api.salary("all", "all", "all", w.model))),
+  ]);
 
   const snapshot = snapshotResult.status === "fulfilled" ? snapshotResult.value : null;
   const snap = snapshot as any;
 
-  const roleSalary: Record<string, { p25: number; p50: number; p75: number; live: boolean }> = {};
-  ROLE_CONFIGS.forEach((r, i) => {
-    const res = roleResults[i];
-    const liveData = res.status === "fulfilled" ? (res.value as SalaryData) : null;
-    const fb = FALLBACK_ROLE_SALARY[r.apiSlug];
-    roleSalary[r.apiSlug] = {
-      p25:  liveData?.salary_p25  ?? fb.p25,
-      p50:  liveData?.salary_p50  ?? fb.p50,
-      p75:  liveData?.salary_p75  ?? fb.p75,
-      live: liveData?.salary_p50 != null,
+  // No fallback numbers here — a role/band/region/work-model with no live
+  // sample this run renders an honest "not enough live data yet" state
+  // instead of a plausible-looking fabricated figure.
+  type LiveSalary = { p25: number | null; p50: number | null; p75: number | null; n: number; live: boolean };
+  const toLive = (res: PromiseSettledResult<SalaryData>): LiveSalary => {
+    const d = res.status === "fulfilled" ? res.value : null;
+    return {
+      p25: d?.salary_p25 ?? null,
+      p50: d?.salary_p50 ?? null,
+      p75: d?.salary_p75 ?? null,
+      n: d?.salary_sample_size ?? 0,
+      live: d?.salary_p50 != null,
     };
-  });
+  };
 
-  const expSalary: Record<string, { range: [number, number]; median: number; live: boolean }> = {};
-  EXPERIENCE_LEVELS.forEach((e, i) => {
-    const res = expResults[i];
-    const liveData = res.status === "fulfilled" ? (res.value as SalaryData) : null;
-    const fb = FALLBACK_EXP_SALARY[e.slug];
-    expSalary[e.slug] = {
-      range:  [liveData?.salary_p25 ?? fb.range[0], liveData?.salary_p75 ?? fb.range[1]],
-      median: liveData?.salary_p50  ?? fb.median,
-      live:   liveData?.salary_p50 != null,
-    };
-  });
+  const roleSalary: Record<string, LiveSalary> = {};
+  ROLE_CONFIGS.forEach((r, i) => { roleSalary[r.apiSlug] = toLive(roleResults[i]); });
 
-  const medianSalary = snap?.salary_p50 ?? 82000;
+  const expSalary: Record<string, LiveSalary> = {};
+  EXPERIENCE_LEVELS.forEach((e, i) => { expSalary[e.slug] = toLive(expResults[i]); });
+
+  const regionSalary: Record<string, LiveSalary> = {};
+  UK_REGIONS.forEach((r, i) => { regionSalary[r.apiSlug] = toLive(regionResults[i]); });
+
+  const workModelSalary: Record<string, LiveSalary> = {};
+  WORK_MODELS.forEach((w, i) => { workModelSalary[w.model] = toLive(workModelResults[i]); });
+
+  const medianSalary = snap?.salary_p50 ?? null;
 
   return (
     <div className="pt-14">
@@ -127,9 +113,9 @@ export default async function SalaryPage() {
               </div>
             </div>
             <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/10 border border-white/20">
-              <span className="text-sm font-bold text-blue-300">{fmtK(snap?.salary_p25 ?? 55000)}</span>
+              <span className="text-sm font-bold text-blue-300">{fmtK(snap?.salary_p25 ?? null)}</span>
               <span className="text-slate-500 text-xs">–</span>
-              <span className="text-sm font-bold text-violet-300">{fmtK(snap?.salary_p75 ?? 120000)}</span>
+              <span className="text-sm font-bold text-violet-300">{fmtK(snap?.salary_p75 ?? null)}</span>
               <p className="text-[10px] text-slate-500">P25 – P75</p>
             </div>
           </div>
@@ -145,21 +131,27 @@ export default async function SalaryPage() {
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="p-4 rounded-xl bg-s2 border border-b1 text-right">
-                <p className="text-xl font-bold text-blue">{fmtK(snap?.salary_p25 ?? 55000)}</p>
+                <p className="text-xl font-bold text-blue">{fmtK(snap?.salary_p25 ?? null)}</p>
                 <p className="text-xs text-t2">25th percentile</p>
               </div>
               <div className="p-4 rounded-xl bg-s2 border border-b1 text-right">
-                <p className="text-xl font-bold text-prp">{fmtK(snap?.salary_p75 ?? 120000)}</p>
+                <p className="text-xl font-bold text-prp">{fmtK(snap?.salary_p75 ?? null)}</p>
                 <p className="text-xs text-t2">75th percentile</p>
               </div>
             </div>
           </div>
-          <SalaryRange
-            p25={snap?.salary_p25 ?? 55000}
-            p50={snap?.salary_p50 ?? 82000}
-            p75={snap?.salary_p75 ?? 120000}
-            height={160}
-          />
+          {snap?.salary_p50 != null ? (
+            <SalaryRange
+              p25={snap.salary_p25}
+              p50={snap.salary_p50}
+              p75={snap.salary_p75}
+              height={160}
+            />
+          ) : (
+            <p className="text-xs text-t3 py-6 text-center border-t border-b1">
+              Live salary distribution unavailable right now — check back after the next pipeline run.
+            </p>
+          )}
         </div>
 
         {/* Experience Bands */}
@@ -183,22 +175,24 @@ export default async function SalaryPage() {
                     </div>
                     <span className="text-[10px] text-t3 bg-s1 px-2 py-0.5 rounded-md border border-b1">{band.years}</span>
                   </div>
-                  <p className={`text-2xl font-black ${band.color} mb-0.5`}>{fmtK(data.median)}</p>
-                  <p className="text-[10px] text-t3 mb-3">{data.live ? "live median" : "estimated median"}</p>
-                  <div className="h-1.5 rounded-full bg-b1 overflow-hidden mb-2">
-                    <div
-                      className="h-full rounded-full bg-current"
-                      style={{
-                        width: `${((data.range[1] - 40000) / 170000) * 100}%`,
-                        color: "currentColor",
-                        opacity: 0.4,
-                      }}
-                    />
-                  </div>
-                  <div className="flex justify-between text-[10px] text-t3 mb-2">
-                    <span>{fmtK(data.range[0])}</span>
-                    <span>{fmtK(data.range[1])}</span>
-                  </div>
+                  {data.live ? (
+                    <>
+                      <p className={`text-2xl font-black ${band.color} mb-0.5`}>{fmtK(data.p50)}</p>
+                      <p className="text-[10px] text-t3 mb-3">live median · n={data.n}</p>
+                      <div className="h-1.5 rounded-full bg-b1 overflow-hidden mb-2">
+                        <div
+                          className="h-full rounded-full bg-current"
+                          style={{ width: `${(((data.p75 ?? 0) - 40000) / 170000) * 100}%`, color: "currentColor", opacity: 0.4 }}
+                        />
+                      </div>
+                      <div className="flex justify-between text-[10px] text-t3 mb-2">
+                        <span>{fmtK(data.p25)}</span>
+                        <span>{fmtK(data.p75)}</span>
+                      </div>
+                    </>
+                  ) : (
+                    <p className="text-xs text-t3 py-3">Not enough live postings yet for this band</p>
+                  )}
                   <p className="text-[10px] text-t2 leading-relaxed border-t border-b1 pt-2">{band.note}</p>
                 </div>
               );
@@ -217,6 +211,14 @@ export default async function SalaryPage() {
             <div className="space-y-4">
               {ROLE_CONFIGS.map((r) => {
                 const s = roleSalary[r.apiSlug];
+                if (!s.live) {
+                  return (
+                    <div key={r.key} className="flex items-center justify-between">
+                      <span className="text-xs text-t1 font-medium">{r.label}</span>
+                      <span className="text-[10px] text-t3">Not enough live postings yet</span>
+                    </div>
+                  );
+                }
                 return (
                   <div key={r.key}>
                     <div className="flex items-center justify-between mb-1.5">
@@ -231,15 +233,15 @@ export default async function SalaryPage() {
                       <div
                         className="absolute top-0 h-full rounded-full"
                         style={{
-                          left:       `${((s.p25 - 40000) / 120000) * 100}%`,
-                          right:      `${100 - ((s.p75 - 40000) / 120000) * 100}%`,
+                          left:       `${(((s.p25 ?? 0) - 40000) / 120000) * 100}%`,
+                          right:      `${100 - (((s.p75 ?? 0) - 40000) / 120000) * 100}%`,
                           background: "linear-gradient(90deg, #93C5FD, #4F46E5, #7C3AED)",
                           opacity:    0.7,
                         }}
                       />
                       <div
                         className="absolute top-0 w-0.5 h-full bg-white shadow-sm"
-                        style={{ left: `${((s.p50 - 40000) / 120000) * 100}%` }}
+                        style={{ left: `${(((s.p50 ?? 0) - 40000) / 120000) * 100}%` }}
                       />
                     </div>
                   </div>
@@ -253,7 +255,7 @@ export default async function SalaryPage() {
             </div>
           </div>
 
-          {/* Regional index */}
+          {/* Regional index — live, queried per-city against market.jobs.location */}
           <div className="bg-s1 rounded-2xl border border-b1 p-6 shadow-card animate-fade-up animate-delay-300">
             <div className="flex items-center gap-2 mb-6">
               <Globe className="w-4 h-4 text-blue" />
@@ -261,65 +263,69 @@ export default async function SalaryPage() {
             </div>
             <div className="space-y-3">
               {UK_REGIONS.map((r) => {
-                const regionMedian = Math.round(medianSalary * r.multiplier);
+                const d = regionSalary[r.apiSlug];
+                const londonMedian = regionSalary["London"]?.p50;
+                const pctOfLondon = d.live && londonMedian ? Math.round(((d.p50 as number) / londonMedian) * 100) : null;
                 return (
                   <div key={r.region} className="p-3 rounded-xl bg-s2 border border-b1 hover:border-b2 transition-colors">
                     <div className="flex items-center justify-between mb-1">
-                      <div>
-                        <span className="text-xs font-semibold text-t1">{r.region}</span>
-                        <p className="text-[10px] text-t3 mt-0.5">{r.note}</p>
-                      </div>
-                      <div className="text-right shrink-0 ml-4">
-                        <p className="text-sm font-bold text-accent">{fmtK(regionMedian)}</p>
-                        <p className="text-[10px] text-t3">{Math.round(r.multiplier * 100)}% of London</p>
-                      </div>
+                      <span className="text-xs font-semibold text-t1">{r.region}</span>
+                      {d.live ? (
+                        <div className="text-right shrink-0 ml-4">
+                          <p className="text-sm font-bold text-accent">{fmtK(d.p50)}</p>
+                          <p className="text-[10px] text-t3">{pctOfLondon != null ? `${pctOfLondon}% of London · ` : ""}n={d.n}</p>
+                        </div>
+                      ) : (
+                        <span className="text-[10px] text-t3">Not enough live postings yet</span>
+                      )}
                     </div>
-                    <div className="h-1.5 rounded-full bg-b1 overflow-hidden mt-2">
-                      <div
-                        className="h-full rounded-full bg-gradient-to-r from-accent to-blue"
-                        style={{ width: `${r.multiplier * 100}%` }}
-                      />
-                    </div>
+                    {d.live && (
+                      <div className="h-1.5 rounded-full bg-b1 overflow-hidden mt-2">
+                        <div
+                          className="h-full rounded-full bg-gradient-to-r from-accent to-blue"
+                          style={{ width: `${Math.min(100, pctOfLondon ?? 100)}%` }}
+                        />
+                      </div>
+                    )}
                   </div>
                 );
               })}
             </div>
             <div className="flex items-start gap-2 mt-4 pt-4 border-t border-b1 text-[10px] text-t3">
               <Info className="w-3 h-3 shrink-0 mt-0.5" />
-              Regional index relative to London median. Based on live posting data + ONS regional pay data.
+              Live median salary per city, computed from GBP-denominated postings mentioning that city this run — not a fixed index.
             </div>
           </div>
         </div>
 
-        {/* Remote Premium */}
+        {/* Remote Premium — live, queried per work_model */}
         <div className="bg-s1 rounded-2xl border border-b1 p-6 shadow-card animate-fade-up animate-delay-400">
           <div className="flex items-center gap-2 mb-6">
             <Laptop className="w-4 h-4 text-prp" />
             <h2 className="text-sm font-bold text-t1">Remote vs On-Site Premium</h2>
           </div>
           <div className="grid sm:grid-cols-3 gap-4">
-            {[
-              { model: "Fully Remote",      salary: Math.round(medianSalary * 0.92), note: "Anchored to company HQ location",    color: "text-prp",   border: "border-prp/20",   bg: "bg-prp/5",   bar: 92  },
-              { model: "Hybrid (2–3 days)", salary: Math.round(medianSalary * 1.0),  note: "Standard in most UK AI roles today", color: "text-accent", border: "border-accent/20", bg: "bg-accent/5", bar: 100 },
-              { model: "Fully On-site",     salary: Math.round(medianSalary * 0.97), note: "London roles may compensate more",   color: "text-blue",  border: "border-blue/20",   bg: "bg-blue/5",  bar: 97  },
-            ].map((row) => (
-              <div key={row.model} className={`p-5 rounded-xl border ${row.border} ${row.bg}`}>
-                <p className={`text-xs font-bold ${row.color} mb-1`}>{row.model}</p>
-                <p className="text-[10px] text-t3 mb-3">{row.note}</p>
-                <p className={`text-2xl font-black ${row.color} mb-3`}>{fmtK(row.salary)}</p>
-                <div className="h-1.5 rounded-full bg-b1 overflow-hidden">
-                  <div
-                    className="h-full rounded-full bg-gradient-to-r from-prp to-accent"
-                    style={{ width: `${row.bar}%` }}
-                  />
+            {WORK_MODELS.map((row) => {
+              const d = workModelSalary[row.model];
+              return (
+                <div key={row.model} className={`p-5 rounded-xl border ${row.border} ${row.bg}`}>
+                  <p className={`text-xs font-bold ${row.color} mb-1`}>{row.label}</p>
+                  <p className="text-[10px] text-t3 mb-3">{row.note}</p>
+                  {d.live ? (
+                    <>
+                      <p className={`text-2xl font-black ${row.color} mb-3`}>{fmtK(d.p50)}</p>
+                      <p className="text-[10px] text-t3">live median · n={d.n}</p>
+                    </>
+                  ) : (
+                    <p className="text-xs text-t3 py-3">Not enough live postings yet</p>
+                  )}
                 </div>
-                <p className="text-[10px] text-t3 mt-1 text-right">{row.bar}% of benchmark</p>
-              </div>
-            ))}
+              );
+            })}
           </div>
           <div className="flex items-start gap-2 mt-4 pt-4 border-t border-b1 text-[10px] text-t3">
             <Info className="w-3 h-3 shrink-0 mt-0.5" />
-            Hybrid commands a slight premium as employers compete for talent willing to commute.
+            Live median salary per work model, computed from this run&apos;s GBP-denominated postings.
           </div>
         </div>
 

@@ -14,6 +14,8 @@ export const metadata: Metadata = {
 };
 
 import { api } from "@/lib/api";
+import type { SkillsData } from "@/lib/api";
+import { ROLE_CONFIGS } from "@/lib/roles";
 import { SkillBar } from "@/components/charts/skill-bar";
 import { PageHero } from "@/components/layout/page-hero";
 import { SkillNetwork } from "@/components/illustrations/skill-network";
@@ -23,9 +25,10 @@ export default async function SkillsPage() {
   let skills   = null;
   let trending = null;
 
-  await Promise.allSettled([
+  const [, , ...roleResults] = await Promise.allSettled([
     api.skills()   .then(d => { skills   = d; }),
     api.trending(7).then(d => { trending = d; }),
+    ...ROLE_CONFIGS.map(r => api.skills(r.apiSlug)),
   ]);
 
   const topSkillsList = Object.entries((skills as any)?.top_skills ?? {})
@@ -36,6 +39,17 @@ export default async function SkillsPage() {
   const risingSkills    = (trending as any)?.rising    ?? [];
   const decliningSkills = (trending as any)?.declining ?? [];
   const hasLiveSkills   = topSkillsList.length > 0;
+
+  // Live top skill per role — no hardcoded per-role skill list. A role with
+  // no snapshot yet shows an honest "not enough live data" state instead.
+  const topSkillPerRole = ROLE_CONFIGS.map((r, i) => {
+    const res = roleResults[i];
+    const d = res.status === "fulfilled" ? (res.value as SkillsData) : null;
+    const ranked = Object.entries(d?.top_skills ?? {}).sort((a, b) => (b[1] as number) - (a[1] as number));
+    const top = ranked[0]?.[0] ?? null;
+    const secondary = ranked.slice(1, 4).map(([s]) => s).join(", ");
+    return { role: r.label, skill: top, secondary, live: top != null };
+  });
 
   return (
     <div className="pt-14">
@@ -182,25 +196,28 @@ export default async function SkillsPage() {
           </div>
         </div>
 
-        {/* Top skill per role */}
+        {/* Top skill per role — live per role_category, not a fixed list */}
         <div className="bg-s1 rounded-2xl border border-b1 p-6 shadow-card animate-fade-up animate-delay-300">
           <h2 className="text-sm font-bold text-t1 mb-1">Top Skill Per Role</h2>
-          <p className="text-xs text-t2 mb-6">Most commonly required skills by job function</p>
+          <p className="text-xs text-t2 mb-6">Most commonly required skills by job function · live this week</p>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
-            {[
-              { role: "ML Engineer",     skill: "PyTorch",    secondary: "Python, Docker",      accent: "text-accent", bg: "bg-accent/8",  border: "border-accent/15" },
-              { role: "Data Scientist",  skill: "Python",     secondary: "Pandas, SQL, Seaborn",accent: "text-blue",   bg: "bg-blue/8",    border: "border-blue/15"   },
-              { role: "MLOps Engineer",  skill: "Kubernetes", secondary: "Docker, Airflow",     accent: "text-prp",    bg: "bg-prp/8",     border: "border-prp/15"    },
-              { role: "NLP / LLM Eng",  skill: "LangChain",  secondary: "HuggingFace, FAISS",  accent: "text-warn",   bg: "bg-warn/8",    border: "border-warn/15"   },
-              { role: "Data Engineer",   skill: "Spark",      secondary: "SQL, Databricks",     accent: "text-ok",     bg: "bg-ok/8",      border: "border-ok/15"     },
-              { role: "AI Researcher",   skill: "PyTorch",    secondary: "JAX, CUDA, arXiv",    accent: "text-err",    bg: "bg-err/8",     border: "border-err/15"    },
-            ].map((r) => (
-              <div key={r.role} className={`p-4 rounded-xl border ${r.border} ${r.bg}`}>
-                <p className="text-[10px] text-t3 mb-1">{r.role}</p>
-                <p className={`text-lg font-black ${r.accent}`}>{r.skill}</p>
-                <p className="text-[10px] text-t2 mt-1">{r.secondary}</p>
-              </div>
-            ))}
+            {topSkillPerRole.map((r, i) => {
+              const palette = ["text-accent bg-accent/8 border-accent/15", "text-blue bg-blue/8 border-blue/15", "text-prp bg-prp/8 border-prp/15", "text-warn bg-warn/8 border-warn/15", "text-ok bg-ok/8 border-ok/15", "text-err bg-err/8 border-err/15", "text-accent bg-accent/8 border-accent/15"];
+              const [accent, bg, border] = palette[i % palette.length].split(" ");
+              return (
+                <div key={r.role} className={`p-4 rounded-xl border ${border} ${bg}`}>
+                  <p className="text-[10px] text-t3 mb-1">{r.role}</p>
+                  {r.live ? (
+                    <>
+                      <p className={`text-lg font-black ${accent}`}>{r.skill}</p>
+                      {r.secondary && <p className="text-[10px] text-t2 mt-1">{r.secondary}</p>}
+                    </>
+                  ) : (
+                    <p className="text-xs text-t3 py-1">Not enough live postings yet</p>
+                  )}
+                </div>
+              );
+            })}
           </div>
         </div>
 
