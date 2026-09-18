@@ -1,8 +1,17 @@
 import type { Metadata } from "next";
+import { Inter, JetBrains_Mono, IBM_Plex_Sans, Newsreader } from "next/font/google";
 import "./globals.css";
 import { Nav } from "@/components/layout/nav";
 import { Footer } from "@/components/layout/footer";
 import { Analytics } from "@vercel/analytics/next";
+
+// Self-hosted via next/font (no Google Fonts runtime request, no CLS from a
+// late-swapping @import). Newsreader is for the editorial band headings
+// (Stage 3) — loaded now so it's cached before that lands.
+const inter = Inter({ subsets: ["latin"], weight: ["300","400","500","600","700","800","900"], variable: "--font-inter", display: "swap" });
+const jetbrainsMono = JetBrains_Mono({ subsets: ["latin"], weight: ["400","500","600"], variable: "--font-jetbrains-mono", display: "swap" });
+const ibmPlexSans = IBM_Plex_Sans({ subsets: ["latin"], weight: ["400","500","600","700"], variable: "--font-ibm-plex-sans", display: "swap" });
+const newsreader = Newsreader({ subsets: ["latin"], weight: ["400","500"], style: ["normal","italic"], variable: "--font-newsreader", display: "swap" });
 
 const BASE_URL = "https://marketforge.digital";
 
@@ -88,7 +97,7 @@ const jsonLd = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en-GB">
+    <html lang="en-GB" className={`${inter.variable} ${jetbrainsMono.variable} ${ibmPlexSans.variable} ${newsreader.variable}`}>
       <head>
         <script
           type="application/ld+json"

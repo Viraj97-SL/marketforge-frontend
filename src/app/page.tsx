@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { api } from "@/lib/api";
 import type { CitiesData, SalaryData, SkillsData, SponsorVerificationData, HealthData } from "@/lib/api";
 import { fmt, fmtK } from "@/lib/utils";
@@ -105,12 +106,17 @@ export default async function HomePage() {
         className="relative min-h-[88vh] flex items-center"
         style={{ background: "linear-gradient(135deg, #0F172A 0%, #1E293B 60%, #0F172A 100%)" }}
       >
-        {/* Real London aerial photo — gradient protects left text */}
-        <div
-          className="absolute inset-0 bg-cover bg-center opacity-[0.18]"
-          style={{ backgroundImage: "url('https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=1920&q=80&auto=format&fit=crop')" }}
-          aria-hidden="true"
-        />
+        {/* Real London aerial photo — gradient protects left text.
+            TODO: swap src to a local /images/hero.avif once the City-of-London-
+            skyline-at-dawn photo (per the brief) lands in public/images —
+            still hotlinked to Unsplash for now, just through next/image
+            instead of a raw CSS background (gets AVIF/WebP + resizing). */}
+        <div className="absolute inset-0 opacity-[0.18]" aria-hidden="true">
+          <Image
+            src="https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=1920&q=80&auto=format&fit=crop"
+            alt="" fill priority sizes="100vw" className="object-cover"
+          />
+        </div>
         <div className="absolute inset-0 bg-gradient-to-r from-slate-900 via-slate-900/70 to-transparent pointer-events-none" />
         <div className="absolute inset-0 opacity-[0.04] pointer-events-none"
           style={{ backgroundImage: "radial-gradient(circle, rgba(255,255,255,1) 1px, transparent 1px)", backgroundSize: "32px 32px" }} />

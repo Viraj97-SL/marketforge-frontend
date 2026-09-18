@@ -1,11 +1,12 @@
 import type { ReactNode } from "react";
+import Image from "next/image";
 
 interface PageHeroProps {
   badge?: string;
   title: string;
   titleAccent?: string;
   subtitle?: string;
-  /** Place image at public/images/illustrations/<name>.webp */
+  /** Local path under public/, or a whitelisted remote URL. Rendered via next/image (fill). */
   imageSrc?: string;
   children?: ReactNode;
 }
@@ -18,11 +19,9 @@ export function PageHero({ badge, title, titleAccent, subtitle, imageSrc, childr
     >
       {/* Full-bleed photo background */}
       {imageSrc && (
-        <div
-          className="absolute inset-0 bg-cover bg-center opacity-[0.22]"
-          style={{ backgroundImage: `url('${imageSrc}')` }}
-          aria-hidden="true"
-        />
+        <div className="absolute inset-0 opacity-[0.22]" aria-hidden="true">
+          <Image src={imageSrc} alt="" fill sizes="100vw" className="object-cover" />
+        </div>
       )}
 
       {/* Text-protection gradient: opaque left, transparent right */}

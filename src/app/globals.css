@@ -1,4 +1,5 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap');
+/* Fonts are self-hosted via next/font (see layout.tsx) — no Google Fonts
+   runtime request, no swap-induced layout shift. */
 
 @tailwind base;
 @tailwind components;
@@ -18,7 +19,7 @@ html { scroll-behavior: smooth; }
 body {
   background-color: #F8FAFC;
   color: #0F172A;
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: var(--font-inter), system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -38,7 +39,7 @@ body {
   border: 1px solid #E2E8F0 !important;
   border-radius: 10px !important;
   color: #0F172A !important;
-  font-family: 'Inter', sans-serif !important;
+  font-family: var(--font-inter), sans-serif !important;
   font-size: 12px !important;
   box-shadow: 0 4px 12px rgba(0,0,0,0.08) !important;
 }
@@ -191,7 +192,7 @@ body {
   --story-text-dim:  #8C8C88;
   --story-text-mute: #575754;
   --story-accent:    #E8A33D;
-  font-family: 'IBM Plex Sans', system-ui, sans-serif;
+  font-family: var(--font-ibm-plex-sans), system-ui, sans-serif;
   background: var(--story-bg);
   color: var(--story-text);
   /* Clip to the rounded shape WITHOUT `overflow: hidden` — that property

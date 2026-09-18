@@ -30,8 +30,9 @@ const config: Config = {
         hero:   "#0F172A",   // slate-900
       },
       fontFamily: {
-        sans: ["Inter", "system-ui", "sans-serif"],
-        mono: ["JetBrains Mono", "monospace"],
+        sans: ["var(--font-inter)", "system-ui", "sans-serif"],
+        mono: ["var(--font-jetbrains-mono)", "monospace"],
+        newsreader: ["var(--font-newsreader)", "Georgia", "serif"],
       },
       backgroundImage: {
         "hero-glow": "linear-gradient(135deg, rgba(79,70,229,0.02) 0%, transparent 50%)",
