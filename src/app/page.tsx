@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { api } from "@/lib/api";
-import type { CitiesData, SalaryData, SkillsData, SponsorVerificationData, HealthData, RolesData, EntryLevelSkillShiftData, SkillCooccurrenceData, EntryLevelUniversalSkillsData } from "@/lib/api";
+import type { CitiesData, SalaryData, SkillsData, SponsorVerificationData, HealthData } from "@/lib/api";
 import { fmt, fmtK } from "@/lib/utils";
 import {
   ArrowRight, Brain, TrendingUp, Shield,
@@ -14,9 +14,9 @@ import {
 } from "lucide-react";
 import { LogoMarquee }      from "@/components/home/logo-marquee";
 import { ContactForm }      from "@/components/home/contact-form";
-import { NarrativeSection } from "@/components/home/narrative-section";
 import { DashboardMockup } from "@/components/illustrations/dashboard-mockup";
 import { PipelineFlow }    from "@/components/illustrations/pipeline-flow";
+import { ChapterOpener }   from "@/components/ui/chapter-opener";
 
 // ─── Hero right-side stats grid ───────────────────────────────────────────────
 // Every value here comes from the API at request time — no plausible-looking
@@ -73,16 +73,12 @@ function buildFeatures(skillsCount: number) {
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 export default async function HomePage() {
-  const [healthRes, salaryRes, skillsRes, sponsorRes, citiesRes, rolesRes, skillShiftRes, cooccurrenceRes, universalSkillsRes] = await Promise.allSettled([
+  const [healthRes, salaryRes, skillsRes, sponsorRes, citiesRes] = await Promise.allSettled([
     api.health(),
     api.salary("all", "all", "all"),
     api.skills(),
     api.sponsorVerification(),
     api.cities(),
-    api.roles(),
-    api.entryLevelSkillShift(),
-    api.skillCooccurrence(6),
-    api.entryLevelUniversalSkills(),
   ]);
 
   const health = healthRes.status === "fulfilled" ? (healthRes.value as HealthData) : null;
@@ -100,11 +96,6 @@ export default async function HomePage() {
   const visaRate = sponsor?.verified_pct != null ? { pct: sponsor.verified_pct, n: sponsor.sample_size } : null;
 
   const cities = citiesRes.status === "fulfilled" ? (citiesRes.value as CitiesData).cities : [];
-
-  const roles = rolesRes.status === "fulfilled" ? (rolesRes.value as RolesData) : null;
-  const skillShift = skillShiftRes.status === "fulfilled" ? (skillShiftRes.value as EntryLevelSkillShiftData) : null;
-  const cooccurrence = cooccurrenceRes.status === "fulfilled" ? (cooccurrenceRes.value as SkillCooccurrenceData) : null;
-  const universalSkills = universalSkillsRes.status === "fulfilled" ? (universalSkillsRes.value as EntryLevelUniversalSkillsData) : null;
 
   const FEATURES = buildFeatures(skillsCount);
 
@@ -157,6 +148,12 @@ export default async function HomePage() {
       {/* ── Logo Cloud ────────────────────────────────────────────────────── */}
       <LogoMarquee />
 
+      <ChapterOpener
+        image="/images/home-provenance.avif"
+        heading="Real postings. Not surveys."
+        sentence="Every listing in this market gets scraped, structured, and ranked — not estimated."
+      />
+
       {/* ── Dashboard preview ─────────────────────────────────────────────── */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 py-20">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
@@ -206,6 +203,12 @@ export default async function HomePage() {
         </div>
       </section>
 
+      <ChapterOpener
+        image="/images/home-capabilities.avif"
+        heading="Built to map the whole market."
+        sentence="Skills, salaries, sponsorship, and signals — one system, laid out block by block."
+      />
+
       {/* ── Features ──────────────────────────────────────────────────────── */}
       <section className="bg-s2 border-y border-b1 py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
@@ -252,6 +255,12 @@ export default async function HomePage() {
         </div>
       </section>
 
+      <ChapterOpener
+        image="/images/home-pipeline.avif"
+        heading="Every posting gets sorted, not skimmed."
+        sentence="A fully automated pipeline moves each job from raw listing to structured intelligence."
+      />
+
       {/* ── How it works — with pipeline illustration ──────────────────────── */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 py-20">
         <div className="text-center mb-12">
@@ -288,9 +297,6 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ── Narrative ─────────────────────────────────────────────────────── */}
-      <NarrativeSection roles={roles} skillShift={skillShift} cooccurrence={cooccurrence} universalSkills={universalSkills} />
-
       {/* ── Who it's for ──────────────────────────────────────────────────── */}
       <section className="bg-s2 border-y border-b1 py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
@@ -305,6 +311,7 @@ export default async function HomePage() {
             {[
               {
                 icon: GraduationCap,
+                image: "/images/persona-seekers.avif",
                 persona: "Job Seekers",
                 accent: "text-accent", bg: "bg-accent/8", border: "border-accent/15",
                 points: [
@@ -317,6 +324,7 @@ export default async function HomePage() {
               },
               {
                 icon: Briefcase,
+                image: "/images/persona-hiring.avif",
                 persona: "Hiring Managers",
                 accent: "text-blue", bg: "bg-blue/8", border: "border-blue/15",
                 points: [
@@ -329,6 +337,7 @@ export default async function HomePage() {
               },
               {
                 icon: Users,
+                image: "/images/persona-research.avif",
                 persona: "Researchers & Analysts",
                 accent: "text-prp", bg: "bg-prp/8", border: "border-prp/15",
                 points: [
@@ -340,15 +349,16 @@ export default async function HomePage() {
                 cta: "Research Signals", href: "/research",
               },
             ].map((p) => (
-              <div key={p.persona} className={`bg-s1 rounded-2xl border ${p.border} p-6 shadow-card animate-fade-up flex flex-col`}>
-                {/* Icon header — single large Lucide icon, no emoji */}
-                <div className={`w-full h-24 rounded-xl ${p.bg} flex items-center justify-center mb-5 relative overflow-hidden`}>
-                  <div className="absolute inset-0 opacity-[0.07]"
-                    style={{ backgroundImage: "radial-gradient(circle,#000 1px,transparent 1px)", backgroundSize: "14px 14px" }} />
-                  <div className={`w-14 h-14 rounded-2xl bg-white/60 border border-white/40 flex items-center justify-center shadow-sm z-10`}>
-                    <p.icon className={`w-8 h-8 ${p.accent}`} strokeWidth={1.5} />
+              <div key={p.persona} className={`bg-s1 rounded-2xl border ${p.border} overflow-hidden shadow-card animate-fade-up flex flex-col`}>
+                {/* 4:3 photo header, icon badge for quick recognition */}
+                <div className="relative w-full aspect-[4/3]">
+                  <Image src={p.image} alt="" fill sizes="(max-width: 640px) 100vw, 33vw" className="object-cover" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/0 to-black/0" />
+                  <div className={`absolute bottom-3 left-3 w-9 h-9 rounded-xl bg-white/90 backdrop-blur-sm border border-white/60 flex items-center justify-center shadow-sm`}>
+                    <p.icon className={`w-4.5 h-4.5 ${p.accent}`} strokeWidth={1.8} />
                   </div>
                 </div>
+                <div className="p-6 flex flex-col flex-1">
                 <h3 className={`text-base font-bold mb-4 ${p.accent}`}>{p.persona}</h3>
                 <ul className="space-y-2 mb-6 flex-1">
                   {p.points.map((pt) => (
@@ -361,11 +371,18 @@ export default async function HomePage() {
                 <Link href={p.href} className={`flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border ${p.border} ${p.bg} ${p.accent} text-xs font-semibold hover:opacity-80 transition-opacity`}>
                   {p.cta} <ChevronRight className="w-3.5 h-3.5" />
                 </Link>
+                </div>
               </div>
             ))}
           </div>
         </div>
       </section>
+
+      <ChapterOpener
+        image="/images/home-closing.avif"
+        heading="Know exactly where you stand."
+        sentence="The road to your next move starts with real market data, not guesswork."
+      />
 
       {/* ── Contact ───────────────────────────────────────────────────────── */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 py-20">

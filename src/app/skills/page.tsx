@@ -20,6 +20,7 @@ import { SkillBar } from "@/components/charts/skill-bar";
 import { PageHero } from "@/components/layout/page-hero";
 import { SkillNetwork } from "@/components/illustrations/skill-network";
 import { RankedTable } from "@/components/ui/ranked-table";
+import { ChapterOpener } from "@/components/ui/chapter-opener";
 import { TrendingUp, TrendingDown, Briefcase, Network, GraduationCap, Layers } from "lucide-react";
 
 const ROLE_LABELS: Record<string, string> = Object.fromEntries(
@@ -68,6 +69,9 @@ export default async function SkillsPage() {
 
   const cooccurrence = cooccurrenceRaw as SkillCooccurrenceData | null;
   const pairs = cooccurrence?.pairs ?? [];
+  const topPairSentence = pairs[0]
+    ? `${pairs[0].skill_a} + ${pairs[0].skill_b} co-occur ${pairs[0].co_count.toLocaleString()} times all-time — the next pair falls off fast.`
+    : "A small number of skill pairs dominate every posting.";
 
   const skillShift = skillShiftRaw as EntryLevelSkillShiftData | null;
   const universalSkills = universalSkillsRaw as EntryLevelUniversalSkillsData | null;
@@ -235,6 +239,12 @@ export default async function SkillsPage() {
             </div>
           </div>
         </div>
+
+        <ChapterOpener
+          image="/images/chapter-concentration.avif"
+          heading="A handful of skills carry almost everything."
+          sentence={topPairSentence}
+        />
 
         {/* Skills that pair together — real co-occurrence, drives the network above */}
         <div className="bg-s1 rounded-2xl border border-b1 p-6 mb-6 shadow-card animate-fade-up animate-delay-300">
