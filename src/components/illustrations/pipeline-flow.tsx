@@ -1,43 +1,40 @@
-import {
-  Download, Zap, FlaskConical, BarChart2, Database, LayoutDashboard,
-} from "lucide-react";
-import { type LucideIcon } from "lucide-react";
+import { MaskIcon } from "@/components/ui/mask-icon";
 
 interface Step {
   n: string; label: string; sub: string;
-  Icon: LucideIcon;
+  iconSrc: string;
   accent: string; bg: string; border: string; ring: string;
 }
 
 const STEPS: Step[] = [
   {
     n: "01", label: "Scrape",       sub: "Adzuna · Reed · Boards",
-    Icon: Download,
+    iconSrc: "/images/icons/step-scrape.png",
     accent: "text-blue",   bg: "bg-blue/8",   border: "border-blue/20",   ring: "ring-blue/20",
   },
   {
     n: "02", label: "Deduplicate",  sub: "MinHash + exact title hash",
-    Icon: Zap,
+    iconSrc: "/images/icons/step-dedupe.png",
     accent: "text-accent", bg: "bg-accent/8", border: "border-accent/20", ring: "ring-accent/20",
   },
   {
     n: "03", label: "Extract",      sub: "flashtext → BM25 → SBERT",
-    Icon: FlaskConical,
+    iconSrc: "/images/icons/step-extract.png",
     accent: "text-prp",    bg: "bg-prp/8",    border: "border-prp/20",    ring: "ring-prp/20",
   },
   {
     n: "04", label: "Analyse",      sub: "Salary NLP · skills ranking",
-    Icon: BarChart2,
+    iconSrc: "/images/icons/step-analyse.png",
     accent: "text-ok",     bg: "bg-ok/8",     border: "border-ok/20",     ring: "ring-ok/20",
   },
   {
     n: "05", label: "Snapshot",     sub: "Weekly DB write · ISR cache",
-    Icon: Database,
+    iconSrc: "/images/icons/step-snapshot.png",
     accent: "text-warn",   bg: "bg-warn/8",   border: "border-warn/20",   ring: "ring-warn/20",
   },
   {
     n: "06", label: "Dashboard",    sub: "Vercel edge · live data",
-    Icon: LayoutDashboard,
+    iconSrc: "/images/icons/step-dashboard.png",
     accent: "text-accent", bg: "bg-accent/8", border: "border-accent/20", ring: "ring-accent/20",
   },
 ];
@@ -75,7 +72,7 @@ export function PipelineFlow({
             <div className="flex items-start gap-4">
               <div className="flex flex-col items-center">
                 <div className={`w-10 h-10 rounded-xl ${s.bg} border ${s.border} flex items-center justify-center shrink-0`}>
-                  <s.Icon className={`w-5 h-5 ${s.accent}`} strokeWidth={1.8} />
+                  <MaskIcon src={s.iconSrc} size={18} className={s.accent} />
                 </div>
                 {i < STEPS.length - 1 && (
                   <div className="w-px h-6 bg-gradient-to-b from-b1 to-transparent mt-1" />
@@ -109,7 +106,7 @@ export function PipelineFlow({
                 transition-all duration-200 hover:shadow-md hover:scale-105
               `}>
                 <div className={`w-9 h-9 rounded-xl bg-white/70 border ${s.border} flex items-center justify-center mb-2 shadow-sm`}>
-                  <s.Icon className={`w-5 h-5 ${s.accent}`} strokeWidth={1.8} />
+                  <MaskIcon src={s.iconSrc} size={18} className={s.accent} />
                 </div>
                 <span className={`text-[8px] font-mono font-bold ${s.accent} mb-0.5 opacity-70`}>{s.n}</span>
                 <span className={`text-[10px] font-bold ${s.accent} leading-tight`}>{s.label}</span>

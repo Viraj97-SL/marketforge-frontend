@@ -4,10 +4,9 @@ import { api } from "@/lib/api";
 import type { CitiesData, SalaryData, SkillsData, SponsorVerificationData, HealthData } from "@/lib/api";
 import { fmt, fmtK } from "@/lib/utils";
 import {
-  ArrowRight, Brain, TrendingUp, Shield,
-  Database, BarChart3, Globe,
-  ChevronRight, Activity, DollarSign,
-  Sparkles, Target, BookOpen,
+  ArrowRight, TrendingUp, Shield,
+  ChevronRight, Activity,
+  Sparkles,
   Mail, MapPin, Clock,
   Users, Briefcase, GraduationCap,
   CalendarDays, Bot, ScanSearch, FlagTriangleRight,
@@ -17,6 +16,7 @@ import { ContactForm }      from "@/components/home/contact-form";
 import { DashboardMockup } from "@/components/illustrations/dashboard-mockup";
 import { PipelineFlow }    from "@/components/illustrations/pipeline-flow";
 import { ChapterOpener }   from "@/components/ui/chapter-opener";
+import { MaskIcon }        from "@/components/ui/mask-icon";
 
 // ─── Hero right-side stats grid ───────────────────────────────────────────────
 // Every value here comes from the API at request time — no plausible-looking
@@ -62,12 +62,12 @@ function HeroStats({ jobsTotal, medianSalary, skillsCount, visaRate, statusOk, f
 function buildFeatures(skillsCount: number) {
   const skillsLabel = skillsCount > 0 ? `${fmt(skillsCount)} tech skills` : "tech skills";
   return [
-    { icon: Brain,     title: "AI-Powered Scraping",       body: "9 autonomous agents collect from Adzuna, Reed, and specialist boards. Dedup + NLP validation baked in.", href: "/market",   accent: "text-accent", bg: "bg-accent/8", iconBg: "bg-accent/15" },
-    { icon: BarChart3, title: "Skill Demand Intelligence", body: `Real-time ranking of ${skillsLabel} by job count, co-occurrence, and week-over-week velocity.`,          href: "/skills",   accent: "text-blue",   bg: "bg-blue/8",   iconBg: "bg-blue/15"   },
-    { icon: DollarSign,title: "Salary Benchmarks",         body: "P25/P50/P75 percentiles by role, experience level, and UK region — updated every pipeline run.",           href: "/salary",   accent: "text-prp",    bg: "bg-prp/8",    iconBg: "bg-prp/15"    },
-    { icon: Globe,     title: "Visa Sponsorship Tracker",  body: "Which companies are licensed Skilled Worker visa sponsors — verified against the GOV.UK register.",         href: "/jobs",     accent: "text-ok",     bg: "bg-ok/8",     iconBg: "bg-ok/15"     },
-    { icon: Target,    title: "Career Gap Analysis",       body: "Upload your CV. Get a personalised market-match score, skill gap report, and 90-day action plan.",          href: "/career",   accent: "text-warn",   bg: "bg-warn/8",   iconBg: "bg-warn/15"   },
-    { icon: BookOpen,  title: "Research Signals",          body: "Emerging tech tracked from arXiv, funding announcements, and GitHub trending — before it hits job boards.", href: "/research", accent: "text-blue",   bg: "bg-blue/8",   iconBg: "bg-blue/15"   },
+    { icon: "/images/icons/feature-scraping.png", title: "AI-Powered Scraping",       body: "9 autonomous agents collect from Adzuna, Reed, and specialist boards. Dedup + NLP validation baked in.", href: "/market"   },
+    { icon: "/images/icons/feature-skills.png",   title: "Skill Demand Intelligence", body: `Real-time ranking of ${skillsLabel} by job count, co-occurrence, and week-over-week velocity.`,          href: "/skills"   },
+    { icon: "/images/icons/feature-salary.png",   title: "Salary Benchmarks",         body: "P25/P50/P75 percentiles by role, experience level, and UK region — updated every pipeline run.",           href: "/salary"   },
+    { icon: "/images/icons/feature-visa.png",     title: "Visa Sponsorship Tracker",  body: "Which companies are licensed Skilled Worker visa sponsors — verified against the GOV.UK register.",         href: "/jobs"     },
+    { icon: "/images/icons/feature-career.png",   title: "Career Gap Analysis",       body: "Upload your CV. Get a personalised market-match score, skill gap report, and 90-day action plan.",          href: "/career"   },
+    { icon: "/images/icons/feature-research.png", title: "Research Signals",          body: "Emerging tech tracked from arXiv, funding announcements, and GitHub trending — before it hits job boards.", href: "/research" },
   ];
 }
 
@@ -238,7 +238,7 @@ export default async function HomePage() {
                   ${i === 0 ? "sm:col-span-2 p-8 justify-center" : "p-6"}`}
                 style={{ animationDelay: `${i * 80}ms` }}
               >
-                <f.icon className={`${i === 0 ? "w-6 h-6" : "w-5 h-5"} text-accent mb-4 shrink-0`} strokeWidth={1.5} />
+                <MaskIcon src={f.icon} size={i === 0 ? 28 : 22} className="text-accent mb-4" />
                 <div className="flex items-start justify-between">
                   <h3 className={`font-bold text-t1 mb-2 group-hover:text-accent transition-colors flex-1 ${i === 0 ? "text-xl sm:text-2xl" : "text-sm"}`}>
                     {f.title}
