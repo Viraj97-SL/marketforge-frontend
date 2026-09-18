@@ -244,18 +244,47 @@ export default async function SkillsPage() {
                 <p className="text-[10px] text-t2">Overall market rank vs. rank among junior-only postings, last 90 days</p>
               </div>
             </div>
-            <div className="space-y-1.5">
-              {(skillShift?.shifts ?? []).slice(0, 8).map((s) => (
-                <div key={s.skill} className="flex items-center gap-3 py-1.5">
-                  <span className="text-xs text-t1 font-medium flex-1">{s.skill}</span>
-                  <span className="text-[10px] font-mono text-t3">#{s.overall_rank} overall</span>
-                  <span className="text-t3">→</span>
-                  <span className="text-[10px] font-mono text-accent font-bold">#{s.junior_rank} junior</span>
-                </div>
-              ))}
-              {(!skillShift || skillShift.shifts.length === 0) && (
-                <p className="text-xs text-t3 py-8 text-center">Not enough junior-level postings yet</p>
-              )}
+            <div className="space-y-3">
+              {(() => {
+                const shifts = (skillShift?.shifts ?? []).slice(0, 8);
+                if (shifts.length === 0) {
+                  return <p className="text-xs text-t3 py-8 text-center">Not enough junior-level postings yet</p>;
+                }
+                const scaleMax = Math.max(...shifts.map((s) => s.overall_rank), 40);
+                const xFor = (rank: number) => 4 + (Math.min(rank, scaleMax) / scaleMax) * 92; // % across track, best rank (1) near left
+                return shifts.map((s) => (
+                  <div key={s.skill}>
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-xs text-t1 font-semibold">{s.skill}</span>
+                      <span className="text-[10px] font-mono text-ok font-bold bg-ok/10 px-1.5 py-0.5 rounded">
+                        ▲ {s.rank_delta} ranks at entry level
+                      </span>
+                    </div>
+                    <div className="relative h-5">
+                      <div className="absolute top-1/2 -translate-y-1/2 left-1 right-1 h-px bg-b1" />
+                      {/* line connecting overall → junior position */}
+                      <div
+                        className="absolute top-1/2 -translate-y-1/2 h-0.5 bg-accent/40 rounded-full"
+                        style={{ left: `${Math.min(xFor(s.overall_rank), xFor(s.junior_rank))}%`, width: `${Math.abs(xFor(s.overall_rank) - xFor(s.junior_rank))}%` }}
+                      />
+                      <div
+                        className="absolute top-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full bg-s3 border-2 border-t3"
+                        style={{ left: `${xFor(s.overall_rank)}%` }}
+                        title={`#${s.overall_rank} overall`}
+                      />
+                      <div
+                        className="absolute top-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-accent shadow-sm"
+                        style={{ left: `${xFor(s.junior_rank)}%` }}
+                        title={`#${s.junior_rank} junior`}
+                      />
+                    </div>
+                    <div className="flex justify-between text-[10px] text-t3">
+                      <span>#{s.overall_rank} overall rank</span>
+                      <span className="text-accent font-semibold">#{s.junior_rank} junior rank</span>
+                    </div>
+                  </div>
+                ));
+              })()}
             </div>
           </div>
 
@@ -269,17 +298,30 @@ export default async function SkillsPage() {
                 <p className="text-[10px] text-t2">Present across the widest range of role categories, not just raw frequency</p>
               </div>
             </div>
-            <div className="space-y-1.5">
-              {(universalSkills?.skills ?? []).slice(0, 8).map((s) => (
-                <div key={s.skill} className="flex items-center gap-3 py-1.5">
-                  <span className="text-xs text-t1 font-medium flex-1">{s.skill}</span>
-                  <span className="text-[10px] font-mono text-blue font-bold">{s.role_span} roles</span>
-                  <span className="text-[10px] font-mono text-t3">{s.total.toLocaleString()} jobs</span>
-                </div>
-              ))}
-              {(!universalSkills || universalSkills.skills.length === 0) && (
-                <p className="text-xs text-t3 py-8 text-center">Not enough live data yet</p>
-              )}
+            <div className="space-y-2.5">
+              {(() => {
+                const spanSkills = (universalSkills?.skills ?? []).slice(0, 8);
+                if (spanSkills.length === 0) {
+                  return <p className="text-xs text-t3 py-8 text-center">Not enough live data yet</p>;
+                }
+                const maxSpan = spanSkills[0].role_span || 1;
+                return spanSkills.map((s) => (
+                  <div key={s.skill}>
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-xs text-t1 font-semibold">{s.skill}</span>
+                      <span className="text-[10px] text-t3">
+                        <span className="text-blue font-bold font-mono">{s.role_span}</span> of {maxSpan} roles · {s.total.toLocaleString()} jobs
+                      </span>
+                    </div>
+                    <div className="h-2 rounded-full bg-s2 overflow-hidden">
+                      <div
+                        className="h-full rounded-full bg-gradient-to-r from-blue to-accent"
+                        style={{ width: `${Math.round((s.role_span / maxSpan) * 100)}%` }}
+                      />
+                    </div>
+                  </div>
+                ));
+              })()}
             </div>
           </div>
         </div>

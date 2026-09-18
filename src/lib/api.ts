@@ -273,7 +273,13 @@ export interface SnapshotHistoryData {
 }
 
 async function get<T>(path: string): Promise<T> {
-  const res = await fetch(`${API}${path}`, { next: { revalidate: 300 } });
+  // no-store, not next.revalidate: Vercel's fetch Data Cache persists across
+  // deployments, so a time-based revalidate window can keep serving a
+  // pre-deploy response (wrong shape, stale counts) until something happens
+  // to trigger a background refresh. The backend already has its own 6h
+  // Redis cache, so every request here going to origin is cheap and always
+  // reflects the currently-deployed backend, not a leftover cached shape.
+  const res = await fetch(`${API}${path}`, { cache: "no-store" });
   if (!res.ok) throw new Error(`API ${path} → ${res.status}`);
   return res.json();
 }

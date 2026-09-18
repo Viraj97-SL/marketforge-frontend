@@ -9,13 +9,22 @@ export interface RankedRow {
   count: number;
 }
 
-const PAGE_SIZE = 25;
+const PAGE_SIZE = 30;
+
+const TIER_BG = ["from-accent to-blue", "from-blue to-prp", "from-prp to-err"] as const;
+const TIER_TEXT = ["text-accent", "text-blue", "text-prp"] as const;
+// Static class strings (not interpolated) so Tailwind's JIT scanner can find them.
+const TIER_HOVER = ["group-hover:text-accent", "group-hover:text-blue", "group-hover:text-prp"] as const;
+function tierFor(rank: number): 0 | 1 | 2 {
+  return rank <= 5 ? 0 : rank <= 15 ? 1 : 2;
+}
 
 /**
- * Search + paginate a ranked (label, count) list entirely client-side —
- * the underlying datasets here (skills ~261 rows, roles ~9 rows) are small
- * enough that a single fetch + local filtering beats round-tripping to the
- * API on every keystroke or page click.
+ * Search + paginate a ranked (label, count) list entirely client-side, 30
+ * rows per page in the same 2-column tiered-rank style the original static
+ * top-30 list used — the underlying datasets here (skills ~261 rows, roles
+ * ~9 rows) are small enough that a single fetch + local filtering beats
+ * round-tripping to the API on every keystroke or page click.
  */
 export function RankedTable({
   rows,
@@ -55,20 +64,24 @@ export function RankedTable({
       {pageRows.length === 0 ? (
         <p className="text-xs text-t3 py-8 text-center">No matches for &quot;{query}&quot;</p>
       ) : (
-        <div className="space-y-1">
+        <div className="grid sm:grid-cols-2 gap-x-8 gap-y-1.5">
           {pageRows.map((r, i) => {
             const rank = (currentPage - 1) * PAGE_SIZE + i + 1;
             const pct = Math.round((r.count / maxCount) * 100);
+            const tier = tierFor(rank);
             return (
               <div key={r.key} className="flex items-center gap-3 py-1.5 group">
-                <span className="w-8 text-[10px] font-mono text-t3 shrink-0 text-right">{rank}</span>
-                <span className="text-xs font-semibold text-t1 flex-1 group-hover:text-accent transition-colors">
+                <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 text-[10px] font-black
+                  ${rank <= 3 ? `bg-gradient-to-br ${TIER_BG[tier]} text-white` : "bg-s2 text-t3"}`}>
+                  {rank}
+                </div>
+                <span className={`text-xs font-semibold text-t1 flex-1 ${TIER_HOVER[tier]} transition-colors`}>
                   {r.label}
                 </span>
-                <div className="w-24 h-1.5 rounded-full bg-s2 overflow-hidden shrink-0 hidden sm:block">
-                  <div className="h-full rounded-full bg-gradient-to-r from-accent to-blue" style={{ width: `${pct}%` }} />
+                <div className="w-20 h-1.5 rounded-full bg-s2 overflow-hidden shrink-0">
+                  <div className={`h-full rounded-full bg-gradient-to-r ${TIER_BG[tier]}`} style={{ width: `${pct}%` }} />
                 </div>
-                <span className="text-[10px] font-mono w-14 text-right shrink-0 text-accent font-bold">
+                <span className={`text-[10px] font-mono w-10 text-right shrink-0 ${TIER_TEXT[tier]} font-bold`}>
                   {r.count.toLocaleString()}
                 </span>
               </div>

@@ -43,6 +43,7 @@ export function SkillBar({ data, height = 360 }: SkillBarProps) {
           type="category"
           dataKey="skill"
           width={110}
+          interval={0}
           tick={{ fill: "#475569", fontSize: 11 }}
           axisLine={false}
           tickLine={false}
