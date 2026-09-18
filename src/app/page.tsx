@@ -122,9 +122,9 @@ export default async function HomePage() {
               <span className="live-dot" />
               Live data · Updated twice weekly
             </div>
-            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-black tracking-tight leading-[1.05] mb-6 text-white animate-fade-up animate-delay-100">
+            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.05] mb-6 text-white animate-fade-up animate-delay-100">
               UK AI Job Market<br />
-              <span className="text-gradient">Intelligence</span>
+              <span className="text-accent">Intelligence</span>
             </h1>
             <p className="text-slate-400 text-lg leading-relaxed mb-10 max-w-xl animate-fade-up animate-delay-200">
               9 autonomous AI agents track hiring trends, skill demand, salary benchmarks,
@@ -148,11 +148,13 @@ export default async function HomePage() {
       {/* ── Logo Cloud ────────────────────────────────────────────────────── */}
       <LogoMarquee />
 
-      <ChapterOpener
-        image="/images/home-provenance.avif"
-        heading="Real postings. Not surveys."
-        sentence="Every listing in this market gets scraped, structured, and ranked — not estimated."
-      />
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 my-12 sm:my-16">
+          <ChapterOpener
+          image="/images/home-provenance.avif"
+          heading="Real postings. Not surveys."
+          sentence="Every listing in this market gets scraped, structured, and ranked — not estimated."
+        />
+      </div>
 
       {/* ── Dashboard preview ─────────────────────────────────────────────── */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 py-20">
@@ -160,10 +162,10 @@ export default async function HomePage() {
           {/* Left copy */}
           <div>
             <p className="section-label mb-3">Live dashboard</p>
-            <h2 className="text-4xl sm:text-5xl font-black tracking-tight text-t1 mb-5 leading-tight">
+            <h2 className="text-4xl sm:text-5xl font-bold tracking-tight text-t1 mb-5 leading-tight">
               See exactly what&apos;s moving
               <br />
-              <span className="text-gradient">in UK AI hiring</span>
+              <span className="text-accent">in UK AI hiring</span>
             </h2>
             <p className="text-t2 leading-relaxed mb-8 max-w-md text-sm">
               Every metric on the dashboard is derived from real job postings — not surveys, not estimates.
@@ -203,21 +205,23 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <ChapterOpener
-        image="/images/home-capabilities.avif"
-        heading="Built to map the whole market."
-        sentence="Skills, salaries, sponsorship, and signals — one system, laid out block by block."
-      />
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 my-12 sm:my-16">
+          <ChapterOpener
+          image="/images/home-capabilities.avif"
+          heading="Built to map the whole market."
+          sentence="Skills, salaries, sponsorship, and signals — one system, laid out block by block."
+        />
+      </div>
 
       {/* ── Features ──────────────────────────────────────────────────────── */}
       <section className="bg-s2 border-y border-b1 py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-14">
             <p className="section-label mb-3">Platform capabilities</p>
-            <h2 className="text-4xl sm:text-5xl font-black tracking-tight text-t1 mb-5">
+            <h2 className="text-4xl sm:text-5xl font-bold tracking-tight text-t1 mb-5">
               Everything you need to navigate
               <br />
-              <span className="text-gradient">the UK AI job market</span>
+              <span className="text-accent">the UK AI job market</span>
             </h2>
             <p className="text-t2 max-w-lg mx-auto leading-relaxed text-sm">
               From raw job postings to actionable career intelligence — all derived from live data,
@@ -230,42 +234,37 @@ export default async function HomePage() {
               <Link
                 key={f.title}
                 href={f.href}
-                className="group bg-s1 rounded-2xl border border-b1 p-6 card-hover shadow-card animate-fade-up flex flex-col"
+                className={`group bg-s1 rounded-2xl border border-b1 card-hover shadow-card animate-fade-up flex flex-col
+                  ${i === 0 ? "sm:col-span-2 p-8 justify-center" : "p-6"}`}
                 style={{ animationDelay: `${i * 80}ms` }}
               >
-                {/* Icon panel — no emoji, single large icon */}
-                <div className={`w-full h-24 rounded-xl ${f.bg} flex items-center justify-center mb-5 relative overflow-hidden`}>
-                  {/* Subtle background grid */}
-                  <div className="absolute inset-0 opacity-[0.07]"
-                    style={{ backgroundImage: "radial-gradient(circle,#000 1px,transparent 1px)", backgroundSize: "16px 16px" }} />
-                  <div className={`w-14 h-14 rounded-2xl ${f.iconBg} border border-white/40 flex items-center justify-center shadow-sm z-10`}>
-                    <f.icon className={`w-7 h-7 ${f.accent}`} strokeWidth={1.6} />
-                  </div>
-                </div>
+                <f.icon className={`${i === 0 ? "w-6 h-6" : "w-5 h-5"} text-accent mb-4 shrink-0`} strokeWidth={1.5} />
                 <div className="flex items-start justify-between">
-                  <h3 className="text-sm font-bold text-t1 mb-2 group-hover:text-accent transition-colors flex-1">
+                  <h3 className={`font-bold text-t1 mb-2 group-hover:text-accent transition-colors flex-1 ${i === 0 ? "text-xl sm:text-2xl" : "text-sm"}`}>
                     {f.title}
                   </h3>
-                  <ChevronRight className="w-4 h-4 text-t3 group-hover:text-accent transition-colors shrink-0 mt-0.5" />
+                  <ChevronRight className="w-4 h-4 text-t3 group-hover:text-accent transition-colors shrink-0 mt-1" />
                 </div>
-                <p className="text-xs text-t2 leading-relaxed">{f.body}</p>
+                <p className={`text-t2 leading-relaxed ${i === 0 ? "text-sm max-w-lg" : "text-xs"}`}>{f.body}</p>
               </Link>
             ))}
           </div>
         </div>
       </section>
 
-      <ChapterOpener
-        image="/images/home-pipeline.avif"
-        heading="Every posting gets sorted, not skimmed."
-        sentence="A fully automated pipeline moves each job from raw listing to structured intelligence."
-      />
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 my-12 sm:my-16">
+          <ChapterOpener
+          image="/images/home-pipeline.avif"
+          heading="Every posting gets sorted, not skimmed."
+          sentence="A fully automated pipeline moves each job from raw listing to structured intelligence."
+        />
+      </div>
 
       {/* ── How it works — with pipeline illustration ──────────────────────── */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 py-20">
         <div className="text-center mb-12">
           <p className="section-label mb-3">How it works</p>
-          <h2 className="text-3xl sm:text-4xl font-black tracking-tight text-t1 mb-4">
+          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-t1 mb-4">
             From job boards to actionable insight
           </h2>
           <p className="text-t2 text-sm max-w-md mx-auto">
@@ -302,7 +301,7 @@ export default async function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-12">
             <p className="section-label mb-3">Built for</p>
-            <h2 className="text-3xl sm:text-4xl font-black tracking-tight text-t1">
+            <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-t1">
               Everyone navigating UK AI careers
             </h2>
           </div>
@@ -378,20 +377,22 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <ChapterOpener
-        image="/images/home-closing.avif"
-        heading="Know exactly where you stand."
-        sentence="The road to your next move starts with real market data, not guesswork."
-      />
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 my-12 sm:my-16">
+          <ChapterOpener
+          image="/images/home-closing.avif"
+          heading="Know exactly where you stand."
+          sentence="The road to your next move starts with real market data, not guesswork."
+        />
+      </div>
 
       {/* ── Contact ───────────────────────────────────────────────────────── */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 py-20">
         <div className="grid lg:grid-cols-2 gap-12 items-start">
           <div>
             <p className="section-label mb-3">Contact us</p>
-            <h2 className="text-4xl sm:text-5xl font-black tracking-tight text-t1 mb-5 leading-tight">
+            <h2 className="text-4xl sm:text-5xl font-bold tracking-tight text-t1 mb-5 leading-tight">
               Let&apos;s talk about<br />
-              <span className="text-gradient">UK AI market data</span>
+              <span className="text-accent">UK AI market data</span>
             </h2>
             <p className="text-t2 leading-relaxed mb-8 max-w-md text-sm">
               Whether you&apos;re a hiring manager, researcher, or developer — get in touch to learn
@@ -434,7 +435,7 @@ export default async function HomePage() {
               <Sparkles className="w-3.5 h-3.5" />
               Free · No sign-up required
             </div>
-            <h2 className="text-4xl sm:text-5xl font-black tracking-tight text-white mb-5 leading-tight">
+            <h2 className="text-4xl sm:text-5xl font-bold tracking-tight text-white mb-5 leading-tight">
               Know exactly where you stand<br />in the UK AI market
             </h2>
             <p className="text-indigo-100 mb-10 max-w-lg mx-auto leading-relaxed text-sm">

@@ -223,7 +223,7 @@ export default async function JobsPage({ searchParams }: PageProps) {
                 <span className="w-2 h-2 rounded-full bg-ok animate-pulse" />
                 Live · Updated twice weekly
               </div>
-              <h1 className="text-4xl sm:text-5xl font-black tracking-tight text-white mb-3">
+              <h1 className="text-4xl sm:text-5xl font-bold tracking-tight text-white mb-3">
                 UK AI / ML Job Board
               </h1>
               <p className="text-slate-400 text-sm max-w-xl leading-relaxed">

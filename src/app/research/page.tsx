@@ -174,7 +174,7 @@ export default function ResearchPage() {
                   ↑ Fast-growing
                 </span>
               </div>
-              <h2 className="text-2xl sm:text-3xl font-black text-t1 mb-3 leading-tight">
+              <h2 className="text-2xl sm:text-3xl font-bold text-t1 mb-3 leading-tight">
                 Agentic AI &amp; Multi-Agent Orchestration
               </h2>
               <p className="text-t2 text-sm leading-relaxed max-w-lg mb-5">

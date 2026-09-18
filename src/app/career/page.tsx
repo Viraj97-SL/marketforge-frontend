@@ -300,7 +300,7 @@ export default function CareerPage() {
       {/* Header */}
       <div className="mb-8 animate-fade-up">
         <p className="text-xs font-semibold text-accent uppercase tracking-widest mb-2">Powered by Live Market Data</p>
-        <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-t1 mb-3">
+        <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-t1 mb-3">
           AI Career Gap Analyser
         </h1>
         <p className="text-t2 max-w-xl">
@@ -449,7 +449,7 @@ export default function CareerPage() {
               <div className="rounded-2xl border border-accent/20 bg-gradient-to-br from-accent/5 to-s1 p-6">
                 <div className="flex items-center justify-between mb-4">
                   <div>
-                    <h2 className="text-lg font-black text-t1">Market Match Score</h2>
+                    <h2 className="text-lg font-bold text-t1">Market Match Score</h2>
                     <p className="text-xs text-t2">vs live UK AI job postings (SBERT similarity)</p>
                   </div>
                   <div className="text-right">
@@ -661,7 +661,7 @@ export default function CareerPage() {
               <div className="rounded-2xl border border-accent/20 bg-gradient-to-br from-accent/5 to-s1 p-6">
                 <div className="flex items-center justify-between mb-2">
                   <div>
-                    <h2 className="text-lg font-black text-t1">ATS Score</h2>
+                    <h2 className="text-lg font-bold text-t1">ATS Score</h2>
                     <p className="text-xs text-t2">Applicant Tracking System compatibility</p>
                   </div>
                   <div className="flex items-center gap-2 text-xs text-ok bg-ok/10 border border-ok/20 px-3 py-1 rounded-full">

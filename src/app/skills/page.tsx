@@ -241,6 +241,7 @@ export default async function SkillsPage() {
         </div>
 
         <ChapterOpener
+          className="mb-6"
           image="/images/chapter-concentration.avif"
           heading="A handful of skills carry almost everything."
           sentence={topPairSentence}

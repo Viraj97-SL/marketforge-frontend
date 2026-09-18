@@ -46,7 +46,7 @@ export function PageHero({ badge, title, titleAccent, subtitle, imageSrc, childr
             <p className="text-[11px] font-bold text-accent uppercase tracking-widest">{badge}</p>
           </div>
         )}
-        <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-white mb-3 leading-tight">
+        <h1 className="font-newsreader font-normal tracking-tight text-white mb-3 leading-[1.1]" style={{ fontSize: "clamp(1.875rem, 4.5vw, 3.25rem)" }}>
           {title}
           {titleAccent && <span className="text-accent"> {titleAccent}</span>}
         </h1>

@@ -2,10 +2,8 @@
 
 import Marquee from "react-fast-marquee";
 import {
-  siGoogle, siNvidia, siAnthropic, siMeta, siHuggingface, siArm,
-  siPalantir, siPytorch, siTensorflow, siApple, siIntel, siAmd,
-  siRollsroyce, siBt, siSage, siHsbc, siSky, siSiemens,
-  siDatabricks, siSnowflake, siDocker, siKubernetes, siGithub, siDatadog,
+  siGoogle, siNvidia, siAnthropic, siMeta, siHuggingface, siPalantir,
+  siRollsroyce, siBt, siHsbc, siDatabricks, siGithub, siArm,
 } from "simple-icons";
 
 type SiIcon = { path: string; hex: string; title: string };
@@ -22,51 +20,34 @@ const ROW1: Brand[] = [
   { name: "Meta AI",         icon: siMeta },
   { name: "Hugging Face",    icon: siHuggingface },
   { name: "ARM",             icon: siArm },
-  { name: "Palantir",        icon: siPalantir },
-  { name: "PyTorch",         icon: siPytorch },
-  { name: "TensorFlow",      icon: siTensorflow },
-  { name: "Apple",           icon: siApple },
-  { name: "Intel",           icon: siIntel },
-  { name: "AMD",             icon: siAmd },
 ];
 
 const ROW2: Brand[] = [
+  { name: "Palantir",     icon: siPalantir },
   { name: "Rolls-Royce",  icon: siRollsroyce },
   { name: "BT Group",     icon: siBt },
-  { name: "Sage",         icon: siSage },
   { name: "HSBC Tech",    icon: siHsbc },
-  { name: "Sky Tech",     icon: siSky },
-  { name: "Siemens",      icon: siSiemens },
   { name: "Databricks",   icon: siDatabricks },
-  { name: "Snowflake",    icon: siSnowflake },
-  { name: "Docker",       icon: siDocker },
-  { name: "Kubernetes",   icon: siKubernetes },
   { name: "GitHub",       icon: siGithub },
-  { name: "Datadog",      icon: siDatadog },
 ];
 
 function BrandPill({ name, icon }: Brand) {
   return (
     <div
-      className="mx-3 flex items-center gap-2.5 px-4 py-2 rounded-full border border-b1 bg-white
-                 hover:border-b2 hover:shadow-card transition-all duration-200 select-none shrink-0"
+      className="group mx-4 flex items-center gap-2 select-none shrink-0 grayscale opacity-50
+                 hover:grayscale-0 hover:opacity-100 transition-all duration-300"
     >
-      <span
-        className="w-6 h-6 rounded-md flex items-center justify-center shrink-0"
-        style={{ backgroundColor: `#${icon.hex}14` }}
+      <svg
+        role="img"
+        viewBox="0 0 24 24"
+        xmlns="http://www.w3.org/2000/svg"
+        className="w-4 h-4 shrink-0"
+        style={{ fill: `#${icon.hex}` }}
+        aria-label={icon.title}
       >
-        <svg
-          role="img"
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
-          className="w-3.5 h-3.5"
-          style={{ fill: `#${icon.hex}` }}
-          aria-label={icon.title}
-        >
-          <path d={icon.path} />
-        </svg>
-      </span>
-      <span className="text-[11px] text-t2 font-semibold whitespace-nowrap">{name}</span>
+        <path d={icon.path} />
+      </svg>
+      <span className="text-[12px] text-t2 font-semibold whitespace-nowrap group-hover:text-t1 transition-colors">{name}</span>
     </div>
   );
 }
