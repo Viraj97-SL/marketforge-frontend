@@ -31,14 +31,16 @@ function roleLabel(rc: string): string {
 
 export default async function SkillsPage() {
   let skills          = null;
+  let weeklySkills     = null;
   let trending        = null;
   let rolesRaw         = null;
   let cooccurrenceRaw  = null;
   let skillShiftRaw    = null;
   let universalSkillsRaw = null;
 
-  const [, , , , , , ...roleResults] = await Promise.allSettled([
+  const [, , , , , , , ...roleResults] = await Promise.allSettled([
     api.skills()                    .then(d => { skills             = d; }),
+    api.weeklySkills()              .then(d => { weeklySkills       = d; }),
     api.trending(7)                 .then(d => { trending           = d; }),
     api.roles()                     .then(d => { rolesRaw           = d; }),
     api.skillCooccurrence(40)       .then(d => { cooccurrenceRaw    = d; }),
@@ -50,6 +52,11 @@ export default async function SkillsPage() {
   const topSkillsList = Object.entries((skills as any)?.top_skills ?? {})
     .map(([skill, count]) => ({ skill, count: count as number }))
     .sort((a, b) => b.count - a.count);
+
+  const weeklyTopSkillsList = Object.entries((weeklySkills as any)?.top_skills ?? {})
+    .map(([skill, count]) => ({ skill, count: count as number }))
+    .sort((a, b) => b.count - a.count);
+  const weekStart = (weeklySkills as any)?.week_start ?? null;
 
   const risingSkills    = (trending as any)?.rising    ?? [];
   const decliningSkills = (trending as any)?.declining ?? [];
@@ -154,6 +161,28 @@ export default async function SkillsPage() {
             </div>
           </div>
         )}
+
+        {/* Top Skills by Job Demand — this week's snapshot (distinct from the all-time ranking above) */}
+        <div className="bg-s1 rounded-2xl border border-b1 p-6 mb-6 shadow-card animate-fade-up animate-delay-150">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h2 className="text-sm font-bold text-t1">Top Skills by Job Demand — This Week</h2>
+              <p className="text-xs text-t2 mt-0.5">
+                Live · ranked by job posting frequency this week{weekStart ? ` · snapshot from ${weekStart}` : ""}
+              </p>
+            </div>
+            {weeklyTopSkillsList.length > 0 && (
+              <span className="text-xs px-2.5 py-1 rounded-full bg-blue/8 text-blue font-semibold border border-blue/20">
+                {weeklyTopSkillsList.length} skills this week
+              </span>
+            )}
+          </div>
+          {weeklyTopSkillsList.length > 0 ? (
+            <SkillBar data={weeklyTopSkillsList.slice(0, 15)} height={340} />
+          ) : (
+            <p className="text-xs text-t3 py-10 text-center">Not enough postings this week yet — check back after the next pipeline run.</p>
+          )}
+        </div>
 
         {/* Trending */}
         <div className="grid sm:grid-cols-2 gap-5 mb-6">

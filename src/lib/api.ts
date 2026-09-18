@@ -292,6 +292,7 @@ export const api = {
     get<SnapshotHistoryData>(`/api/v1/market/snapshot-history?weeks=${weeks}`),
   skills: (role = "all", days?: number) =>
     get<SkillsData>(`/api/v1/market/skills?role_category=${role}${days ? `&days=${days}` : ""}`),
+  weeklySkills: (role = "all") => get<SkillsData>(`/api/v1/market/skills?role_category=${role}&week=latest`),
   roles: (days?: number) => get<RolesData>(`/api/v1/market/roles${days ? `?days=${days}` : ""}`),
   skillCooccurrence: (limit = 40) => get<SkillCooccurrenceData>(`/api/v1/market/skill-cooccurrence?limit=${limit}`),
   salary: (role = "all", level = "all", location = "all", workModel = "all") =>
