@@ -14,12 +14,13 @@ export const metadata: Metadata = {
 };
 
 import { api } from "@/lib/api";
-import type { SalaryData } from "@/lib/api";
+import type { SalaryData, SnapshotHistoryData, SalaryBenchmarkData } from "@/lib/api";
 import { fmtK } from "@/lib/utils";
 import { ROLE_CONFIGS } from "@/lib/roles";
 import { SalaryRange } from "@/components/charts/salary-range";
+import { MarketTrend } from "@/components/charts/market-trend";
 import { PageHero } from "@/components/layout/page-hero";
-import { DollarSign, Globe, TrendingUp, Info, Laptop, GraduationCap, Code2, Layers, Star } from "lucide-react";
+import { DollarSign, Globe, TrendingUp, Info, Laptop, GraduationCap, Code2, Layers, Star, LineChart, Landmark } from "lucide-react";
 
 export const revalidate = 300;
 
@@ -49,8 +50,10 @@ const WORK_MODELS = [
 ] as const;
 
 export default async function SalaryPage() {
-  const [snapshotResult, ...roleResults] = await Promise.allSettled([
+  const [snapshotResult, historyResult, benchmarkResult, ...roleResults] = await Promise.allSettled([
     api.snapshot(),
+    api.snapshotHistory(26),
+    api.salaryBenchmark(),
     ...ROLE_CONFIGS.map(r => api.salary(r.apiSlug, "all", "all")),
   ]);
 
@@ -62,6 +65,12 @@ export default async function SalaryPage() {
 
   const snapshot = snapshotResult.status === "fulfilled" ? snapshotResult.value : null;
   const snap = snapshot as any;
+
+  const snapshotHistory = historyResult.status === "fulfilled" ? (historyResult.value as SnapshotHistoryData) : null;
+  const historyWeeks = (snapshotHistory?.weeks ?? []).filter((w) => w.salary_p50 != null);
+
+  const salaryBenchmark = benchmarkResult.status === "fulfilled" ? (benchmarkResult.value as SalaryBenchmarkData) : null;
+  const asheBenchmark = salaryBenchmark?.benchmarks?.[0] ?? null;
 
   // No fallback numbers here — a role/band/region/work-model with no live
   // sample this run renders an honest "not enough live data yet" state
@@ -153,6 +162,47 @@ export default async function SalaryPage() {
             </p>
           )}
         </div>
+
+        {/* Salary trend over time — real weekly_snapshots history, not a single-week figure */}
+        <div className="bg-s1 rounded-2xl border border-b1 p-6 mb-6 shadow-card animate-fade-up animate-delay-100">
+          <div className="flex items-center gap-2 mb-1">
+            <LineChart className="w-4 h-4 text-accent" />
+            <h2 className="text-sm font-bold text-t1">Median Salary Over Time</h2>
+          </div>
+          <p className="text-xs text-t2 mb-6">Weekly posting volume &amp; median salary · last {historyWeeks.length || 0} weeks with live salary data</p>
+          {historyWeeks.length > 1 ? (
+            <MarketTrend weeks={historyWeeks} height={220} />
+          ) : (
+            <p className="text-xs text-t3 py-10 text-center">Not enough weekly history yet to chart a trend.</p>
+          )}
+        </div>
+
+        {/* ONS national comparison — real government benchmark, not a live-postings figure */}
+        {asheBenchmark && (
+          <div className="bg-s1 rounded-2xl border border-b1 p-6 mb-6 shadow-card animate-fade-up animate-delay-150">
+            <div className="flex items-center gap-2 mb-1">
+              <Landmark className="w-4 h-4 text-blue" />
+              <h2 className="text-sm font-bold text-t1">How This Compares to the UK National Average</h2>
+            </div>
+            <p className="text-xs text-t2 mb-6">
+              {asheBenchmark.soc_title} (SOC {asheBenchmark.soc_code}) · {salaryBenchmark?.source} · {asheBenchmark.year}
+            </p>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="p-4 rounded-xl bg-s2 border border-b1">
+                <p className="text-[10px] text-t3 mb-1">Live median (this platform)</p>
+                <p className="text-2xl font-black text-accent">{fmtK(medianSalary)}</p>
+              </div>
+              <div className="p-4 rounded-xl bg-s2 border border-b1">
+                <p className="text-[10px] text-t3 mb-1">ONS ASHE national median</p>
+                <p className="text-2xl font-black text-blue">{fmtK(asheBenchmark.salary_p50)}</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-2 mt-4 pt-4 border-t border-b1 text-[10px] text-t3">
+              <Info className="w-3 h-3 shrink-0 mt-0.5" />
+              {salaryBenchmark?.methodology}
+            </div>
+          </div>
+        )}
 
         {/* Experience Bands */}
         <div className="bg-s1 rounded-2xl border border-b1 p-6 mb-6 shadow-card animate-fade-up animate-delay-150">

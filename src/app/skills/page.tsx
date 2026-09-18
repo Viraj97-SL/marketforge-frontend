@@ -3,42 +3,66 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "AI & ML Skills Demand UK",
   description:
-    "Which skills are UK AI employers hiring for right now? Live rankings by job count, weekly velocity, and role category.",
+    "Which skills are UK AI employers hiring for right now? All-time rankings by job count, weekly velocity, and role category.",
   alternates: { canonical: "https://marketforge.digital/skills" },
   openGraph: {
     title: "UK AI Skills Demand Rankings | MarketForge AI",
     description:
-      "Real-time UK AI/ML skills demand: Python, PyTorch, LangChain, MLflow — ranked by job postings, role category breakdowns, and week-over-week trends.",
+      "UK AI/ML skills demand ranked across our full pipeline history: job postings, role category breakdowns, and week-over-week trends.",
     url: "https://marketforge.digital/skills",
   },
 };
 
 import { api } from "@/lib/api";
-import type { SkillsData } from "@/lib/api";
+import type { SkillsData, RolesData, SkillCooccurrenceData, EntryLevelSkillShiftData, EntryLevelUniversalSkillsData } from "@/lib/api";
 import { ROLE_CONFIGS } from "@/lib/roles";
 import { SkillBar } from "@/components/charts/skill-bar";
 import { PageHero } from "@/components/layout/page-hero";
 import { SkillNetwork } from "@/components/illustrations/skill-network";
-import { TrendingUp, TrendingDown } from "lucide-react";
+import { RankedTable } from "@/components/ui/ranked-table";
+import { TrendingUp, TrendingDown, Briefcase, Network, GraduationCap, Layers } from "lucide-react";
+
+const ROLE_LABELS: Record<string, string> = Object.fromEntries(
+  ROLE_CONFIGS.map((r) => [r.apiSlug, r.label])
+);
+function roleLabel(rc: string): string {
+  return ROLE_LABELS[rc] ?? rc.split("_").map((w) => w[0].toUpperCase() + w.slice(1)).join(" ");
+}
 
 export default async function SkillsPage() {
-  let skills   = null;
-  let trending = null;
+  let skills          = null;
+  let trending        = null;
+  let rolesRaw         = null;
+  let cooccurrenceRaw  = null;
+  let skillShiftRaw    = null;
+  let universalSkillsRaw = null;
 
-  const [, , ...roleResults] = await Promise.allSettled([
-    api.skills()   .then(d => { skills   = d; }),
-    api.trending(7).then(d => { trending = d; }),
+  const [, , , , , , ...roleResults] = await Promise.allSettled([
+    api.skills()                    .then(d => { skills             = d; }),
+    api.trending(7)                 .then(d => { trending           = d; }),
+    api.roles()                     .then(d => { rolesRaw           = d; }),
+    api.skillCooccurrence(40)       .then(d => { cooccurrenceRaw    = d; }),
+    api.entryLevelSkillShift()      .then(d => { skillShiftRaw      = d; }),
+    api.entryLevelUniversalSkills() .then(d => { universalSkillsRaw = d; }),
     ...ROLE_CONFIGS.map(r => api.skills(r.apiSlug)),
   ]);
 
   const topSkillsList = Object.entries((skills as any)?.top_skills ?? {})
     .map(([skill, count]) => ({ skill, count: count as number }))
-    .sort((a, b) => b.count - a.count)
-    .slice(0, 30);
+    .sort((a, b) => b.count - a.count);
 
   const risingSkills    = (trending as any)?.rising    ?? [];
   const decliningSkills = (trending as any)?.declining ?? [];
   const hasLiveSkills   = topSkillsList.length > 0;
+
+  const roles = rolesRaw as RolesData | null;
+  const roleRows = (roles?.roles ?? []).map((r) => ({ key: r.role_category, label: roleLabel(r.role_category), count: r.job_count }));
+
+  const cooccurrence = cooccurrenceRaw as SkillCooccurrenceData | null;
+  const pairs = cooccurrence?.pairs ?? [];
+
+  const skillShift = skillShiftRaw as EntryLevelSkillShiftData | null;
+  const universalSkills = universalSkillsRaw as EntryLevelUniversalSkillsData | null;
 
   // Live top skill per role — no hardcoded per-role skill list. A role with
   // no snapshot yet shows an honest "not enough live data" state instead.
@@ -60,7 +84,7 @@ export default async function SkillsPage() {
           badge="Skill Intelligence"
           title="UK AI Skills"
           titleAccent="Demand"
-          subtitle="Which skills are UK AI employers actually hiring for right now? Ranked by job posting frequency, derived from live NLP analysis of job descriptions."
+          subtitle="Which skills are UK AI employers actually hiring for right now? Ranked across our full pipeline history, derived from live NLP analysis of job descriptions."
           imageSrc="https://images.unsplash.com/photo-1557562645-4eee56b29bc1?w=1920&q=80&auto=format&fit=crop"
         >
           <div className="flex flex-wrap items-center gap-2 text-xs text-slate-400">
@@ -74,29 +98,42 @@ export default async function SkillsPage() {
           </div>
         </PageHero>
 
-        {/* Skill network illustration */}
+        {/* Skill network illustration — real job counts + real co-occurrence */}
         <div className="bg-s1 rounded-2xl border border-b1 p-6 mb-6 shadow-card animate-fade-up animate-delay-50">
           <div className="flex items-center justify-between mb-4">
             <div>
               <h2 className="text-sm font-bold text-t1">UK AI Skill Ecosystem</h2>
-              <p className="text-xs text-t2 mt-0.5">How in-demand skills connect and co-occur in job postings</p>
-            </div>
-            <div className="flex items-center gap-3 text-[10px] text-t3">
-              <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-accent inline-block" />Core</span>
-              <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-indigo-200 inline-block" />Primary</span>
-              <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-s3 border border-b1 inline-block" />Secondary</span>
+              <p className="text-xs text-t2 mt-0.5">How in-demand skills connect and co-occur in job postings — node size = live job count, lines = real co-listing frequency</p>
             </div>
           </div>
-          <SkillNetwork height={320} />
+          <SkillNetwork height={320} topSkills={topSkillsList} pairs={pairs} />
         </div>
 
-        {/* Live top-30 ranked list + bar chart */}
+        {/* Top Roles by Job Demand */}
+        <div className="bg-s1 rounded-2xl border border-b1 p-6 mb-6 shadow-card animate-fade-up animate-delay-75">
+          <div className="flex items-center gap-2.5 mb-6">
+            <div className="w-9 h-9 rounded-xl bg-blue/10 flex items-center justify-center">
+              <Briefcase className="w-4 h-4 text-blue" />
+            </div>
+            <div>
+              <h2 className="text-sm font-bold text-t1">Top Roles by Job Demand</h2>
+              <p className="text-[10px] text-t2">Ranked by postings across our full pipeline history · search to jump to a role</p>
+            </div>
+          </div>
+          {roleRows.length > 0 ? (
+            <RankedTable rows={roleRows} countLabel="job postings" searchPlaceholder="Search roles by name…" />
+          ) : (
+            <p className="text-xs text-t3 py-8 text-center">Not enough live role data yet</p>
+          )}
+        </div>
+
+        {/* Top Skills by Job Demand */}
         {hasLiveSkills && (
           <div className="bg-s1 rounded-2xl border border-b1 p-6 mb-6 shadow-card animate-fade-up animate-delay-100">
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h2 className="text-sm font-bold text-t1">Top 30 Most In-Demand Skills</h2>
-                <p className="text-xs text-t2 mt-0.5">Live · ranked by job posting frequency this week</p>
+                <h2 className="text-sm font-bold text-t1">Top Skills by Job Demand</h2>
+                <p className="text-xs text-t2 mt-0.5">Ranked across our full pipeline history · search to jump to a skill</p>
               </div>
               <span className="text-xs px-2.5 py-1 rounded-full bg-accent/8 text-accent font-semibold border border-accent/20">
                 {topSkillsList.length} skills tracked
@@ -106,41 +143,14 @@ export default async function SkillsPage() {
             {/* Bar chart (top 15) */}
             <SkillBar data={topSkillsList.slice(0, 15)} height={340} />
 
-            {/* Ranked full list (all 30) */}
+            {/* Full searchable, paginated ranking */}
             <div className="mt-8 border-t border-b1 pt-6">
-              <h3 className="text-xs font-bold text-t1 mb-4">Full Top 30 Ranking</h3>
-              <div className="grid sm:grid-cols-2 gap-x-8 gap-y-1.5">
-                {topSkillsList.map((s, i) => {
-                  const pct = Math.round((s.count / topSkillsList[0].count) * 100);
-                  const tier = i < 5 ? "accent" : i < 15 ? "blue" : "prp";
-                  const tierColor = tier === "accent" ? "text-accent" : tier === "blue" ? "text-blue" : "text-prp";
-                  const tierBg   = tier === "accent" ? "from-accent to-blue" : tier === "blue" ? "from-blue to-prp" : "from-prp to-err";
-                  return (
-                    <div key={s.skill} className="flex items-center gap-3 py-1.5 group">
-                      {/* Rank badge */}
-                      <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 text-[10px] font-black
-                        ${i < 3 ? `bg-gradient-to-br ${tierBg} text-white` : "bg-s2 text-t3"}`}>
-                        {i + 1}
-                      </div>
-                      {/* Skill name */}
-                      <span className={`text-xs font-semibold flex-1 ${i < 5 ? "text-t1" : "text-t1"} group-hover:${tierColor} transition-colors`}>
-                        {s.skill}
-                      </span>
-                      {/* Bar */}
-                      <div className="w-20 h-1.5 rounded-full bg-s2 overflow-hidden shrink-0">
-                        <div
-                          className={`h-full rounded-full bg-gradient-to-r ${tierBg}`}
-                          style={{ width: `${pct}%` }}
-                        />
-                      </div>
-                      {/* Count */}
-                      <span className={`text-[10px] font-mono w-10 text-right shrink-0 ${tierColor} font-bold`}>
-                        {s.count.toLocaleString()}
-                      </span>
-                    </div>
-                  );
-                })}
-              </div>
+              <h3 className="text-xs font-bold text-t1 mb-4">Full Ranking</h3>
+              <RankedTable
+                rows={topSkillsList.map((s) => ({ key: s.skill, label: s.skill, count: s.count }))}
+                countLabel="job postings"
+                searchPlaceholder="Search skills by name…"
+              />
             </div>
           </div>
         )}
@@ -196,10 +206,88 @@ export default async function SkillsPage() {
           </div>
         </div>
 
+        {/* Skills that pair together — real co-occurrence, drives the network above */}
+        <div className="bg-s1 rounded-2xl border border-b1 p-6 mb-6 shadow-card animate-fade-up animate-delay-300">
+          <div className="flex items-center gap-2.5 mb-5">
+            <div className="w-9 h-9 rounded-xl bg-prp/10 flex items-center justify-center">
+              <Network className="w-4 h-4 text-prp" />
+            </div>
+            <div>
+              <h2 className="text-sm font-bold text-t1">Skills That Pair Together</h2>
+              <p className="text-[10px] text-t2">Skill pairs most often required in the same posting, all-time</p>
+            </div>
+          </div>
+          {pairs.length > 0 ? (
+            <div className="grid sm:grid-cols-2 gap-x-8 gap-y-1.5">
+              {pairs.slice(0, 16).map((p, i) => (
+                <div key={`${p.skill_a}-${p.skill_b}`} className="flex items-center gap-2.5 py-1.5">
+                  <span className="text-[10px] text-t3 font-mono w-5">{String(i + 1).padStart(2, "0")}</span>
+                  <span className="text-xs text-t1 font-medium flex-1">{p.skill_a} <span className="text-t3">+</span> {p.skill_b}</span>
+                  <span className="text-[10px] font-mono text-prp font-bold">{p.co_count.toLocaleString()}×</span>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-xs text-t3 py-8 text-center">Not enough live co-occurrence data yet</p>
+          )}
+        </div>
+
+        {/* Entry-level insights */}
+        <div className="grid sm:grid-cols-2 gap-5 mb-6">
+          <div className="bg-s1 rounded-2xl border border-b1 p-6 shadow-card animate-fade-up animate-delay-350">
+            <div className="flex items-center gap-2.5 mb-5">
+              <div className="w-9 h-9 rounded-xl bg-accent/10 flex items-center justify-center">
+                <GraduationCap className="w-4 h-4 text-accent" />
+              </div>
+              <div>
+                <h2 className="text-sm font-bold text-t1">Skills That Punch Above Their Weight at Entry Level</h2>
+                <p className="text-[10px] text-t2">Overall market rank vs. rank among junior-only postings, last 90 days</p>
+              </div>
+            </div>
+            <div className="space-y-1.5">
+              {(skillShift?.shifts ?? []).slice(0, 8).map((s) => (
+                <div key={s.skill} className="flex items-center gap-3 py-1.5">
+                  <span className="text-xs text-t1 font-medium flex-1">{s.skill}</span>
+                  <span className="text-[10px] font-mono text-t3">#{s.overall_rank} overall</span>
+                  <span className="text-t3">→</span>
+                  <span className="text-[10px] font-mono text-accent font-bold">#{s.junior_rank} junior</span>
+                </div>
+              ))}
+              {(!skillShift || skillShift.shifts.length === 0) && (
+                <p className="text-xs text-t3 py-8 text-center">Not enough junior-level postings yet</p>
+              )}
+            </div>
+          </div>
+
+          <div className="bg-s1 rounded-2xl border border-b1 p-6 shadow-card animate-fade-up animate-delay-400">
+            <div className="flex items-center gap-2.5 mb-5">
+              <div className="w-9 h-9 rounded-xl bg-blue/10 flex items-center justify-center">
+                <Layers className="w-4 h-4 text-blue" />
+              </div>
+              <div>
+                <h2 className="text-sm font-bold text-t1">Skills Spanning the Most Roles</h2>
+                <p className="text-[10px] text-t2">Present across the widest range of role categories, not just raw frequency</p>
+              </div>
+            </div>
+            <div className="space-y-1.5">
+              {(universalSkills?.skills ?? []).slice(0, 8).map((s) => (
+                <div key={s.skill} className="flex items-center gap-3 py-1.5">
+                  <span className="text-xs text-t1 font-medium flex-1">{s.skill}</span>
+                  <span className="text-[10px] font-mono text-blue font-bold">{s.role_span} roles</span>
+                  <span className="text-[10px] font-mono text-t3">{s.total.toLocaleString()} jobs</span>
+                </div>
+              ))}
+              {(!universalSkills || universalSkills.skills.length === 0) && (
+                <p className="text-xs text-t3 py-8 text-center">Not enough live data yet</p>
+              )}
+            </div>
+          </div>
+        </div>
+
         {/* Top skill per role — live per role_category, not a fixed list */}
-        <div className="bg-s1 rounded-2xl border border-b1 p-6 shadow-card animate-fade-up animate-delay-300">
+        <div className="bg-s1 rounded-2xl border border-b1 p-6 shadow-card animate-fade-up animate-delay-500">
           <h2 className="text-sm font-bold text-t1 mb-1">Top Skill Per Role</h2>
-          <p className="text-xs text-t2 mb-6">Most commonly required skills by job function · live this week</p>
+          <p className="text-xs text-t2 mb-6">Most commonly required skills by job function · all-time</p>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {topSkillPerRole.map((r, i) => {
               const palette = ["text-accent bg-accent/8 border-accent/15", "text-blue bg-blue/8 border-blue/15", "text-prp bg-prp/8 border-prp/15", "text-warn bg-warn/8 border-warn/15", "text-ok bg-ok/8 border-ok/15", "text-err bg-err/8 border-err/15", "text-accent bg-accent/8 border-accent/15"];

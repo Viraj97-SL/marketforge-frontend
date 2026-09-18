@@ -36,17 +36,6 @@ import {
 
 export const revalidate = 300;
 
-const FALLBACK_CITIES: CityCount[] = [
-  { city: "London",     job_count: 4820 },
-  { city: "Manchester", job_count: 610  },
-  { city: "Cambridge",  job_count: 540  },
-  { city: "Edinburgh",  job_count: 380  },
-  { city: "Bristol",    job_count: 290  },
-  { city: "Oxford",     job_count: 260  },
-  { city: "Birmingham", job_count: 195  },
-  { city: "Leeds",      job_count: 160  },
-];
-
 const CITY_FLAGS: Record<string, string> = {
   London: "🏙️", Manchester: "🌃", Cambridge: "🎓", Edinburgh: "🏰",
   Bristol: "🌉", Oxford: "📚", Birmingham: "🏢", Leeds: "🌆",
@@ -103,10 +92,9 @@ export default async function MarketPage() {
     value: p.vacancies_index,
   }));
 
-  const cityList: CityCount[] =
-    (citiesRaw as any)?.cities?.length ? (citiesRaw as any).cities : FALLBACK_CITIES;
+  const cityList: CityCount[] = (citiesRaw as any)?.cities ?? [];
   const cityMax = cityList[0]?.job_count ?? 1;
-  const isLiveCities = (citiesRaw as any)?.cities?.length > 0;
+  const isLiveCities = cityList.length > 0;
 
   const snap = snapshot as any;
 
@@ -260,47 +248,52 @@ export default async function MarketPage() {
           <div className="flex items-center gap-2 mb-6">
             <MapPin className="w-4 h-4 text-blue" />
             <h2 className="text-sm font-bold text-t1">Top UK Hiring Cities</h2>
-            <span className="text-xs text-t3 ml-auto">
-              {isLiveCities ? "Live data this week" : "Illustrative · live data when available"}
-            </span>
+            <span className="text-xs text-t3 ml-auto">{isLiveCities ? "Live data this week" : ""}</span>
           </div>
 
-          <div className="grid lg:grid-cols-2 gap-8 items-center">
-            {/* UK map illustration */}
-            <UKMap className="h-80 lg:h-96" showLabels animated cities={isLiveCities ? cityList : undefined} />
+          {isLiveCities ? (
+            <div className="grid lg:grid-cols-2 gap-8 items-center">
+              {/* UK map illustration */}
+              <UKMap className="h-80 lg:h-96" showLabels animated cities={cityList} />
 
-            {/* City bar list */}
-            <div className="space-y-3">
-              {cityList.map((city, i) => {
-                const barPct = Math.round((city.job_count / cityMax) * 100);
-                return (
-                  <div key={city.city} className="flex items-center gap-4">
-                    <span className="text-[10px] font-mono text-t3 w-5 shrink-0">{String(i + 1).padStart(2, "0")}</span>
-                    <span className="text-base shrink-0">{CITY_FLAGS[city.city] ?? "📍"}</span>
-                    <div className="flex-1">
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="text-xs font-semibold text-t1">{city.city}</span>
-                        <div className="flex items-center gap-2 text-[10px]">
-                          <span className="text-accent font-bold">{city.job_count.toLocaleString()}</span>
-                          <span className="text-t3">jobs</span>
-                          <span className="text-t3 font-mono w-8 text-right">{barPct}%</span>
+              {/* City bar list */}
+              <div className="space-y-3">
+                {cityList.map((city, i) => {
+                  const barPct = Math.round((city.job_count / cityMax) * 100);
+                  return (
+                    <div key={city.city} className="flex items-center gap-4">
+                      <span className="text-[10px] font-mono text-t3 w-5 shrink-0">{String(i + 1).padStart(2, "0")}</span>
+                      <span className="text-base shrink-0">{CITY_FLAGS[city.city] ?? "📍"}</span>
+                      <div className="flex-1">
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-xs font-semibold text-t1">{city.city}</span>
+                          <div className="flex items-center gap-2 text-[10px]">
+                            <span className="text-accent font-bold">{city.job_count.toLocaleString()}</span>
+                            <span className="text-t3">jobs</span>
+                            <span className="text-t3 font-mono w-8 text-right">{barPct}%</span>
+                          </div>
+                        </div>
+                        <div className="h-1.5 rounded-full bg-s2 overflow-hidden">
+                          <div
+                            className="h-full rounded-full bg-gradient-to-r from-accent to-blue"
+                            style={{ width: `${barPct}%`, transition: "width 0.8s ease" }}
+                          />
                         </div>
                       </div>
-                      <div className="h-1.5 rounded-full bg-s2 overflow-hidden">
-                        <div
-                          className="h-full rounded-full bg-gradient-to-r from-accent to-blue"
-                          style={{ width: `${barPct}%`, transition: "width 0.8s ease" }}
-                        />
-                      </div>
                     </div>
-                  </div>
-                );
-              })}
-              <p className="text-[10px] text-t3 mt-4 pt-4 border-t border-b1">
-                London dominates UK AI hiring. Strong hubs in Cambridge (biotech AI), Edinburgh (NLP/fintech), Bristol (robotics).
-              </p>
+                  );
+                })}
+                {cityList[0] && (
+                  <p className="text-[10px] text-t3 mt-4 pt-4 border-t border-b1">
+                    {cityList[0].city} leads UK AI/ML hiring this run with {cityList[0].job_count.toLocaleString()} postings
+                    {cityList[1] ? ` — ${Math.round((cityList[1].job_count / cityList[0].job_count) * 100)}% of that in ${cityList[1].city} next.` : "."}
+                  </p>
+                )}
+              </div>
             </div>
-          </div>
+          ) : (
+            <p className="text-xs text-t3 py-10 text-center">Not enough live city data yet — check back after the next pipeline run.</p>
+          )}
         </div>
 
         {/* Hiring Velocity */}

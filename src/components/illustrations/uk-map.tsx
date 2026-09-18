@@ -63,13 +63,6 @@ const CONNECTIONS: [string, string][] = [
   ["Edinburgh", "Glasgow"],
 ];
 
-const FALLBACK_CITIES: MapCity[] = [
-  { city: "London", job_count: 4820 }, { city: "Manchester", job_count: 610 },
-  { city: "Cambridge", job_count: 540 }, { city: "Edinburgh", job_count: 380 },
-  { city: "Bristol", job_count: 290 }, { city: "Oxford", job_count: 260 },
-  { city: "Birmingham", job_count: 195 }, { city: "Leeds", job_count: 160 },
-];
-
 export function UKMap({
   className = "",
   showLabels = true,
@@ -79,10 +72,10 @@ export function UKMap({
   className?: string;
   showLabels?: boolean;
   animated?: boolean;
-  /** Real per-city job counts from /api/v1/market/cities — falls back to illustrative numbers when absent. */
+  /** Real per-city job counts from /api/v1/market/cities — renders an empty state when absent, never fabricated numbers. */
   cities?: MapCity[];
 }) {
-  const source = cities?.length ? cities : FALLBACK_CITIES;
+  const source = cities ?? [];
   const isLive = Boolean(cities?.length);
 
   const plotted = source
@@ -251,7 +244,7 @@ export function UKMap({
           <circle cx="16" cy="98" r="3.5" fill={isLive ? "#059669" : "#94A3B8"} />
           <circle cx="16" cy="98" r="6" fill={isLive ? "#059669" : "#94A3B8"} opacity="0.2" />
           <text x="28" y="101.5" fontSize="8.5" fill={isLive ? "#059669" : "#94A3B8"} fontWeight="700"
-            fontFamily="ui-sans-serif,system-ui,sans-serif">{isLive ? "Live · updated weekly" : "Illustrative pending live data"}</text>
+            fontFamily="ui-sans-serif,system-ui,sans-serif">{isLive ? "Live · updated weekly" : "Not enough live data yet"}</text>
         </g>
 
         {/* Compass */}
