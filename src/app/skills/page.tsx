@@ -64,6 +64,7 @@ export default async function SkillsPage() {
 
   const roles = rolesRaw as RolesData | null;
   const roleRows = (roles?.roles ?? []).map((r) => ({ key: r.role_category, label: roleLabel(r.role_category), count: r.job_count }));
+  const roleJobCount: Record<string, number> = Object.fromEntries((roles?.roles ?? []).map((r) => [r.role_category, r.job_count]));
 
   const cooccurrence = cooccurrenceRaw as SkillCooccurrenceData | null;
   const pairs = cooccurrence?.pairs ?? [];
@@ -79,7 +80,7 @@ export default async function SkillsPage() {
     const ranked = Object.entries(d?.top_skills ?? {}).sort((a, b) => (b[1] as number) - (a[1] as number));
     const top = ranked[0]?.[0] ?? null;
     const secondary = ranked.slice(1, 4).map(([s]) => s).join(", ");
-    return { role: r.label, skill: top, secondary, live: top != null };
+    return { role: r.label, skill: top, secondary, live: top != null, n: roleJobCount[r.apiSlug] ?? 0 };
   });
 
   return (
@@ -96,7 +97,7 @@ export default async function SkillsPage() {
         >
           <div className="flex flex-wrap items-center gap-2 text-xs text-slate-400">
             <span className="px-2.5 py-1 rounded-full bg-white/10 border border-white/20 font-semibold">
-              {hasLiveSkills ? `${topSkillsList.length} skills live` : "500+ skills tracked"}
+              {hasLiveSkills ? `${topSkillsList.length} skills live` : "Skills tracked live"}
             </span>
             <span className="text-slate-600">·</span>
             <span>3-gate NLP extraction</span>
@@ -270,7 +271,14 @@ export default async function SkillsPage() {
               </div>
               <div>
                 <h2 className="text-sm font-bold text-t1">Skills That Punch Above Their Weight at Entry Level</h2>
-                <p className="text-[10px] text-t2">Overall market rank vs. rank among junior-only postings, last 90 days</p>
+                <p className="text-[10px] text-t2">
+                  Overall market rank vs. rank among junior-only postings, last 90 days
+                  {skillShift && skillShift.sample_size_junior > 0 && (
+                    <span className={skillShift.sample_size_junior < 50 ? "text-warn font-semibold" : ""}>
+                      {" "}· n={skillShift.sample_size_junior.toLocaleString()} junior postings{skillShift.sample_size_junior < 50 ? " (small sample)" : ""}
+                    </span>
+                  )}
+                </p>
               </div>
             </div>
             <div className="space-y-3">
@@ -365,7 +373,14 @@ export default async function SkillsPage() {
               const [accent, bg, border] = palette[i % palette.length].split(" ");
               return (
                 <div key={r.role} className={`p-4 rounded-xl border ${border} ${bg}`}>
-                  <p className="text-[10px] text-t3 mb-1">{r.role}</p>
+                  <div className="flex items-center justify-between mb-1">
+                    <p className="text-[10px] text-t3">{r.role}</p>
+                    {r.n > 0 && (
+                      <p className="text-[9px] text-t3 font-mono">
+                        {r.n.toLocaleString()} posting{r.n === 1 ? "" : "s"}{r.n < 50 ? " · small sample" : ""}
+                      </p>
+                    )}
+                  </div>
                   {r.live ? (
                     <>
                       <p className={`text-lg font-black ${accent}`}>{r.skill}</p>

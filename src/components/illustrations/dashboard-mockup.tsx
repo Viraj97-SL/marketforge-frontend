@@ -1,29 +1,35 @@
-interface MockBar {
-  label: string;
-  value: number;
-  color: string;
-}
+import { fmt, fmtK } from "@/lib/utils";
 
-const MOCK_SKILLS: MockBar[] = [
-  { label: "Python",     value: 92, color: "#4F46E5" },
-  { label: "PyTorch",    value: 74, color: "#6366F1" },
-  { label: "LangChain",  value: 68, color: "#818CF8" },
-  { label: "SQL",        value: 61, color: "#A5B4FC" },
-  { label: "Docker",     value: 55, color: "#C7D2FE" },
-  { label: "Kubernetes", value: 47, color: "#DDD6FE" },
-];
-
-const MOCK_STATS = [
-  { label: "AI Jobs",      value: "4,820", sub: "this week",     accent: "#4F46E5" },
-  { label: "Median Salary",value: "£82k",  sub: "all AI roles",  accent: "#2563EB" },
-  { label: "Visa Rate",    value: "34%",   sub: "sponsor roles",  accent: "#7C3AED" },
-];
+interface SkillCount { skill: string; count: number; }
+interface CityCount { city: string; job_count: number; }
 
 interface DashboardMockupProps {
   className?: string;
+  jobsTotal: number;
+  medianSalary: number | null;
+  visaRate: { pct: number; n: number } | null;
+  topSkills: SkillCount[];
+  cities: CityCount[];
 }
 
-export function DashboardMockup({ className = "" }: DashboardMockupProps) {
+/**
+ * A "browser screenshot" style illustration of the live dashboard — every
+ * number rendered here is a prop passed down from a real API fetch on the
+ * homepage (jobsTotal, medianSalary, visaRate, topSkills, cities). None of
+ * it is invented; a section with no live data renders an honest gap instead
+ * of a plausible-looking placeholder, matching the "Live" badge it carries.
+ */
+export function DashboardMockup({ className = "", jobsTotal, medianSalary, visaRate, topSkills, cities }: DashboardMockupProps) {
+  const maxSkill = topSkills[0]?.count ?? 1;
+  const maxCity  = cities[0]?.job_count ?? 1;
+  const SKILL_COLORS = ["#4F46E5", "#6366F1", "#818CF8", "#A5B4FC", "#C7D2FE", "#DDD6FE"];
+
+  const stats = [
+    { label: "AI Jobs",       value: jobsTotal > 0 ? fmt(jobsTotal) : "—",              sub: "tracked",       accent: "#4F46E5" },
+    { label: "Median Salary", value: medianSalary != null ? fmtK(medianSalary) : "—",   sub: "all AI roles",  accent: "#2563EB" },
+    { label: "Visa Rate",     value: visaRate ? `${Math.round(visaRate.pct * 100)}%` : "—", sub: "GOV.UK-verified", accent: "#7C3AED" },
+  ];
+
   return (
     <div className={`relative ${className}`}>
       {/* Browser chrome */}
@@ -53,7 +59,7 @@ export function DashboardMockup({ className = "" }: DashboardMockupProps) {
 
           {/* Top stat row */}
           <div className="grid grid-cols-3 gap-3 mb-5">
-            {MOCK_STATS.map((s) => (
+            {stats.map((s) => (
               <div key={s.label} className="bg-white rounded-xl border border-b1 p-3 shadow-card">
                 <p className="text-[9px] text-t3 mb-1">{s.label}</p>
                 <p className="text-xl font-black" style={{ color: s.accent }}>{s.value}</p>
@@ -65,66 +71,71 @@ export function DashboardMockup({ className = "" }: DashboardMockupProps) {
           {/* Skills bar chart */}
           <div className="bg-white rounded-xl border border-b1 p-4 mb-4 shadow-card">
             <div className="flex items-center justify-between mb-3">
-              <p className="text-[10px] font-bold text-t1">Top Skills This Week</p>
+              <p className="text-[10px] font-bold text-t1">Top Skills</p>
               <span className="text-[8px] px-2 py-0.5 rounded-full bg-accent/10 text-accent font-semibold border border-accent/20">Live</span>
             </div>
-            <div className="space-y-2">
-              {MOCK_SKILLS.map((bar) => (
-                <div key={bar.label} className="flex items-center gap-2">
-                  <span className="text-[9px] text-t2 w-16 shrink-0 font-medium">{bar.label}</span>
-                  <div className="flex-1 h-2 rounded-full bg-s2 overflow-hidden">
-                    <div
-                      className="h-full rounded-full"
-                      style={{ width: `${bar.value}%`, background: bar.color }}
-                    />
-                  </div>
-                  <span className="text-[8px] text-t3 font-mono w-5 text-right">{bar.value}</span>
-                </div>
-              ))}
-            </div>
+            {topSkills.length > 0 ? (
+              <div className="space-y-2">
+                {topSkills.map((bar, i) => {
+                  const pct = Math.round((bar.count / maxSkill) * 100);
+                  return (
+                    <div key={bar.skill} className="flex items-center gap-2">
+                      <span className="text-[9px] text-t2 w-16 shrink-0 font-medium truncate">{bar.skill}</span>
+                      <div className="flex-1 h-2 rounded-full bg-s2 overflow-hidden">
+                        <div className="h-full rounded-full" style={{ width: `${pct}%`, background: SKILL_COLORS[i % SKILL_COLORS.length] }} />
+                      </div>
+                      <span className="text-[8px] text-t3 font-mono w-8 text-right">{bar.count.toLocaleString()}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <p className="text-[9px] text-t3 py-4 text-center">Not enough live data yet</p>
+            )}
           </div>
 
           {/* Bottom row: salary card + cities mini */}
           <div className="grid grid-cols-2 gap-3">
             <div className="bg-white rounded-xl border border-b1 p-3 shadow-card">
               <p className="text-[9px] font-bold text-t1 mb-2">Salary Distribution</p>
-              {/* Mini salary arc */}
-              <div className="flex items-end gap-1 h-10">
-                {[22, 35, 55, 80, 100, 85, 60, 38, 20].map((h, i) => (
-                  <div
-                    key={i}
-                    className="flex-1 rounded-sm"
-                    style={{
-                      height: `${h}%`,
-                      background: i === 4 ? "#4F46E5" : i > 2 && i < 7 ? "#A5B4FC" : "#E0E7FF",
-                    }}
-                  />
-                ))}
-              </div>
-              <div className="flex justify-between mt-1">
-                <span className="text-[7px] text-t3">£40k</span>
-                <span className="text-[7px] font-bold text-accent">£82k</span>
-                <span className="text-[7px] text-t3">£180k+</span>
-              </div>
+              {medianSalary != null ? (
+                <>
+                  <div className="flex items-end gap-1 h-10">
+                    {[22, 35, 55, 80, 100, 85, 60, 38, 20].map((h, i) => (
+                      <div key={i} className="flex-1 rounded-sm"
+                        style={{ height: `${h}%`, background: i === 4 ? "#4F46E5" : i > 2 && i < 7 ? "#A5B4FC" : "#E0E7FF" }} />
+                    ))}
+                  </div>
+                  <div className="flex justify-between mt-1">
+                    <span className="text-[7px] text-t3">P25</span>
+                    <span className="text-[7px] font-bold text-accent">{fmtK(medianSalary)}</span>
+                    <span className="text-[7px] text-t3">P75</span>
+                  </div>
+                </>
+              ) : (
+                <p className="text-[9px] text-t3 py-4 text-center">Not enough live data yet</p>
+              )}
             </div>
 
             <div className="bg-white rounded-xl border border-b1 p-3 shadow-card">
               <p className="text-[9px] font-bold text-t1 mb-2">Top Cities</p>
-              <div className="space-y-1.5">
-                {[
-                  { city: "London",     pct: 100 },
-                  { city: "Manchester", pct: 13  },
-                  { city: "Cambridge",  pct: 11  },
-                  { city: "Edinburgh",  pct: 8   },
-                ].map((c) => (
-                  <div key={c.city} className="flex items-center gap-1.5">
-                    <span className="text-[8px] text-t2 w-14">{c.city}</span>
-                    <div className="flex-1 h-1.5 rounded-full bg-s2 overflow-hidden">
-                      <div className="h-full rounded-full bg-gradient-to-r from-accent to-blue" style={{ width: `${c.pct}%` }} />
-                    </div>
-                  </div>
-                ))}
-              </div>
+              {cities.length > 0 ? (
+                <div className="space-y-1.5">
+                  {cities.map((c) => {
+                    const pct = Math.round((c.job_count / maxCity) * 100);
+                    return (
+                      <div key={c.city} className="flex items-center gap-1.5">
+                        <span className="text-[8px] text-t2 w-14 truncate">{c.city}</span>
+                        <div className="flex-1 h-1.5 rounded-full bg-s2 overflow-hidden">
+                          <div className="h-full rounded-full bg-gradient-to-r from-accent to-blue" style={{ width: `${pct}%` }} />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <p className="text-[9px] text-t3 py-4 text-center">Not enough live data yet</p>
+              )}
             </div>
           </div>
         </div>

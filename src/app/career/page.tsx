@@ -1,5 +1,5 @@
 "use client";
-import { useState, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { api, type CareerProfile, type CareerReport, type CVAnalysisReport } from "@/lib/api";
 import { fmtK, pct } from "@/lib/utils";
 import {
@@ -191,16 +191,25 @@ function Dropzone({ onFile }: { onFile: (f: File) => void }) {
 }
 
 // ═════════════════════════════════════════════════════════════════════════════
-const careerSteps = [
-  { n: "01", Icon: PenLine,      label: "Enter your skills",  sub: "Paste skills or upload your CV",         accent: "text-accent", bg: "bg-accent/8", border: "border-accent/20", iconBg: "bg-accent/15" },
-  { n: "02", Icon: BarChart2,    label: "Run AI analysis",    sub: "SBERT matches you to 4,800+ live roles", accent: "text-blue",   bg: "bg-blue/8",   border: "border-blue/20",   iconBg: "bg-blue/15"   },
-  { n: "03", Icon: ClipboardList,label: "Get your report",    sub: "Score, gaps, 90-day plan",               accent: "text-prp",    bg: "bg-prp/8",    border: "border-prp/20",    iconBg: "bg-prp/15"    },
-];
+function buildCareerSteps(jobsTotal: number) {
+  const roleCount = jobsTotal > 0 ? `${jobsTotal.toLocaleString()} live roles` : "live roles";
+  return [
+    { n: "01", Icon: PenLine,      label: "Enter your skills",  sub: "Paste skills or upload your CV",       accent: "text-accent", bg: "bg-accent/8", border: "border-accent/20", iconBg: "bg-accent/15" },
+    { n: "02", Icon: BarChart2,    label: "Run AI analysis",    sub: `SBERT matches you to ${roleCount}`,    accent: "text-blue",   bg: "bg-blue/8",   border: "border-blue/20",   iconBg: "bg-blue/15"   },
+    { n: "03", Icon: ClipboardList,label: "Get your report",    sub: "Score, gaps, 90-day plan",             accent: "text-prp",    bg: "bg-prp/8",    border: "border-prp/20",    iconBg: "bg-prp/15"    },
+  ];
+}
 
 // Main page
 // ═════════════════════════════════════════════════════════════════════════════
 export default function CareerPage() {
   const [activeTab, setActiveTab] = useState<"skills" | "cv">("skills");
+
+  // Live jobs_total for the "SBERT matches you to N live roles" step copy —
+  // fetched client-side since this page isn't a server component.
+  const [jobsTotal, setJobsTotal] = useState(0);
+  useEffect(() => { api.health().then((h) => setJobsTotal(h.jobs_total)).catch(() => {}); }, []);
+  const careerSteps = buildCareerSteps(jobsTotal);
 
   // ── Skills tab state ──────────────────────────────────────────────────────
   const [skills, setSkills]     = useState("");

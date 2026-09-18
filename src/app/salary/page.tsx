@@ -50,8 +50,11 @@ const WORK_MODELS = [
 ] as const;
 
 export default async function SalaryPage() {
-  const [snapshotResult, historyResult, benchmarkResult, ...roleResults] = await Promise.allSettled([
-    api.snapshot(),
+  const [overallResult, historyResult, benchmarkResult, ...roleResults] = await Promise.allSettled([
+    // All-time, same source as every panel below (role/experience/region/work-model) —
+    // this used to be api.snapshot() (the latest week's snapshot row), which could
+    // show a different median here than the "Salary by Role" panel a few pixels down.
+    api.salary("all", "all", "all"),
     api.snapshotHistory(26),
     api.salaryBenchmark(),
     ...ROLE_CONFIGS.map(r => api.salary(r.apiSlug, "all", "all")),
@@ -63,8 +66,8 @@ export default async function SalaryPage() {
     Promise.allSettled(WORK_MODELS.map(w => api.salary("all", "all", "all", w.model))),
   ]);
 
-  const snapshot = snapshotResult.status === "fulfilled" ? snapshotResult.value : null;
-  const snap = snapshot as any;
+  const snap = overallResult.status === "fulfilled" ? (overallResult.value as SalaryData) : null;
+  const overallN = snap?.salary_sample_size ?? 0;
 
   const snapshotHistory = historyResult.status === "fulfilled" ? (historyResult.value as SnapshotHistoryData) : null;
   const historyWeeks = (snapshotHistory?.weeks ?? []).filter((w) => w.salary_p50 != null);
@@ -136,7 +139,10 @@ export default async function SalaryPage() {
             <div>
               <p className="section-label mb-2">Market Distribution</p>
               <p className="text-5xl font-black text-t1 tracking-tight">{fmtK(medianSalary)}</p>
-              <p className="text-t2 mt-1 text-sm">Median UK AI/ML salary — all roles, all seniorities</p>
+              <p className="text-t2 mt-1 text-sm">
+                Median UK AI/ML salary — all roles, all seniorities
+                {overallN > 0 && <span className="text-t3"> · n={overallN.toLocaleString()}</span>}
+              </p>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="p-4 rounded-xl bg-s2 border border-b1 text-right">

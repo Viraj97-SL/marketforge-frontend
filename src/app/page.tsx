@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { api } from "@/lib/api";
+import type { CitiesData, SalaryData, SkillsData, SponsorVerificationData, HealthData } from "@/lib/api";
 import { fmt, fmtK } from "@/lib/utils";
 import {
   ArrowRight, Brain, TrendingUp, Shield,
@@ -16,14 +17,22 @@ import { DashboardMockup } from "@/components/illustrations/dashboard-mockup";
 import { PipelineFlow }    from "@/components/illustrations/pipeline-flow";
 
 // ─── Hero right-side stats grid ───────────────────────────────────────────────
-function HeroStats({ jobsTotal, statusOk, freshness }: {
-  jobsTotal: number; statusOk: boolean; freshness?: number;
+// Every value here comes from the API at request time — no plausible-looking
+// literal fallback. A stat that fails to fetch shows "—", never a guess.
+function HeroStats({ jobsTotal, medianSalary, skillsCount, visaRate, statusOk, freshness }: {
+  jobsTotal: number; medianSalary: number | null; skillsCount: number; visaRate: { pct: number; n: number } | null;
+  statusOk: boolean; freshness?: number;
 }) {
   const stats = [
-    { label: "UK AI Jobs Tracked", value: jobsTotal > 0 ? fmt(jobsTotal) : "4,200+", accent: "text-indigo-300" },
-    { label: "Median AI Salary",   value: "£82k",  accent: "text-blue-300"   },
-    { label: "Skills Monitored",   value: "500+",  accent: "text-violet-300" },
-    { label: "Visa Sponsor Rate",  value: "34%",   accent: "text-emerald-300"},
+    { label: "UK AI Jobs Tracked", value: jobsTotal > 0 ? fmt(jobsTotal) : "—", accent: "text-indigo-300" },
+    { label: "Median AI Salary",   value: medianSalary != null ? fmtK(medianSalary) : "—", accent: "text-blue-300"   },
+    { label: "Skills Monitored",   value: skillsCount > 0 ? fmt(skillsCount) : "—", accent: "text-violet-300" },
+    {
+      label: "Visa Sponsor Rate",
+      value: visaRate ? `${Math.round(visaRate.pct * 100)}%` : "—",
+      sub: visaRate ? `of ${visaRate.n.toLocaleString()} employers, GOV.UK-verified` : undefined,
+      accent: "text-emerald-300",
+    },
   ];
   return (
     <div className="grid grid-cols-2 gap-3">
@@ -31,6 +40,7 @@ function HeroStats({ jobsTotal, statusOk, freshness }: {
         <div key={s.label} className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm p-5">
           <p className="text-xs text-slate-400 mb-2">{s.label}</p>
           <p className={`text-3xl font-black ${s.accent}`}>{s.value}</p>
+          {"sub" in s && s.sub && <p className="text-[10px] text-slate-500 mt-1">{s.sub}</p>}
         </div>
       ))}
       <div className="col-span-2 rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 flex items-center gap-2">
@@ -46,23 +56,46 @@ function HeroStats({ jobsTotal, statusOk, freshness }: {
 }
 
 // ─── Feature list ─────────────────────────────────────────────────────────────
-const FEATURES = [
-  { icon: Brain,     title: "AI-Powered Scraping",       body: "9 autonomous agents collect from Adzuna, Reed, and specialist boards. Dedup + NLP validation baked in.", href: "/market",   accent: "text-accent", bg: "bg-accent/8", iconBg: "bg-accent/15" },
-  { icon: BarChart3, title: "Skill Demand Intelligence", body: "Real-time ranking of 500+ tech skills by job count, co-occurrence, and week-over-week velocity.",          href: "/skills",   accent: "text-blue",   bg: "bg-blue/8",   iconBg: "bg-blue/15"   },
-  { icon: DollarSign,title: "Salary Benchmarks",         body: "P25/P50/P75 percentiles by role, experience level, and UK region — updated every pipeline run.",           href: "/salary",   accent: "text-prp",    bg: "bg-prp/8",    iconBg: "bg-prp/15"    },
-  { icon: Globe,     title: "Visa Sponsorship Tracker",  body: "Which companies sponsor Skilled Worker visas for AI/ML roles — verified via NLP on job descriptions.",      href: "/jobs",     accent: "text-ok",     bg: "bg-ok/8",     iconBg: "bg-ok/15"     },
-  { icon: Target,    title: "Career Gap Analysis",       body: "Upload your CV. Get a personalised market-match score, skill gap report, and 90-day action plan.",          href: "/career",   accent: "text-warn",   bg: "bg-warn/8",   iconBg: "bg-warn/15"   },
-  { icon: BookOpen,  title: "Research Signals",          body: "Emerging tech tracked from arXiv, funding announcements, and GitHub trending — before it hits job boards.", href: "/research", accent: "text-blue",   bg: "bg-blue/8",   iconBg: "bg-blue/15"   },
-];
+// `body` for the skills card is a template, not a literal — see FEATURES(skillsCount) below.
+function buildFeatures(skillsCount: number) {
+  const skillsLabel = skillsCount > 0 ? `${fmt(skillsCount)} tech skills` : "tech skills";
+  return [
+    { icon: Brain,     title: "AI-Powered Scraping",       body: "9 autonomous agents collect from Adzuna, Reed, and specialist boards. Dedup + NLP validation baked in.", href: "/market",   accent: "text-accent", bg: "bg-accent/8", iconBg: "bg-accent/15" },
+    { icon: BarChart3, title: "Skill Demand Intelligence", body: `Real-time ranking of ${skillsLabel} by job count, co-occurrence, and week-over-week velocity.`,          href: "/skills",   accent: "text-blue",   bg: "bg-blue/8",   iconBg: "bg-blue/15"   },
+    { icon: DollarSign,title: "Salary Benchmarks",         body: "P25/P50/P75 percentiles by role, experience level, and UK region — updated every pipeline run.",           href: "/salary",   accent: "text-prp",    bg: "bg-prp/8",    iconBg: "bg-prp/15"    },
+    { icon: Globe,     title: "Visa Sponsorship Tracker",  body: "Which companies are licensed Skilled Worker visa sponsors — verified against the GOV.UK register.",         href: "/jobs",     accent: "text-ok",     bg: "bg-ok/8",     iconBg: "bg-ok/15"     },
+    { icon: Target,    title: "Career Gap Analysis",       body: "Upload your CV. Get a personalised market-match score, skill gap report, and 90-day action plan.",          href: "/career",   accent: "text-warn",   bg: "bg-warn/8",   iconBg: "bg-warn/15"   },
+    { icon: BookOpen,  title: "Research Signals",          body: "Emerging tech tracked from arXiv, funding announcements, and GitHub trending — before it hits job boards.", href: "/research", accent: "text-blue",   bg: "bg-blue/8",   iconBg: "bg-blue/15"   },
+  ];
+}
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 export default async function HomePage() {
-  let health = null;
-  try { health = await api.health(); } catch {}
+  const [healthRes, salaryRes, skillsRes, sponsorRes, citiesRes] = await Promise.allSettled([
+    api.health(),
+    api.salary("all", "all", "all"),
+    api.skills(),
+    api.sponsorVerification(),
+    api.cities(),
+  ]);
 
+  const health = healthRes.status === "fulfilled" ? (healthRes.value as HealthData) : null;
   const jobsTotal = health?.jobs_total ?? 0;
   const freshness = health?.data_freshness_h ?? undefined;
   const statusOk  = health?.status === "healthy";
+
+  const salary = salaryRes.status === "fulfilled" ? (salaryRes.value as SalaryData) : null;
+  const medianSalary = salary?.salary_p50 ?? null;
+
+  const skillsData = skillsRes.status === "fulfilled" ? (skillsRes.value as SkillsData) : null;
+  const skillsCount = Object.keys(skillsData?.top_skills ?? {}).length;
+
+  const sponsor = sponsorRes.status === "fulfilled" ? (sponsorRes.value as SponsorVerificationData) : null;
+  const visaRate = sponsor?.verified_pct != null ? { pct: sponsor.verified_pct, n: sponsor.sample_size } : null;
+
+  const cities = citiesRes.status === "fulfilled" ? (citiesRes.value as CitiesData).cities : [];
+
+  const FEATURES = buildFeatures(skillsCount);
 
   return (
     <div className="pt-14 overflow-x-hidden">
@@ -107,7 +140,7 @@ export default async function HomePage() {
             </div>
           </div>
           <div className="animate-fade-in animate-delay-200 hidden lg:block">
-            <HeroStats jobsTotal={jobsTotal} statusOk={statusOk} freshness={freshness} />
+            <HeroStats jobsTotal={jobsTotal} medianSalary={medianSalary} skillsCount={skillsCount} visaRate={visaRate} statusOk={statusOk} freshness={freshness} />
           </div>
         </div>
       </section>
@@ -153,7 +186,13 @@ export default async function HomePage() {
 
           {/* Right — mockup */}
           <div className="animate-fade-up animate-delay-200">
-            <DashboardMockup />
+            <DashboardMockup
+              jobsTotal={jobsTotal}
+              medianSalary={medianSalary}
+              visaRate={visaRate}
+              topSkills={Object.entries(skillsData?.top_skills ?? {}).map(([skill, count]) => ({ skill, count: count as number })).sort((a, b) => b.count - a.count).slice(0, 6)}
+              cities={cities.slice(0, 4)}
+            />
           </div>
         </div>
       </section>
