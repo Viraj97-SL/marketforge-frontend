@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { api } from "@/lib/api";
-import type { CitiesData, SalaryData, SkillsData, SponsorVerificationData, HealthData } from "@/lib/api";
+import type { CitiesData, SalaryData, SkillsData, SponsorVerificationData, HealthData, RolesData, EntryLevelSkillShiftData, SkillCooccurrenceData, EntryLevelUniversalSkillsData } from "@/lib/api";
 import { fmt, fmtK } from "@/lib/utils";
 import {
   ArrowRight, Brain, TrendingUp, Shield,
@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { LogoMarquee }      from "@/components/home/logo-marquee";
 import { ContactForm }      from "@/components/home/contact-form";
+import { NarrativeSection } from "@/components/home/narrative-section";
 import { DashboardMockup } from "@/components/illustrations/dashboard-mockup";
 import { PipelineFlow }    from "@/components/illustrations/pipeline-flow";
 
@@ -72,12 +73,16 @@ function buildFeatures(skillsCount: number) {
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 export default async function HomePage() {
-  const [healthRes, salaryRes, skillsRes, sponsorRes, citiesRes] = await Promise.allSettled([
+  const [healthRes, salaryRes, skillsRes, sponsorRes, citiesRes, rolesRes, skillShiftRes, cooccurrenceRes, universalSkillsRes] = await Promise.allSettled([
     api.health(),
     api.salary("all", "all", "all"),
     api.skills(),
     api.sponsorVerification(),
     api.cities(),
+    api.roles(),
+    api.entryLevelSkillShift(),
+    api.skillCooccurrence(6),
+    api.entryLevelUniversalSkills(),
   ]);
 
   const health = healthRes.status === "fulfilled" ? (healthRes.value as HealthData) : null;
@@ -95,6 +100,11 @@ export default async function HomePage() {
   const visaRate = sponsor?.verified_pct != null ? { pct: sponsor.verified_pct, n: sponsor.sample_size } : null;
 
   const cities = citiesRes.status === "fulfilled" ? (citiesRes.value as CitiesData).cities : [];
+
+  const roles = rolesRes.status === "fulfilled" ? (rolesRes.value as RolesData) : null;
+  const skillShift = skillShiftRes.status === "fulfilled" ? (skillShiftRes.value as EntryLevelSkillShiftData) : null;
+  const cooccurrence = cooccurrenceRes.status === "fulfilled" ? (cooccurrenceRes.value as SkillCooccurrenceData) : null;
+  const universalSkills = universalSkillsRes.status === "fulfilled" ? (universalSkillsRes.value as EntryLevelUniversalSkillsData) : null;
 
   const FEATURES = buildFeatures(skillsCount);
 
@@ -277,6 +287,9 @@ export default async function HomePage() {
           ))}
         </div>
       </section>
+
+      {/* ── Narrative ─────────────────────────────────────────────────────── */}
+      <NarrativeSection roles={roles} skillShift={skillShift} cooccurrence={cooccurrence} universalSkills={universalSkills} />
 
       {/* ── Who it's for ──────────────────────────────────────────────────── */}
       <section className="bg-s2 border-y border-b1 py-20">

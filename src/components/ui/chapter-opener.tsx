@@ -2,8 +2,8 @@ import Image from "next/image";
 import type { ReactNode } from "react";
 
 interface ChapterOpenerProps {
-  /** Local path under public/, e.g. "/images/chapter-builders.avif". */
-  image: string;
+  /** Local path under public/, e.g. "/images/chapter-builders.avif". Omit to render on --ink alone (no fabricated placeholder photo). */
+  image?: string;
   heading: ReactNode;
   /** A single sentence. */
   sentence: string;
@@ -22,15 +22,17 @@ export function ChapterOpener({ image, heading, sentence, className = "" }: Chap
       className={`relative w-full overflow-hidden aspect-[2/1] ${className}`}
       style={{ background: "var(--ink)" }}
     >
-      <div
-        className="absolute inset-0"
-        style={{
-          maskImage: "linear-gradient(to bottom, transparent 0%, #000 12%, #000 88%, transparent 100%)",
-          WebkitMaskImage: "linear-gradient(to bottom, transparent 0%, #000 12%, #000 88%, transparent 100%)",
-        }}
-      >
-        <Image src={image} alt="" fill sizes="100vw" className="object-cover" style={{ opacity: 0.5 }} />
-      </div>
+      {image && (
+        <div
+          className="absolute inset-0"
+          style={{
+            maskImage: "linear-gradient(to bottom, transparent 0%, #000 12%, #000 88%, transparent 100%)",
+            WebkitMaskImage: "linear-gradient(to bottom, transparent 0%, #000 12%, #000 88%, transparent 100%)",
+          }}
+        >
+          <Image src={image} alt="" fill sizes="100vw" className="object-cover" style={{ opacity: 0.5 }} />
+        </div>
+      )}
 
       <div
         className="absolute inset-0 pointer-events-none"
