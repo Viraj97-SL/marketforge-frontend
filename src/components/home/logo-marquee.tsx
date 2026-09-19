@@ -4,6 +4,8 @@ import Marquee from "react-fast-marquee";
 import {
   siGoogle, siNvidia, siAnthropic, siMeta, siHuggingface, siPalantir,
   siRollsroyce, siBt, siHsbc, siDatabricks, siGithub, siArm,
+  siPytorch, siTensorflow, siApple, siIntel, siAmd, siSage,
+  siSky, siSiemens, siSnowflake, siDocker, siKubernetes, siDatadog,
 } from "simple-icons";
 
 type SiIcon = { path: string; hex: string; title: string };
@@ -20,6 +22,12 @@ const ROW1: Brand[] = [
   { name: "Meta AI",         icon: siMeta },
   { name: "Hugging Face",    icon: siHuggingface },
   { name: "ARM",             icon: siArm },
+  { name: "PyTorch",         icon: siPytorch },
+  { name: "TensorFlow",      icon: siTensorflow },
+  { name: "Apple",           icon: siApple },
+  { name: "Intel",           icon: siIntel },
+  { name: "AMD",             icon: siAmd },
+  { name: "Docker",          icon: siDocker },
 ];
 
 const ROW2: Brand[] = [
@@ -29,6 +37,12 @@ const ROW2: Brand[] = [
   { name: "HSBC Tech",    icon: siHsbc },
   { name: "Databricks",   icon: siDatabricks },
   { name: "GitHub",       icon: siGithub },
+  { name: "Sage",         icon: siSage },
+  { name: "Sky Tech",     icon: siSky },
+  { name: "Siemens",      icon: siSiemens },
+  { name: "Snowflake",    icon: siSnowflake },
+  { name: "Kubernetes",   icon: siKubernetes },
+  { name: "Datadog",      icon: siDatadog },
 ];
 
 function BrandPill({ name, icon }: Brand) {

@@ -58,17 +58,28 @@ function HeroStats({ jobsTotal, medianSalary, skillsCount, visaRate, statusOk, f
 }
 
 // ─── Feature list ─────────────────────────────────────────────────────────────
+// Every class string below is written out in full (never template-interpolated)
+// so Tailwind's static scanner can find it — `text-${accent}` would silently
+// fail to generate the class at build time.
+const ACCENT_STYLES = {
+  accent: { text: "text-accent", groupText: "group-hover:text-accent", iconBg: "bg-accent/10", iconBorder: "border-accent/25", wash: "from-accent/[0.07]", ring: "group-hover:shadow-[0_0_0_1px_rgba(79,70,229,0.25),0_12px_28px_-8px_rgba(79,70,229,0.35)]" },
+  blue:   { text: "text-blue",   groupText: "group-hover:text-blue",   iconBg: "bg-blue/10",   iconBorder: "border-blue/25",   wash: "from-blue/[0.07]",   ring: "group-hover:shadow-[0_0_0_1px_rgba(37,99,235,0.25),0_12px_28px_-8px_rgba(37,99,235,0.35)]" },
+  prp:    { text: "text-prp",    groupText: "group-hover:text-prp",    iconBg: "bg-prp/10",    iconBorder: "border-prp/25",    wash: "from-prp/[0.07]",    ring: "group-hover:shadow-[0_0_0_1px_rgba(124,58,237,0.25),0_12px_28px_-8px_rgba(124,58,237,0.35)]" },
+  ok:     { text: "text-ok",     groupText: "group-hover:text-ok",     iconBg: "bg-ok/10",     iconBorder: "border-ok/25",     wash: "from-ok/[0.07]",     ring: "group-hover:shadow-[0_0_0_1px_rgba(5,150,105,0.25),0_12px_28px_-8px_rgba(5,150,105,0.35)]" },
+  warn:   { text: "text-warn",   groupText: "group-hover:text-warn",   iconBg: "bg-warn/10",   iconBorder: "border-warn/25",   wash: "from-warn/[0.07]",   ring: "group-hover:shadow-[0_0_0_1px_rgba(217,119,6,0.25),0_12px_28px_-8px_rgba(217,119,6,0.35)]" },
+} as const;
+
 // `body` for the skills card is a template, not a literal — see FEATURES(skillsCount) below.
 function buildFeatures(skillsCount: number) {
   const skillsLabel = skillsCount > 0 ? `${fmt(skillsCount)} tech skills` : "tech skills";
   return [
-    { icon: "/images/icons/feature-scraping.png", title: "AI-Powered Scraping",       body: "9 autonomous agents collect from Adzuna, Reed, and specialist boards. Dedup + NLP validation baked in.", href: "/market"   },
-    { icon: "/images/icons/feature-skills.png",   title: "Skill Demand Intelligence", body: `Real-time ranking of ${skillsLabel} by job count, co-occurrence, and week-over-week velocity.`,          href: "/skills"   },
-    { icon: "/images/icons/feature-salary.png",   title: "Salary Benchmarks",         body: "P25/P50/P75 percentiles by role, experience level, and UK region — updated every pipeline run.",           href: "/salary"   },
-    { icon: "/images/icons/feature-visa.png",     title: "Visa Sponsorship Tracker",  body: "Which companies are licensed Skilled Worker visa sponsors — verified against the GOV.UK register.",         href: "/jobs"     },
-    { icon: "/images/icons/feature-career.png",   title: "Career Gap Analysis",       body: "Upload your CV. Get a personalised market-match score, skill gap report, and 90-day action plan.",          href: "/career"   },
-    { icon: "/images/icons/feature-research.png", title: "Research Signals",          body: "Emerging tech tracked from arXiv, funding announcements, and GitHub trending — before it hits job boards.", href: "/research" },
-  ];
+    { icon: "/images/icons/feature-scraping.png", title: "AI-Powered Scraping",       body: "9 autonomous agents collect from Adzuna, Reed, and specialist boards. Dedup + NLP validation baked in.", href: "/market",   accent: "accent" },
+    { icon: "/images/icons/feature-skills.png",   title: "Skill Demand Intelligence", body: `Real-time ranking of ${skillsLabel} by job count, co-occurrence, and week-over-week velocity.`,          href: "/skills",   accent: "blue"   },
+    { icon: "/images/icons/feature-salary.png",   title: "Salary Benchmarks",         body: "P25/P50/P75 percentiles by role, experience level, and UK region — updated every pipeline run.",           href: "/salary",   accent: "prp"    },
+    { icon: "/images/icons/feature-visa.png",     title: "Visa Sponsorship Tracker",  body: "Which companies are licensed Skilled Worker visa sponsors — verified against the GOV.UK register.",         href: "/jobs",     accent: "ok"     },
+    { icon: "/images/icons/feature-career.png",   title: "Career Gap Analysis",       body: "Upload your CV. Get a personalised market-match score, skill gap report, and 90-day action plan.",          href: "/career",   accent: "warn"   },
+    { icon: "/images/icons/feature-research.png", title: "Research Signals",          body: "Emerging tech tracked from arXiv, funding announcements, and GitHub trending — before it hits job boards.", href: "/research", accent: "blue"   },
+  ] as const;
 }
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
@@ -230,24 +241,33 @@ export default async function HomePage() {
           </div>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {FEATURES.map((f, i) => (
-              <Link
-                key={f.title}
-                href={f.href}
-                className={`group bg-s1 rounded-2xl border border-b1 card-hover shadow-card animate-fade-up flex flex-col
-                  ${i === 0 ? "sm:col-span-2 p-8 justify-center" : "p-6"}`}
-                style={{ animationDelay: `${i * 80}ms` }}
-              >
-                <MaskIcon src={f.icon} size={i === 0 ? 28 : 22} className="text-accent mb-4" />
-                <div className="flex items-start justify-between">
-                  <h3 className={`font-bold text-t1 mb-2 group-hover:text-accent transition-colors flex-1 ${i === 0 ? "text-xl sm:text-2xl" : "text-sm"}`}>
-                    {f.title}
-                  </h3>
-                  <ChevronRight className="w-4 h-4 text-t3 group-hover:text-accent transition-colors shrink-0 mt-1" />
-                </div>
-                <p className={`text-t2 leading-relaxed ${i === 0 ? "text-sm max-w-lg" : "text-xs"}`}>{f.body}</p>
-              </Link>
-            ))}
+            {FEATURES.map((f, i) => {
+              const s = ACCENT_STYLES[f.accent];
+              return (
+                <Link
+                  key={f.title}
+                  href={f.href}
+                  className={`group relative overflow-hidden bg-s1 rounded-2xl border border-b1 shadow-card animate-fade-up flex flex-col
+                    transition-all duration-300 hover:-translate-y-0.5 hover:border-transparent ${s.ring}
+                    ${i === 0 ? "sm:col-span-2 p-8 justify-center" : "p-6"}`}
+                  style={{ animationDelay: `${i * 80}ms` }}
+                >
+                  {/* Corner colour wash — subtle, per-card identity */}
+                  <div className={`absolute -top-10 -right-10 w-40 h-40 rounded-full bg-gradient-to-br ${s.wash} to-transparent pointer-events-none`} />
+
+                  <div className={`relative w-11 h-11 rounded-xl ${s.iconBg} border ${s.iconBorder} flex items-center justify-center mb-4 transition-transform duration-300 group-hover:scale-110`}>
+                    <MaskIcon src={f.icon} size={i === 0 ? 24 : 20} className={s.text} />
+                  </div>
+                  <div className="relative flex items-start justify-between">
+                    <h3 className={`font-bold text-t1 mb-2 ${s.groupText} transition-colors flex-1 ${i === 0 ? "text-xl sm:text-2xl" : "text-sm"}`}>
+                      {f.title}
+                    </h3>
+                    <ChevronRight className={`w-4 h-4 text-t3 ${s.groupText} transition-all shrink-0 mt-1 group-hover:translate-x-0.5`} />
+                  </div>
+                  <p className={`relative text-t2 leading-relaxed ${i === 0 ? "text-sm max-w-lg" : "text-xs"}`}>{f.body}</p>
+                </Link>
+              );
+            })}
           </div>
         </div>
       </section>
