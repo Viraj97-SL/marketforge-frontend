@@ -11,12 +11,7 @@
   --ok:     #059669;
   --warn:   #D97706;
   --err:    #DC2626;
-
-  /* Editorial band tokens (Stage 3) — dark full-bleed photographic
-     sections only. Existing tokens above are unchanged. */
-  --ink:      oklch(0.17 0.03 258);
-  --ink-text: oklch(0.94 0.01 258);
-  --ink-dim:  oklch(0.68 0.02 258);
+  --bg:     #F8FAFC;   /* page background — bands sit on this, not a dark block */
 }
 
 * { box-sizing: border-box; }
@@ -29,6 +24,12 @@ body {
   -webkit-font-smoothing: antialiased;
   font-variant-numeric: tabular-nums;
 }
+
+/* ── Section rhythm ─────────────────────────────────────────────── */
+/* Every content section and band uses padding only for vertical spacing —
+   no margin-top/bottom anywhere, so nothing collapses or doubles up. */
+.section-pad { padding-block: clamp(5rem, 9vw, 7.5rem); }
+.band-pad    { padding-block: clamp(6rem, 12vw, 10rem); }
 
 /* ── Reduced motion (Stage 5) ───────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {

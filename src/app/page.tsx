@@ -125,7 +125,7 @@ export default async function HomePage() {
         <div className="absolute inset-0 bg-gradient-to-r from-slate-900 via-slate-900/70 to-transparent pointer-events-none" />
         <div className="absolute inset-0 opacity-[0.04] pointer-events-none"
           style={{ backgroundImage: "radial-gradient(circle, rgba(255,255,255,1) 1px, transparent 1px)", backgroundSize: "32px 32px" }} />
-        <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-bg to-transparent" />
+        <div className="absolute inset-x-0 bottom-0 h-[22vh] bg-gradient-to-t from-bg to-transparent pointer-events-none" />
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-24 w-full grid lg:grid-cols-2 gap-16 items-center">
           <div>
@@ -159,16 +159,15 @@ export default async function HomePage() {
       {/* ── Logo Cloud ────────────────────────────────────────────────────── */}
       <LogoMarquee />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 my-12 sm:my-16">
-          <ChapterOpener
-          image="/images/home-provenance.avif"
-          heading="Real postings. Not surveys."
-          sentence="Every listing in this market gets scraped, structured, and ranked — not estimated."
-        />
-      </div>
+      <ChapterOpener
+        image="/images/home-provenance.avif"
+        heading="Real postings. Not surveys."
+        sentence="Every listing in this market gets scraped, structured, and ranked — not estimated."
+      />
 
       {/* ── Dashboard preview ─────────────────────────────────────────────── */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 py-20">
+      <section className="section-pad">
+       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           {/* Left copy */}
           <div>
@@ -214,18 +213,17 @@ export default async function HomePage() {
             />
           </div>
         </div>
+        </div>
       </section>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 my-12 sm:my-16">
-          <ChapterOpener
-          image="/images/home-capabilities.avif"
-          heading="Built to map the whole market."
-          sentence="Skills, salaries, sponsorship, and signals — one system, laid out block by block."
-        />
-      </div>
+      <ChapterOpener
+        image="/images/home-capabilities.avif"
+        heading="Built to map the whole market."
+        sentence="Skills, salaries, sponsorship, and signals — one system, laid out block by block."
+      />
 
       {/* ── Features ──────────────────────────────────────────────────────── */}
-      <section className="bg-s2 border-y border-b1 py-20">
+      <section className="bg-s2 border-y border-b1 section-pad">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-14">
             <p className="section-label mb-3">Platform capabilities</p>
@@ -272,16 +270,15 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 my-12 sm:my-16">
-          <ChapterOpener
-          image="/images/home-pipeline.avif"
-          heading="Every posting gets sorted, not skimmed."
-          sentence="A fully automated pipeline moves each job from raw listing to structured intelligence."
-        />
-      </div>
+      <ChapterOpener
+        image="/images/home-pipeline.avif"
+        heading="Every posting gets sorted, not skimmed."
+        sentence="A fully automated pipeline moves each job from raw listing to structured intelligence."
+      />
 
       {/* ── How it works — with pipeline illustration ──────────────────────── */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 py-20">
+      <section className="section-pad">
+       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="text-center mb-12">
           <p className="section-label mb-3">How it works</p>
           <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-t1 mb-4">
@@ -314,10 +311,11 @@ export default async function HomePage() {
             </div>
           ))}
         </div>
+        </div>
       </section>
 
       {/* ── Who it's for ──────────────────────────────────────────────────── */}
-      <section className="bg-s2 border-y border-b1 py-20">
+      <section className="bg-s2 border-y border-b1 section-pad">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-12">
             <p className="section-label mb-3">Built for</p>
@@ -397,16 +395,15 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 my-12 sm:my-16">
-          <ChapterOpener
-          image="/images/home-closing.avif"
-          heading="Know exactly where you stand."
-          sentence="The road to your next move starts with real market data, not guesswork."
-        />
-      </div>
+      <ChapterOpener
+        image="/images/home-closing.avif"
+        heading="The road to your next move."
+        sentence="The road to your next move starts with real market data, not guesswork."
+      />
 
       {/* ── Contact ───────────────────────────────────────────────────────── */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 py-20">
+      <section className="section-pad">
+       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="grid lg:grid-cols-2 gap-12 items-start">
           <div>
             <p className="section-label mb-3">Contact us</p>
@@ -442,10 +439,12 @@ export default async function HomePage() {
             <ContactForm />
           </div>
         </div>
+        </div>
       </section>
 
       {/* ── CTA band ──────────────────────────────────────────────────────── */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 py-8 pb-20">
+      <section className="section-pad">
+       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="relative rounded-3xl overflow-hidden p-12 sm:p-20 text-center"
           style={{ background: "linear-gradient(135deg, #4F46E5 0%, #2563EB 100%)" }}>
           <div className="absolute inset-0 opacity-[0.06] pointer-events-none"
@@ -471,6 +470,7 @@ export default async function HomePage() {
               </Link>
             </div>
           </div>
+        </div>
         </div>
       </section>
 

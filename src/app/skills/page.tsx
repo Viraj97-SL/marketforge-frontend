@@ -89,7 +89,7 @@ export default async function SkillsPage() {
 
   return (
     <div className="pt-14">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-10">
 
         {/* Hero */}
         <PageHero
@@ -240,12 +240,15 @@ export default async function SkillsPage() {
           </div>
         </div>
 
-        <ChapterOpener
-          className="mb-6"
-          image="/images/chapter-concentration.avif"
-          heading="A handful of skills carry almost everything."
-          sentence={topPairSentence}
-        />
+      </div>
+
+      <ChapterOpener
+        image="/images/chapter-concentration.avif"
+        heading="A handful of skills carry almost everything."
+        sentence={topPairSentence}
+      />
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 pb-10">
 
         {/* Skills that pair together — real co-occurrence, drives the network above */}
         <div className="bg-s1 rounded-2xl border border-b1 p-6 mb-6 shadow-card animate-fade-up animate-delay-300">
