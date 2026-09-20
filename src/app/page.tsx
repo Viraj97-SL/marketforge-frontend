@@ -125,7 +125,6 @@ export default async function HomePage() {
         <div className="absolute inset-0 bg-gradient-to-r from-slate-900 via-slate-900/70 to-transparent pointer-events-none" />
         <div className="absolute inset-0 opacity-[0.04] pointer-events-none"
           style={{ backgroundImage: "radial-gradient(circle, rgba(255,255,255,1) 1px, transparent 1px)", backgroundSize: "32px 32px" }} />
-        <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-bg to-transparent pointer-events-none" />
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-24 w-full grid lg:grid-cols-2 gap-16 items-center">
           <HeroReveal>

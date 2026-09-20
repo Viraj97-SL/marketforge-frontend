@@ -16,13 +16,12 @@ interface PageHeroProps {
  * Full-bleed page hero — MUST be rendered as a sibling of the page's
  * max-w-7xl container, never nested inside it (same rule as the homepage
  * hero and the ChapterOpener/EditorialBand bands). No bottom fade — the
- * hero ends on a crisp edge; only the homepage hero fades, into the logo
- * marquee below it.
+ * hero ends on a crisp edge against the page background, no exceptions.
  */
 export function PageHero({ badge, title, titleAccent, subtitle, imageSrc, children }: PageHeroProps) {
   return (
     <section
-      className="relative w-full min-h-[clamp(400px,52vh,560px)] flex items-center"
+      className="relative w-full min-h-[clamp(520px,64vh,680px)] flex items-center"
       style={{ background: "linear-gradient(135deg, #141329 0%, #1E293B 60%, #141329 100%)" }}
     >
       {/* Full-bleed photo background — 0.50 opacity, scroll-linked scale/pan */}
@@ -64,7 +63,7 @@ export function PageHero({ badge, title, titleAccent, subtitle, imageSrc, childr
             style={{ fontSize: "clamp(2.75rem, 5.5vw, 4.5rem)", lineHeight: 1.04, letterSpacing: "-0.02em" }}
           >
             {title}
-            {titleAccent && <span className="hero-accent text-accent"> {titleAccent}</span>}
+            {titleAccent && <span className="hero-accent text-accent">{titleAccent}</span>}
           </h1>
         </HeroRevealItem>
         {subtitle && (

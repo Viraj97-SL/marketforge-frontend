@@ -118,7 +118,13 @@ body {
    users see the underline immediately, never a hidden one — the
    animation (scoped to the no-preference query) is what makes it
    start hidden and wipe in for everyone else. */
-.hero-accent { position: relative; display: inline-block; }
+/* Word gap lives here, not as a text-node space before {titleAccent} —
+   a leading space is the first character inside an inline-block box and
+   gets collapsed by whitespace handling, which is exactly how this word
+   space went missing before. margin-left sits outside the box, so the
+   ::after underline (left:0/right:0, relative to the box itself) still
+   starts right at the accent word's first glyph. */
+.hero-accent { position: relative; display: inline-block; margin-left: 0.28em; }
 .hero-accent::after {
   content: "";
   position: absolute;
