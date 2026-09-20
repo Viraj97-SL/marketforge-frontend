@@ -28,6 +28,19 @@ export interface SkillCooccurrenceData {
   pairs: SkillPair[];
 }
 
+export interface SkillMatrixData {
+  skills: SkillCount[];
+  matrix: number[][];
+  leaf_order: number[];
+}
+
+export interface SkillCount { skill: string; count: number; }
+
+export interface SkillHistoryData {
+  weeks: string[];
+  series: Record<string, number[]>;
+}
+
 export interface SalaryData {
   salary_p25: number | null;
   salary_p50: number | null;
@@ -295,6 +308,9 @@ export const api = {
   weeklySkills: (role = "all") => get<SkillsData>(`/api/v1/market/skills?role_category=${role}&week=latest`),
   roles: (days?: number) => get<RolesData>(`/api/v1/market/roles${days ? `?days=${days}` : ""}`),
   skillCooccurrence: (limit = 40) => get<SkillCooccurrenceData>(`/api/v1/market/skill-cooccurrence?limit=${limit}`),
+  skillMatrix: () => get<SkillMatrixData>("/api/v1/market/skill-matrix"),
+  skillHistory: (skills: string[], weeks = 8) =>
+    get<SkillHistoryData>(`/api/v1/market/skill-history?skills=${encodeURIComponent(skills.join(","))}&weeks=${weeks}`),
   salary: (role = "all", level = "all", location = "all", workModel = "all") =>
     get<SalaryData>(`/api/v1/market/salary?role_category=${role}&experience_level=${level}&location=${location}&work_model=${workModel}`),
   trending: (days = 7) => get<TrendingData>(`/api/v1/market/trending?days=${days}`),

@@ -71,10 +71,9 @@ export function RankedTable({
             const tier = tierFor(rank);
             return (
               <div key={r.key} className="flex items-center gap-3 py-1.5 group">
-                <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 text-[10px] font-black
-                  ${rank <= 3 ? `bg-gradient-to-br ${TIER_BG[tier]} text-white` : "bg-s2 text-t3"}`}>
+                <span className="w-7 shrink-0 text-right text-[11px] font-mono text-t3">
                   {rank}
-                </div>
+                </span>
                 <span className={`text-xs font-semibold text-t1 flex-1 ${TIER_HOVER[tier]} transition-colors`}>
                   {r.label}
                 </span>

@@ -14,14 +14,19 @@ export const metadata: Metadata = {
 };
 
 import { api } from "@/lib/api";
-import type { SkillsData, RolesData, SkillCooccurrenceData, EntryLevelSkillShiftData, EntryLevelUniversalSkillsData } from "@/lib/api";
+import type { SkillsData, RolesData, SkillCooccurrenceData, SkillMatrixData, SkillHistoryData, EntryLevelSkillShiftData, EntryLevelUniversalSkillsData } from "@/lib/api";
 import { ROLE_CONFIGS } from "@/lib/roles";
 import { SkillBar } from "@/components/charts/skill-bar";
+import { Sparkline } from "@/components/charts/sparkline";
 import { PageHero } from "@/components/layout/page-hero";
-import { SkillNetwork } from "@/components/illustrations/skill-network";
+import { SkillEcosystemCard } from "@/components/illustrations/skill-ecosystem-card";
+import { RoleFingerprint } from "@/components/illustrations/role-fingerprint";
 import { RankedTable } from "@/components/ui/ranked-table";
 import { ChapterOpener } from "@/components/ui/chapter-opener";
 import { TrendingUp, TrendingDown, Briefcase, Network, GraduationCap, Layers } from "lucide-react";
+
+const RISING_COLOR = "#0891B2";
+const COOLING_COLOR = "#C2410C";
 
 const ROLE_LABELS: Record<string, string> = Object.fromEntries(
   ROLE_CONFIGS.map((r) => [r.apiSlug, r.label])
@@ -38,8 +43,9 @@ export default async function SkillsPage() {
   let cooccurrenceRaw  = null;
   let skillShiftRaw    = null;
   let universalSkillsRaw = null;
+  let matrixRaw        = null;
 
-  const [, , , , , , , ...roleResults] = await Promise.allSettled([
+  const [, , , , , , , , ...roleResults] = await Promise.allSettled([
     api.skills()                    .then(d => { skills             = d; }),
     api.weeklySkills()              .then(d => { weeklySkills       = d; }),
     api.trending(7)                 .then(d => { trending           = d; }),
@@ -47,6 +53,7 @@ export default async function SkillsPage() {
     api.skillCooccurrence(40)       .then(d => { cooccurrenceRaw    = d; }),
     api.entryLevelSkillShift()      .then(d => { skillShiftRaw      = d; }),
     api.entryLevelUniversalSkills() .then(d => { universalSkillsRaw = d; }),
+    api.skillMatrix()               .then(d => { matrixRaw          = d; }),
     ...ROLE_CONFIGS.map(r => api.skills(r.apiSlug)),
   ]);
 
@@ -62,6 +69,19 @@ export default async function SkillsPage() {
   const risingSkills    = (trending as any)?.rising    ?? [];
   const decliningSkills = (trending as any)?.declining ?? [];
   const hasLiveSkills   = topSkillsList.length > 0;
+
+  const matrixData = matrixRaw as SkillMatrixData | null;
+
+  // Sparkline history for the displayed rising/cooling rows — fetched
+  // after `trending` resolves, since the skill list isn't known until then.
+  const risingForHistory   = risingSkills.slice(0, 12);
+  const coolingForHistory  = decliningSkills.slice(0, 12);
+  const [risingHistoryRes, coolingHistoryRes] = await Promise.allSettled([
+    risingForHistory.length  > 0 ? api.skillHistory(risingForHistory, 8)  : Promise.resolve(null),
+    coolingForHistory.length > 0 ? api.skillHistory(coolingForHistory, 8) : Promise.resolve(null),
+  ]);
+  const risingHistory  = (risingHistoryRes.status  === "fulfilled" ? risingHistoryRes.value  : null) as SkillHistoryData | null;
+  const coolingHistory = (coolingHistoryRes.status === "fulfilled" ? coolingHistoryRes.value : null) as SkillHistoryData | null;
 
   const roles = rolesRaw as RolesData | null;
   const roleRows = (roles?.roles ?? []).map((r) => ({ key: r.role_category, label: roleLabel(r.role_category), count: r.job_count }));
@@ -87,6 +107,18 @@ export default async function SkillsPage() {
     return { role: r.label, skill: top, secondary, live: top != null, n: roleJobCount[r.apiSlug] ?? 0 };
   });
 
+  // Role fingerprints (Stage 2) — same live per-role data, kept as counts
+  // for a 5-bar mini chart instead of a name-only top-4 list.
+  const roleFingerprints = ROLE_CONFIGS.map((r, i) => {
+    const res = roleResults[i];
+    const d = res.status === "fulfilled" ? (res.value as SkillsData) : null;
+    const ranked = Object.entries(d?.top_skills ?? {})
+      .map(([skill, count]) => ({ skill, count: count as number }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 5);
+    return { role: r.label, n: roleJobCount[r.apiSlug] ?? 0, topSkills: ranked };
+  });
+
   return (
     <div className="pt-14">
       {/* Hero */}
@@ -110,23 +142,25 @@ export default async function SkillsPage() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-10">
 
-        {/* Skill network illustration — real job counts + real co-occurrence */}
+        {/* Skill ecosystem — matrix (default) / network toggle, real co-occurrence */}
         <div className="bg-s1 rounded-2xl border border-b1 p-6 mb-6 shadow-card animate-fade-up animate-delay-50">
           <div className="flex items-center justify-between mb-4">
             <div>
               <h2 className="text-sm font-bold text-t1">UK AI Skill Ecosystem</h2>
-              <p className="text-xs text-t2 mt-0.5">How in-demand skills connect and co-occur in job postings — node size = live job count, lines = real co-listing frequency</p>
+              <p className="text-xs text-t2 mt-0.5">Top 24 skills by job count, ordered by hierarchical clustering — related skills land next to each other, so concentration shows up as dark blocks on the diagonal</p>
             </div>
           </div>
-          <SkillNetwork height={320} topSkills={topSkillsList} pairs={pairs} />
+          {matrixData && matrixData.skills.length > 0 ? (
+            <SkillEcosystemCard skills={matrixData.skills} matrix={matrixData.matrix} leafOrder={matrixData.leaf_order} />
+          ) : (
+            <p className="text-xs text-t3 py-10 text-center">Not enough live co-occurrence data yet</p>
+          )}
         </div>
 
         {/* Top Roles by Job Demand */}
         <div className="bg-s1 rounded-2xl border border-b1 p-6 mb-6 shadow-card animate-fade-up animate-delay-75">
           <div className="flex items-center gap-2.5 mb-6">
-            <div className="w-9 h-9 rounded-xl bg-blue/10 flex items-center justify-center">
-              <Briefcase className="w-4 h-4 text-blue" />
-            </div>
+            <Briefcase className="w-5 h-5 text-accent" strokeWidth={1.75} />
             <div>
               <h2 className="text-sm font-bold text-t1">Top Roles by Job Demand</h2>
               <p className="text-[10px] text-t2">Ranked by postings across our full pipeline history · search to jump to a role</p>
@@ -193,9 +227,7 @@ export default async function SkillsPage() {
         <div className="grid sm:grid-cols-2 gap-5 mb-6">
           <div className="bg-s1 rounded-2xl border border-b1 p-6 shadow-card animate-fade-up animate-delay-200">
             <div className="flex items-center gap-2.5 mb-5">
-              <div className="w-9 h-9 rounded-xl bg-ok/10 flex items-center justify-center">
-                <TrendingUp className="w-4 h-4 text-ok" />
-              </div>
+              <TrendingUp className="w-5 h-5 text-accent" strokeWidth={1.75} />
               <div>
                 <h2 className="text-sm font-bold text-t1">Rising Skills</h2>
                 <p className="text-[10px] text-t2">Growing in demand week-over-week</p>
@@ -205,8 +237,11 @@ export default async function SkillsPage() {
               {risingSkills.slice(0, 12).map((s: string, i: number) => (
                 <div key={s} className="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-s2 transition-colors">
                   <span className="text-[10px] text-t3 font-mono w-5">{String(i + 1).padStart(2, "0")}</span>
-                  <span className="text-xs text-t1 font-medium">{s}</span>
-                  <span className="ml-auto text-[10px] bg-ok/10 text-ok px-1.5 py-0.5 rounded font-bold">↑</span>
+                  <span className="text-xs text-t1 font-medium flex-1 truncate">{s}</span>
+                  {risingHistory?.series[s] && (
+                    <Sparkline values={risingHistory.series[s]} color={RISING_COLOR} width={40} height={16} />
+                  )}
+                  <span className="text-xs font-bold shrink-0" style={{ color: RISING_COLOR }}>↑</span>
                 </div>
               ))}
               {risingSkills.length === 0 && (
@@ -217,9 +252,7 @@ export default async function SkillsPage() {
 
           <div className="bg-s1 rounded-2xl border border-b1 p-6 shadow-card animate-fade-up animate-delay-250">
             <div className="flex items-center gap-2.5 mb-5">
-              <div className="w-9 h-9 rounded-xl bg-warn/10 flex items-center justify-center">
-                <TrendingDown className="w-4 h-4 text-warn" />
-              </div>
+              <TrendingDown className="w-5 h-5 text-accent" strokeWidth={1.75} />
               <div>
                 <h2 className="text-sm font-bold text-t1">Cooling Skills</h2>
                 <p className="text-[10px] text-t2">Losing frequency in job postings</p>
@@ -229,8 +262,11 @@ export default async function SkillsPage() {
               {decliningSkills.slice(0, 12).map((s: string, i: number) => (
                 <div key={s} className="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-s2 transition-colors">
                   <span className="text-[10px] text-t3 font-mono w-5">{String(i + 1).padStart(2, "0")}</span>
-                  <span className="text-xs text-t1 font-medium">{s}</span>
-                  <span className="ml-auto text-[10px] bg-warn/10 text-warn px-1.5 py-0.5 rounded font-bold">↓</span>
+                  <span className="text-xs text-t1 font-medium flex-1 truncate">{s}</span>
+                  {coolingHistory?.series[s] && (
+                    <Sparkline values={coolingHistory.series[s]} color={COOLING_COLOR} width={40} height={16} />
+                  )}
+                  <span className="text-xs font-bold shrink-0" style={{ color: COOLING_COLOR }}>↓</span>
                 </div>
               ))}
               {decliningSkills.length === 0 && (
@@ -253,9 +289,7 @@ export default async function SkillsPage() {
         {/* Skills that pair together — real co-occurrence, drives the network above */}
         <div className="bg-s1 rounded-2xl border border-b1 p-6 mb-6 shadow-card animate-fade-up animate-delay-300">
           <div className="flex items-center gap-2.5 mb-5">
-            <div className="w-9 h-9 rounded-xl bg-prp/10 flex items-center justify-center">
-              <Network className="w-4 h-4 text-prp" />
-            </div>
+            <Network className="w-5 h-5 text-accent" strokeWidth={1.75} />
             <div>
               <h2 className="text-sm font-bold text-t1">Skills That Pair Together</h2>
               <p className="text-[10px] text-t2">Skill pairs most often required in the same posting, all-time</p>
@@ -280,9 +314,7 @@ export default async function SkillsPage() {
         <div className="grid sm:grid-cols-2 gap-5 mb-6">
           <div className="bg-s1 rounded-2xl border border-b1 p-6 shadow-card animate-fade-up animate-delay-350">
             <div className="flex items-center gap-2.5 mb-5">
-              <div className="w-9 h-9 rounded-xl bg-accent/10 flex items-center justify-center">
-                <GraduationCap className="w-4 h-4 text-accent" />
-              </div>
+              <GraduationCap className="w-5 h-5 text-accent" strokeWidth={1.75} />
               <div>
                 <h2 className="text-sm font-bold text-t1">Skills That Punch Above Their Weight at Entry Level</h2>
                 <p className="text-[10px] text-t2">
@@ -341,9 +373,7 @@ export default async function SkillsPage() {
 
           <div className="bg-s1 rounded-2xl border border-b1 p-6 shadow-card animate-fade-up animate-delay-400">
             <div className="flex items-center gap-2.5 mb-5">
-              <div className="w-9 h-9 rounded-xl bg-blue/10 flex items-center justify-center">
-                <Layers className="w-4 h-4 text-blue" />
-              </div>
+              <Layers className="w-5 h-5 text-accent" strokeWidth={1.75} />
               <div>
                 <h2 className="text-sm font-bold text-t1">Skills Spanning the Most Roles</h2>
                 <p className="text-[10px] text-t2">Present across the widest range of role categories, not just raw frequency</p>
@@ -407,6 +437,14 @@ export default async function SkillsPage() {
               );
             })}
           </div>
+        </div>
+
+        {/* Role fingerprints — small multiples, same live per-role data as
+            above, shows the shape of demand differs by role at a glance */}
+        <div className="bg-s1 rounded-2xl border border-b1 p-6 mt-6 shadow-card animate-fade-up animate-delay-550">
+          <h2 className="text-sm font-bold text-t1 mb-1">Role Fingerprints</h2>
+          <p className="text-xs text-t2 mb-6">Top 5 skills per role on a shared scale — the shape differs by role, not just the ranking</p>
+          <RoleFingerprint roles={roleFingerprints} />
         </div>
 
       </div>

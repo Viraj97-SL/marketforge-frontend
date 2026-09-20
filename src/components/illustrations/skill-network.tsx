@@ -1,52 +1,74 @@
 "use client";
 
 interface SkillCount { skill: string; count: number; }
-interface SkillPair { skill_a: string; skill_b: string; co_count: number; pmi_score: number; }
+interface PlacedNode { id: string; label: string; x: number; y: number; r: number; count: number; cluster: number; }
+interface PlacedEdge { id: string; a: PlacedNode; b: PlacedNode; w: number; opacity: number; coCount: number; }
 
-interface PlacedNode { id: string; label: string; x: number; y: number; r: number; count: number; tier: 0 | 1 | 2 | 3; }
-interface PlacedEdge { id: string; a: PlacedNode; b: PlacedNode; w: number; coCount: number; }
+// 4-slot cluster palette, CVD-checked — a 5th slot fails colour-vision
+// separation, so cap at four clusters and fold any tail into the last one.
+const CLUSTER_COLOR = ["#4F46E5", "#C2410C", "#0891B2", "#BE185D"] as const;
+const CLUSTER_COUNT = CLUSTER_COLOR.length;
 
-const TIER_STYLE = [
-  { fill: "#4F46E5", stroke: "#818CF8", glow: 8 }, // core (centre)
-  { fill: "#2563EB", stroke: "#60A5FA", glow: 6 }, // ring 1
-  { fill: "#7C3AED", stroke: "#A78BFA", glow: 4 }, // ring 2
-  { fill: "#059669", stroke: "#34D399", glow: 3 }, // ring 3 (outer)
-] as const;
+// Shape glyph per cluster — identity is never colour alone.
+type Shape = "circle" | "square" | "diamond" | "triangle";
+const CLUSTER_SHAPE: Shape[] = ["circle", "square", "diamond", "triangle"];
 
-const TIER_LABEL = ["Core", "Primary", "Secondary", "Adjacent"] as const;
+function NodeShape({ shape, x, y, r, fill, stroke }: { shape: Shape; x: number; y: number; r: number; fill: string; stroke: string }) {
+  const common = { fill, stroke, strokeWidth: 1 };
+  switch (shape) {
+    case "square": {
+      const s = r * 1.7;
+      return <rect x={x - s / 2} y={y - s / 2} width={s} height={s} rx={s * 0.18} {...common} />;
+    }
+    case "diamond": {
+      const s = r * 1.25;
+      return <polygon points={`${x},${y - s} ${x + s},${y} ${x},${y + s} ${x - s},${y}`} {...common} />;
+    }
+    case "triangle": {
+      const s = r * 1.35;
+      return <polygon points={`${x},${y - s} ${x + s * 0.95},${y + s * 0.75} ${x - s * 0.95},${y + s * 0.75}`} {...common} />;
+    }
+    case "circle":
+    default:
+      return <circle cx={x} cy={y} r={r} {...common} />;
+  }
+}
 
-// Ring layout: [ring size, radius, y-squash] — index 0 is the core node itself.
-const RINGS: { size: number; radius: number; squash: number }[] = [
-  { size: 6, radius: 128, squash: 0.74 },
-  { size: 8, radius: 205, squash: 0.78 },
-  { size: 6, radius: 268, squash: 0.86 },
-];
+function legendGlyph(shape: Shape, color: string) {
+  switch (shape) {
+    case "square": return <rect x="0" y="0" width="9" height="9" rx="2" fill={color} />;
+    case "diamond": return <polygon points="4.5,0 9,4.5 4.5,9 0,4.5" fill={color} />;
+    case "triangle": return <polygon points="4.5,0 9,8 0,8" fill={color} />;
+    case "circle":
+    default: return <circle cx="4.5" cy="4.5" r="4.5" fill={color} />;
+  }
+}
 
 /**
- * Real skill-demand network: node size = live job count for that skill
- * (from /api/v1/market/skills), edges = real co-occurrence counts (from
- * /api/v1/market/skill-cooccurrence, backed by market.skill_cooccurrence).
- * No hardcoded numbers — renders an honest empty state when live data is
- * unavailable instead of a fabricated graph.
+ * Real skill-demand network, backed by the same skill-matrix payload as the
+ * matrix view (same 24 skills, same co-occurrence counts, same leaf order) —
+ * clusters are the leaf order cut into 4 contiguous groups, not a hand-
+ * assigned "demand tier". Edge width AND opacity both encode co-occurrence
+ * count. No hardcoded numbers — renders an honest empty state when live
+ * data is unavailable instead of a fabricated graph.
  */
 export function SkillNetwork({
-  topSkills,
-  pairs,
+  skills,
+  matrix,
+  leafOrder,
   height = 420,
   className = "",
-  maxNodes = 20,
 }: {
-  topSkills: SkillCount[];
-  pairs: SkillPair[];
+  skills: SkillCount[];
+  matrix: number[][];
+  leafOrder: number[];
   height?: number;
   className?: string;
-  maxNodes?: number;
 }) {
   const W = 760, H = height;
   const scale = H / 480;
-  const nodes = topSkills.slice(0, maxNodes);
 
-  if (nodes.length === 0) {
+  if (skills.length === 0) {
     return (
       <div className={`w-full flex items-center justify-center text-xs text-t3 ${className}`} style={{ height }}>
         Not enough live skill data yet
@@ -54,177 +76,146 @@ export function SkillNetwork({
     );
   }
 
-  const cx = W / 2, cy = 240;
-  const maxCount = nodes[0].count;
-  const minCount = nodes[nodes.length - 1].count;
+  const order = leafOrder.length === skills.length ? leafOrder : skills.map((_, i) => i);
+  const n = order.length;
+  const perCluster = Math.ceil(n / CLUSTER_COUNT);
+  const clusterOfLeafPos = (pos: number) => Math.min(CLUSTER_COUNT - 1, Math.floor(pos / perCluster));
+
+  const maxCount = Math.max(...skills.map((s) => s.count));
+  const minCount = Math.min(...skills.map((s) => s.count));
   const radiusFor = (count: number) => {
-    if (maxCount === minCount) return 22;
+    if (maxCount === minCount) return 20;
     const t = (count - minCount) / (maxCount - minCount);
-    return 14 + t * 24;
+    return 13 + t * 22;
   };
 
+  const cx = W / 2, cy = 240;
+  const clusterRadius = 175;
+  const clusterAngles = [-Math.PI / 4, (3 * Math.PI) / 4, Math.PI / 4, (5 * Math.PI) / 4]; // NE, SW, SE, NW-ish spread
+
+  // Place nodes: group by cluster (from leaf-order position), arrange each
+  // cluster's members on a small sub-ring around that cluster's centre.
+  const byLeafPos = order.map((origIdx, pos) => ({ origIdx, pos, skill: skills[origIdx] }));
+  const clusters: typeof byLeafPos[] = Array.from({ length: CLUSTER_COUNT }, () => []);
+  byLeafPos.forEach((item) => clusters[clusterOfLeafPos(item.pos)].push(item));
+
   const placed: PlacedNode[] = [];
-  nodes.forEach((n, i) => {
-    if (i === 0) {
-      placed.push({ id: n.skill, label: n.skill, x: cx, y: cy, r: radiusFor(n.count) + 12, count: n.count, tier: 0 });
-      return;
-    }
-    let idx = i - 1;
-    let ringNo = 0;
-    while (ringNo < RINGS.length && idx >= RINGS[ringNo].size) {
-      idx -= RINGS[ringNo].size;
-      ringNo++;
-    }
-    const ring = RINGS[Math.min(ringNo, RINGS.length - 1)];
-    const ringSize = ringNo < RINGS.length ? ring.size : ring.size;
-    const angle = (idx / Math.max(1, ringSize)) * Math.PI * 2 - Math.PI / 2;
-    placed.push({
-      id: n.skill, label: n.skill,
-      x: cx + Math.cos(angle) * ring.radius,
-      y: cy + Math.sin(angle) * ring.radius * ring.squash,
-      r: radiusFor(n.count), count: n.count, tier: (Math.min(ringNo, RINGS.length - 1) + 1) as 1 | 2 | 3,
+  clusters.forEach((members, ci) => {
+    if (members.length === 0) return;
+    const angle = clusterAngles[ci];
+    const ccx = cx + Math.cos(angle) * clusterRadius * 0.62;
+    const ccy = cy + Math.sin(angle) * clusterRadius * 0.5;
+    const subRadius = 32 + members.length * 9;
+    members.forEach((m, i) => {
+      const a = (i / Math.max(1, members.length)) * Math.PI * 2 - Math.PI / 2;
+      const r = radiusFor(m.skill.count);
+      placed.push({
+        id: m.skill.skill, label: m.skill.skill,
+        x: members.length === 1 ? ccx : ccx + Math.cos(a) * subRadius,
+        y: members.length === 1 ? ccy : ccy + Math.sin(a) * subRadius * 0.82,
+        r, count: m.skill.count, cluster: ci,
+      });
     });
   });
 
-  const nodeIds = new Set(placed.map((n) => n.id));
-  const byId = new Map(placed.map((n) => [n.id, n]));
-  const relevantPairs = pairs.filter((p) => nodeIds.has(p.skill_a) && nodeIds.has(p.skill_b));
-  const maxCo = relevantPairs.reduce((m, p) => Math.max(m, p.co_count), 1);
-  const edges: PlacedEdge[] = relevantPairs.map((p) => ({
-    id: `${p.skill_a}-${p.skill_b}`,
-    a: byId.get(p.skill_a)!, b: byId.get(p.skill_b)!,
-    w: 0.6 + (p.co_count / maxCo) * 3.2,
-    coCount: p.co_count,
-  }));
+  const byId = new Map(placed.map((p) => [p.id, p]));
+  let maxCo = 1;
+  const rawEdges: { a: PlacedNode; b: PlacedNode; coCount: number }[] = [];
+  for (let a = 0; a < n; a++) {
+    for (let b = a + 1; b < n; b++) {
+      const v = matrix[order[a]]?.[order[b]] ?? 0;
+      if (v <= 0) continue;
+      if (v > maxCo) maxCo = v;
+      const na = byId.get(skills[order[a]].skill), nb = byId.get(skills[order[b]].skill);
+      if (na && nb) rawEdges.push({ a: na, b: nb, coCount: v });
+    }
+  }
+  const edges: PlacedEdge[] = rawEdges.map((e, i) => {
+    const t = e.coCount / maxCo;
+    return { id: `e${i}`, a: e.a, b: e.b, w: 0.5 + t * 3.5, opacity: 0.06 + t * 0.7, coCount: e.coCount };
+  });
 
-  const tiersPresent = Array.from(new Set(placed.map((n) => n.tier))).sort();
+  const clustersPresent = clusters.map((m, ci) => ({ ci, top: m.slice().sort((x, y) => y.skill.count - x.skill.count)[0] })).filter((c) => c.top);
 
   return (
-    <div className={`w-full overflow-x-auto ${className}`}>
-      <svg
-        viewBox={`0 0 ${W} 480`}
-        style={{ minWidth: `${W * scale}px`, height: `${H}px` }}
-        className="block mx-auto"
-      >
-        <defs>
-          {TIER_STYLE.map((c, i) => (
-            <radialGradient key={i} id={`nf-tier-${i}`} cx="35%" cy="30%" r="70%">
-              <stop offset="0%" stopColor={c.stroke} />
-              <stop offset="100%" stopColor={c.fill} />
-            </radialGradient>
-          ))}
-          {TIER_STYLE.map((c, i) => (
-            <filter key={i} id={`snGlow-${i}`} x="-80%" y="-80%" width="260%" height="260%">
-              <feGaussianBlur stdDeviation={c.glow} result="b" />
-              <feMerge><feMergeNode in="b" /><feMergeNode in="SourceGraphic" /></feMerge>
-            </filter>
-          ))}
-          <radialGradient id="snBg" cx="55%" cy="50%" r="65%">
-            <stop offset="0%" stopColor="#EEF2FF" stopOpacity="0.7" />
-            <stop offset="100%" stopColor="#F7F7FC" stopOpacity="0" />
-          </radialGradient>
-          <linearGradient id="snEdge" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%" stopColor="#818CF8" stopOpacity="0.05" />
-            <stop offset="50%" stopColor="#818CF8" stopOpacity="0.5" />
-            <stop offset="100%" stopColor="#818CF8" stopOpacity="0.05" />
-          </linearGradient>
-        </defs>
-
-        <rect x="0" y="0" width={W} height="480" fill="url(#snBg)" rx="12" />
-
-        {/* Ambient dot-grid texture for depth */}
-        {[60, 140, 220, 300, 380, 440].map((y) =>
-          [40, 140, 240, 340, 440, 540, 640, 720].map((x) => (
-            <circle key={`${x}-${y}`} cx={x} cy={y} r="1.4" fill="#C7D2FE" opacity="0.3" />
-          ))
-        )}
-
-        {/* Concentric ring guides — visualise the tier structure itself */}
-        {RINGS.map((r, i) => (
-          <ellipse key={i} cx={cx} cy={cy} rx={r.radius} ry={r.radius * r.squash} fill="none" stroke="#C7D2FE" strokeWidth="0.6" strokeDasharray="2 4" opacity="0.4" />
+    <div className={`w-full ${className}`}>
+      {/* Legend — above the plot, colour + shape, never colour alone */}
+      <div className="flex flex-wrap items-center gap-4 mb-3">
+        {clustersPresent.map(({ ci, top }) => (
+          <div key={ci} className="flex items-center gap-1.5">
+            <svg width="9" height="9" viewBox="0 0 9 9">{legendGlyph(CLUSTER_SHAPE[ci], CLUSTER_COLOR[ci])}</svg>
+            <span className="text-[10px] text-t2">Cluster: {top.skill.skill} &amp; related</span>
+          </div>
         ))}
+        <span className="text-[10px] text-t3 ml-auto">Size = job count · line = co-listing frequency</span>
+      </div>
 
-        {/* Edges — real co-occurrence pairs, curved for an organic network feel */}
-        {edges.map((e) => {
-          const mx = (e.a.x + e.b.x) / 2, my = (e.a.y + e.b.y) / 2;
-          const dx = e.b.x - e.a.x, dy = e.b.y - e.a.y;
-          const bend = 0.12;
-          const cxp = mx - dy * bend, cyp = my + dx * bend;
-          return (
-            <path
-              key={e.id}
-              d={`M${e.a.x},${e.a.y} Q${cxp},${cyp} ${e.b.x},${e.b.y}`}
-              fill="none"
-              stroke="url(#snEdge)"
-              strokeWidth={e.w}
-            >
-              <title>{e.a.label} + {e.b.label}: co-listed {e.coCount.toLocaleString()}×</title>
-            </path>
-          );
-        })}
+      <div className="w-full overflow-x-auto">
+        <svg
+          viewBox={`0 0 ${W} 480`}
+          style={{ minWidth: `${W * scale}px`, height: `${H}px` }}
+          className="block mx-auto"
+        >
+          <defs>
+            <radialGradient id="snBg" cx="55%" cy="50%" r="65%">
+              <stop offset="0%" stopColor="#EEF2FF" stopOpacity="0.7" />
+              <stop offset="100%" stopColor="#F7F7FC" stopOpacity="0" />
+            </radialGradient>
+          </defs>
 
-        {/* Nodes — real job counts */}
-        {placed.map((n) => {
-          const c = TIER_STYLE[n.tier];
-          return (
-            <g key={n.id}>
-              <circle cx={n.x} cy={n.y} r={n.r + 14} fill={c.fill} opacity="0.06" />
-              <circle cx={n.x} cy={n.y} r={n.r + 3} fill="none" stroke={c.stroke} strokeWidth="0.8" opacity="0.35" />
-              <circle cx={n.x} cy={n.y} r={n.r} fill={`url(#nf-tier-${n.tier})`} filter={`url(#snGlow-${n.tier})`} />
-              <circle cx={n.x - n.r * 0.22} cy={n.y - n.r * 0.22} r={n.r * 0.4} fill="white" opacity="0.22" />
-              {n.tier === 0 && (
-                <circle cx={n.x} cy={n.y} r={n.r + 9} fill="none" stroke={c.stroke} strokeWidth="1.2" strokeDasharray="5 3" opacity="0.4" style={{ animation: "snPulse 3s ease-in-out infinite" }} />
-              )}
-              <text
-                x={n.x} y={n.y + (n.tier === 0 ? 4.5 : 3.5)}
-                textAnchor="middle"
-                fontSize={n.tier === 0 ? "12.5" : n.r > 18 ? "9.5" : "8"}
-                fontWeight={n.tier === 0 ? "900" : "700"}
-                fill="#ffffff"
-                fontFamily="ui-sans-serif,system-ui,sans-serif"
-                style={{ pointerEvents: "none" }}
+          <rect x="0" y="0" width={W} height="480" fill="url(#snBg)" rx="12" />
+
+          {/* Edges — width AND opacity both encode co-occurrence count */}
+          {edges.map((e) => {
+            const mx = (e.a.x + e.b.x) / 2, my = (e.a.y + e.b.y) / 2;
+            const dx = e.b.x - e.a.x, dy = e.b.y - e.a.y;
+            const bend = 0.1;
+            const cxp = mx - dy * bend, cyp = my + dx * bend;
+            const sameCluster = e.a.cluster === e.b.cluster;
+            return (
+              <path
+                key={e.id}
+                d={`M${e.a.x},${e.a.y} Q${cxp},${cyp} ${e.b.x},${e.b.y}`}
+                fill="none"
+                stroke={sameCluster ? CLUSTER_COLOR[e.a.cluster] : "#94A3B8"}
+                strokeWidth={e.w}
+                opacity={e.opacity}
               >
-                {n.label}
-              </text>
-              {n.r >= 19 && (
+                <title>{e.a.label} + {e.b.label}: co-listed {e.coCount.toLocaleString()}×</title>
+              </path>
+            );
+          })}
+
+          {/* Nodes — no glow/blur filters; shape + colour encode cluster */}
+          {placed.map((nd) => {
+            const color = CLUSTER_COLOR[nd.cluster];
+            const shape = CLUSTER_SHAPE[nd.cluster];
+            const showLabelAlways = nd.r >= 16;
+            return (
+              <g key={nd.id} className="sn-node-group">
+                <NodeShape shape={shape} x={nd.x} y={nd.y} r={nd.r} fill={color} stroke="#FFFFFF" />
                 <text
-                  x={n.x} y={n.y + (n.tier === 0 ? 17 : 15)}
+                  x={nd.x} y={nd.y + 4}
                   textAnchor="middle"
-                  fontSize={n.tier === 0 ? "8.5" : "7.5"}
-                  fill="#ffffff" opacity="0.75"
+                  fontSize="12"
+                  fontWeight="700"
+                  fill="#ffffff"
                   fontFamily="ui-sans-serif,system-ui,sans-serif"
-                  style={{ pointerEvents: "none" }}
+                  className={showLabelAlways ? "" : "sn-hover-label"}
+                  style={{ pointerEvents: "none", opacity: showLabelAlways ? 1 : 0 }}
                 >
-                  {n.count.toLocaleString()} jobs
+                  {nd.label}
                 </text>
-              )}
-              <title>{n.label}: {n.count.toLocaleString()} live postings</title>
-            </g>
-          );
-        })}
+                <title>{nd.label}: {nd.count.toLocaleString()} live postings</title>
+              </g>
+            );
+          })}
+        </svg>
+      </div>
 
-        <g transform="translate(10,10)">
-          <rect x="0" y="0" width="150" height={16 + tiersPresent.length * 14 + 30} rx="10" fill="white" opacity="0.92" stroke="#E0E7FF" strokeWidth="1" />
-          <text x="10" y="14" fontSize="7" fontWeight="800" fill="#94A3B8" fontFamily="ui-sans-serif,system-ui,sans-serif" letterSpacing="0.5">
-            DEMAND TIER
-          </text>
-          {tiersPresent.map((t, i) => (
-            <g key={t} transform={`translate(10,${24 + i * 14})`}>
-              <circle cx="4" cy="0" r="4" fill={TIER_STYLE[t].fill} />
-              <text x="14" y="3" fontSize="8" fontWeight="700" fill="#334155" fontFamily="ui-sans-serif,system-ui,sans-serif">{TIER_LABEL[t]}</text>
-            </g>
-          ))}
-          <text x="10" y={24 + tiersPresent.length * 14 + 8} fontSize="7" fill="#64748B" fontFamily="ui-sans-serif,system-ui,sans-serif">Size = live job count</text>
-          <text x="10" y={24 + tiersPresent.length * 14 + 19} fontSize="7" fill="#64748B" fontFamily="ui-sans-serif,system-ui,sans-serif">Line = times co-listed</text>
-        </g>
-
-        <style>{`
-          @keyframes snPulse {
-            0%,100% { opacity: 0.4; }
-            50%      { opacity: 0.1; }
-          }
-        `}</style>
-      </svg>
+      <style>{`
+        .sn-node-group:hover .sn-hover-label { opacity: 1 !important; }
+      `}</style>
     </div>
   );
 }
