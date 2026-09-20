@@ -14,14 +14,13 @@ interface PageHeroProps {
 /**
  * Full-bleed page hero — MUST be rendered as a sibling of the page's
  * max-w-7xl container, never nested inside it (same rule as the homepage
- * hero and the ChapterOpener/EditorialBand bands). Fixed height, not
- * content-driven, so every inner route reads consistently against the
- * homepage's full-viewport hero.
+ * hero and the ChapterOpener/EditorialBand bands). Same min-h-[88vh] as
+ * the homepage hero, so every inner route reads consistently against it.
  */
 export function PageHero({ badge, title, titleAccent, subtitle, imageSrc, children }: PageHeroProps) {
   return (
     <section
-      className="relative w-full h-[44vh] min-h-[340px] flex items-center animate-fade-up"
+      className="relative w-full min-h-[88vh] flex items-center animate-fade-up"
       style={{ background: "linear-gradient(135deg, #141329 0%, #1E293B 60%, #141329 100%)" }}
     >
       {/* Full-bleed photo background */}

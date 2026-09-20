@@ -212,7 +212,7 @@ export default async function JobsPage({ searchParams }: PageProps) {
   return (
     <div className="pt-14">
       {/* Dark hero banner */}
-      <section className="relative w-full h-[44vh] min-h-[340px] flex items-center"
+      <section className="relative w-full min-h-[88vh] flex items-center"
         style={{ background: "linear-gradient(135deg,#141329 0%,#1E1B4B 60%,#141329 100%)" }}>
         <div className="absolute inset-0 opacity-[0.04]"
           style={{ backgroundImage: "radial-gradient(circle,rgba(255,255,255,1) 1px,transparent 1px)", backgroundSize: "28px 28px" }} />
