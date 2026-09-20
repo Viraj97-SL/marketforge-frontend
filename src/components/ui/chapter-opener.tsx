@@ -7,7 +7,7 @@ interface ChapterOpenerProps {
   heading: ReactNode;
   /** A single sentence. */
   sentence: string;
-  /** 0.18-0.34. Lower it per-image if a specific photo goes muddy at the default. */
+  /** 0.30-0.50. Tune per-image if a specific photo goes muddy or the heading loses contrast. */
   imageOpacity?: number;
   className?: string;
 }
@@ -15,33 +15,22 @@ interface ChapterOpenerProps {
 /**
  * Full-bleed band: MUST be rendered as a sibling of the page's max-w-7xl
  * container, never a child of it — nesting it inside gives it the
- * container's width and defeats the whole point. The image sits at low
- * opacity, desaturated, on the page's own background colour (not a dark
- * block) and is mask-faded top/bottom so it dissolves into the surrounding
- * sections instead of creating a hard light/dark edge. No radius, border,
- * shadow, or margin — those are what made this read as a "card" instead of
- * a continuous part of the page. Photography never sits behind a chart,
- * table, or ranking.
+ * container's width and defeats the whole point. The image is duotoned
+ * (see .duo in globals.css: grayscale + lighten/multiply blend against
+ * --duo-dark/--duo-light) and mask-faded top/bottom so it dissolves into
+ * the surrounding sections instead of creating a hard light/dark edge.
+ * No radius, border, shadow, or margin. Photography never sits behind a
+ * chart, table, or ranking.
  */
-export function ChapterOpener({ image, heading, sentence, imageOpacity = 0.26, className = "" }: ChapterOpenerProps) {
+export function ChapterOpener({ image, heading, sentence, imageOpacity = 0.4, className = "" }: ChapterOpenerProps) {
   return (
     <section
-      className={`relative w-full isolate band-pad ${className}`}
+      className={`relative w-full band-pad ${className}`}
       style={{ background: "var(--bg)" }}
     >
       {image && (
-        <div
-          className="absolute inset-0 -z-10"
-          style={{
-            maskImage: "linear-gradient(to bottom, transparent 0%, #000 18%, #000 82%, transparent 100%)",
-            WebkitMaskImage: "linear-gradient(to bottom, transparent 0%, #000 18%, #000 82%, transparent 100%)",
-          }}
-        >
-          <Image
-            src={image} alt="" fill sizes="100vw"
-            className="object-cover"
-            style={{ opacity: imageOpacity, filter: "saturate(0.45) contrast(1.04)" }}
-          />
+        <div className="duo" aria-hidden="true" style={{ opacity: imageOpacity }}>
+          <Image src={image} alt="" fill sizes="100vw" quality={55} />
         </div>
       )}
 

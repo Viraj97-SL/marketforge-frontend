@@ -15,7 +15,7 @@ export function PageHero({ badge, title, titleAccent, subtitle, imageSrc, childr
   return (
     <div
       className="relative rounded-2xl overflow-hidden mb-10 animate-fade-up"
-      style={{ background: "linear-gradient(135deg, #0F172A 0%, #1E293B 60%, #0F172A 100%)" }}
+      style={{ background: "linear-gradient(135deg, #141329 0%, #1E293B 60%, #141329 100%)" }}
     >
       {/* Full-bleed photo background */}
       {imageSrc && (

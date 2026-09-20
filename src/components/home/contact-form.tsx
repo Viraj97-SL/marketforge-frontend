@@ -89,11 +89,11 @@ export function ContactForm() {
           value={form.interest}
           onChange={(e) => update("interest", e.target.value)}
           className={`${INPUT} px-4 appearance-none cursor-pointer`}
-          style={{ color: form.interest ? "#0F172A" : "#94A3B8" }}
+          style={{ color: form.interest ? "#16162B" : "#94A3B8" }}
         >
           <option value="" disabled style={{ color: "#94A3B8" }}>Area of interest</option>
           {INTERESTS.map((i) => (
-            <option key={i} value={i} style={{ color: "#0F172A" }}>{i}</option>
+            <option key={i} value={i} style={{ color: "#16162B" }}>{i}</option>
           ))}
         </select>
       </div>

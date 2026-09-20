@@ -9,16 +9,16 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Light body palette
-        bg:     "#F8FAFC",   // slate-50 — page background
+        // Duotone body palette
+        bg:     "#F7F7FC",   // page background
         s1:     "#FFFFFF",   // white — card surfaces
-        s2:     "#F1F5F9",   // slate-100 — secondary surface
-        s3:     "#E8EEF5",   // slate-150 — hover surface
-        b1:     "#E2E8F0",   // slate-200 — primary border
-        b2:     "#CBD5E1",   // slate-300 — secondary border
-        t1:     "#0F172A",   // slate-900 — primary text
-        t2:     "#475569",   // slate-600 — secondary text
-        t3:     "#94A3B8",   // slate-400 — muted text
+        s2:     "#F0F0F8",   // secondary surface
+        s3:     "#E9E9F4",   // hover surface
+        b1:     "#E4E4F0",   // primary border
+        b2:     "#CFCFE2",   // secondary border
+        t1:     "#16162B",   // primary text
+        t2:     "#4B5167",   // secondary text
+        t3:     "#8E93AB",   // muted text
         // Brand accent — Indigo
         accent: "#4F46E5",   // indigo-600
         blue:   "#2563EB",   // blue-600
@@ -27,7 +27,11 @@ const config: Config = {
         err:    "#DC2626",   // red-600
         prp:    "#7C3AED",   // violet-600
         // Dark hero token (page hero sections)
-        hero:   "#0F172A",   // slate-900
+        hero:   "#141329",
+        // Duotone image treatment
+        duoDark:  "#2A2472",   // image shadows
+        duoLight: "#F5EFDC",   // image highlights, warm cream
+        paper:    "#F7F7FC",   // alias of bg, for the band mask
       },
       fontFamily: {
         sans: ["var(--font-inter)", "system-ui", "sans-serif"],

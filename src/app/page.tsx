@@ -116,7 +116,7 @@ export default async function HomePage() {
       {/* ── Hero ─────────────────────────────────────────────────────────── */}
       <section
         className="relative min-h-[88vh] flex items-center"
-        style={{ background: "linear-gradient(135deg, #0F172A 0%, #1E293B 60%, #0F172A 100%)" }}
+        style={{ background: "linear-gradient(135deg, #141329 0%, #1E293B 60%, #141329 100%)" }}
       >
         {/* City of London skyline at dawn — gradient protects left text */}
         <div className="absolute inset-0 opacity-[0.18]" aria-hidden="true">
@@ -163,6 +163,7 @@ export default async function HomePage() {
         image="/images/home-provenance.avif"
         heading="Real postings. Not surveys."
         sentence="Every listing in this market gets scraped, structured, and ranked — not estimated."
+        imageOpacity={0.34}
       />
 
       {/* ── Dashboard preview ─────────────────────────────────────────────── */}
@@ -220,6 +221,7 @@ export default async function HomePage() {
         image="/images/home-capabilities.avif"
         heading="Built to map the whole market."
         sentence="Skills, salaries, sponsorship, and signals — one system, laid out block by block."
+        imageOpacity={0.42}
       />
 
       {/* ── Features ──────────────────────────────────────────────────────── */}
@@ -274,6 +276,7 @@ export default async function HomePage() {
         image="/images/home-pipeline.avif"
         heading="Every posting gets sorted, not skimmed."
         sentence="A fully automated pipeline moves each job from raw listing to structured intelligence."
+        imageOpacity={0.38}
       />
 
       {/* ── How it works — with pipeline illustration ──────────────────────── */}
@@ -399,6 +402,7 @@ export default async function HomePage() {
         image="/images/home-closing.avif"
         heading="The road to your next move."
         sentence="The road to your next move starts with real market data, not guesswork."
+        imageOpacity={0.44}
       />
 
       {/* ── Contact ───────────────────────────────────────────────────────── */}

@@ -40,7 +40,7 @@ export function MarketTrend({ weeks, height = 220 }: MarketTrendProps) {
             <stop offset="95%" stopColor="#4F46E5" stopOpacity={0} />
           </linearGradient>
         </defs>
-        <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" vertical={false} />
+        <CartesianGrid strokeDasharray="3 3" stroke="#E4E4F0" vertical={false} />
         <XAxis dataKey="label" tick={{ fill: "#94A3B8", fontSize: 11 }} axisLine={false} tickLine={false} />
         <YAxis yAxisId="jobs"   tick={{ fill: "#94A3B8", fontSize: 11 }} axisLine={false} tickLine={false} width={36} />
         <YAxis yAxisId="salary" orientation="right" tick={{ fill: "#94A3B8", fontSize: 11 }} axisLine={false} tickLine={false} width={48}

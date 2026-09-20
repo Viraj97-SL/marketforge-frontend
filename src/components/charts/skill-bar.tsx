@@ -32,7 +32,7 @@ export function SkillBar({ data, height = 360 }: SkillBarProps) {
   return (
     <ResponsiveContainer width="100%" height={height}>
       <BarChart data={sorted} layout="vertical" margin={{ left: 0, right: 20, top: 4, bottom: 4 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" horizontal={false} />
+        <CartesianGrid strokeDasharray="3 3" stroke="#E4E4F0" horizontal={false} />
         <XAxis
           type="number"
           tick={{ fill: "#94A3B8", fontSize: 11 }}

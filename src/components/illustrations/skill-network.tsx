@@ -121,7 +121,7 @@ export function SkillNetwork({
           ))}
           <radialGradient id="snBg" cx="55%" cy="50%" r="65%">
             <stop offset="0%" stopColor="#EEF2FF" stopOpacity="0.7" />
-            <stop offset="100%" stopColor="#F8FAFC" stopOpacity="0" />
+            <stop offset="100%" stopColor="#F7F7FC" stopOpacity="0" />
           </radialGradient>
           <linearGradient id="snEdge" x1="0" y1="0" x2="1" y2="0">
             <stop offset="0%" stopColor="#818CF8" stopOpacity="0.05" />

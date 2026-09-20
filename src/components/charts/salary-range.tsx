@@ -77,7 +77,7 @@ export function SalaryRange({ p25, p50, p75, height = 220 }: SalaryRangeProps) {
       {/* Bar chart */}
       <ResponsiveContainer width="100%" height={height}>
         <ComposedChart data={data} margin={{ left: 10, right: 10, top: 4, bottom: 4 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" vertical={false} />
+          <CartesianGrid strokeDasharray="3 3" stroke="#E4E4F0" vertical={false} />
           <XAxis
             dataKey="label"
             tick={{ fill: "#94A3B8", fontSize: 11 }}
