@@ -25,6 +25,13 @@ const MAP = {
   // Gemini_Generated_Image_7uxhw57uxhw57uxh.jpg is a duplicate/alt take of
   // the card-catalogue (chapter-concentration) shot -- not imported.
   // chapter-emerging.avif (construction site) has no source photo yet.
+
+  // Skills page upgrade, Stage 3 bands:
+  "Gemini_Generated_Image_42w83j42w83j42w8.jpg": "skills-taxonomy.avif", // specimen-drawer cabinet, tiny sorted compartments
+  "Gemini_Generated_Image_kxcfqokxcfqokxcf.jpg": "skills-week.avif",     // pigeonhole wall, mostly empty, a few papers placed
+  "Gemini_Generated_Image_7makf87makf87mak.jpg": "skills-close.avif",   // pegboard tool wall, every tool traced to its silhouette
+  // Gemini_Generated_Image_eurrw4eurrw4eurr.jpg (workbench) is a spare/alt
+  // take -- not imported, doesn't match any of the three brief bands.
 };
 
 for (const [srcName, outName] of Object.entries(MAP)) {

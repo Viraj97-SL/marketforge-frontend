@@ -23,6 +23,7 @@ import { SkillEcosystemCard } from "@/components/illustrations/skill-ecosystem-c
 import { RoleFingerprint } from "@/components/illustrations/role-fingerprint";
 import { RankedTable } from "@/components/ui/ranked-table";
 import { ChapterOpener } from "@/components/ui/chapter-opener";
+import { EditorialBand } from "@/components/ui/editorial-band";
 import { TrendingUp, TrendingDown, Briefcase, Network, GraduationCap, Layers } from "lucide-react";
 
 const RISING_COLOR = "#0891B2";
@@ -140,6 +141,13 @@ export default async function SkillsPage() {
         </div>
       </PageHero>
 
+      <EditorialBand
+        image="/images/skills-taxonomy.avif"
+        imageOpacity={0.36}
+        heading="261 skills, extracted three ways."
+        body="flashtext exact match, then BM25 fuzzy, then SBERT semantic. Each gate cuts false positives the last one let through."
+      />
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-10">
 
         {/* Skill ecosystem — matrix (default) / network toggle, real co-occurrence */}
@@ -200,6 +208,17 @@ export default async function SkillsPage() {
             </div>
           </div>
         )}
+
+      </div>
+
+      <EditorialBand
+        image="/images/skills-week.avif"
+        imageOpacity={0.40}
+        heading="What moved in the last seven days."
+        body="Weekly snapshots, not a rolling average. The week of 2026-09-14 is a single pipeline run."
+      />
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6">
 
         {/* Top Skills by Job Demand — this week's snapshot (distinct from the all-time ranking above) */}
         <div className="bg-s1 rounded-2xl border border-b1 p-6 mb-6 shadow-card animate-fade-up animate-delay-150">
@@ -448,6 +467,13 @@ export default async function SkillsPage() {
         </div>
 
       </div>
+
+      <EditorialBand
+        image="/images/skills-close.avif"
+        imageOpacity={0.42}
+        heading="Every number here traces back to a posting."
+        body="No survey panel, no salary estimate model, no extrapolation."
+      />
     </div>
   );
 }
