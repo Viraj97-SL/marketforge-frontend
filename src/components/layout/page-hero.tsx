@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
-import Image from "next/image";
+import { HeroImage } from "./hero-image";
+import { HeroReveal, HeroRevealItem } from "./hero-reveal";
 
 interface PageHeroProps {
   badge?: string;
@@ -14,25 +15,28 @@ interface PageHeroProps {
 /**
  * Full-bleed page hero — MUST be rendered as a sibling of the page's
  * max-w-7xl container, never nested inside it (same rule as the homepage
- * hero and the ChapterOpener/EditorialBand bands). Same min-h-[88vh] as
- * the homepage hero, so every inner route reads consistently against it.
+ * hero and the ChapterOpener/EditorialBand bands). No bottom fade — the
+ * hero ends on a crisp edge; only the homepage hero fades, into the logo
+ * marquee below it.
  */
 export function PageHero({ badge, title, titleAccent, subtitle, imageSrc, children }: PageHeroProps) {
   return (
     <section
-      className="relative w-full min-h-[88vh] flex items-center animate-fade-up"
+      className="relative w-full min-h-[clamp(400px,52vh,560px)] flex items-center"
       style={{ background: "linear-gradient(135deg, #141329 0%, #1E293B 60%, #141329 100%)" }}
     >
-      {/* Full-bleed photo background */}
-      {imageSrc && (
-        <div className="absolute inset-0 opacity-[0.22]" aria-hidden="true">
-          <Image src={imageSrc} alt="" fill sizes="100vw" className="object-cover" />
-        </div>
-      )}
+      {/* Full-bleed photo background — 0.50 opacity, scroll-linked scale/pan */}
+      {imageSrc && <HeroImage src={imageSrc} opacity={0.5} />}
 
-      {/* Text-protection gradient: opaque left, transparent right */}
+      {/* Text-protection scrim: opaque left, transparent right */}
       {imageSrc && (
-        <div className="absolute inset-0 bg-gradient-to-r from-slate-900 via-slate-900/80 to-slate-900/30 pointer-events-none" />
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background:
+              "linear-gradient(to right, var(--hero) 0%, color-mix(in oklab, var(--hero) 82%, transparent) 38%, color-mix(in oklab, var(--hero) 35%, transparent) 62%, transparent 82%)",
+          }}
+        />
       )}
 
       {/* Subtle dot texture */}
@@ -44,26 +48,34 @@ export function PageHero({ badge, title, titleAccent, subtitle, imageSrc, childr
         }}
       />
 
-      {/* Bottom dissolve into the page background */}
-      <div className="absolute inset-x-0 bottom-0 h-[22vh] bg-gradient-to-t from-bg to-transparent pointer-events-none" />
-
       {/* Content */}
-      <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6">
+      <HeroReveal className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6">
         {badge && (
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-accent/20 border border-accent/30 mb-4">
-            <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
-            <p className="text-[11px] font-bold text-accent uppercase tracking-widest">{badge}</p>
-          </div>
+          <HeroRevealItem>
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-accent/20 border border-accent/30 mb-4">
+              <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
+              <p className="text-xs font-bold text-accent uppercase tracking-[0.18em]">{badge}</p>
+            </div>
+          </HeroRevealItem>
         )}
-        <h1 className="font-newsreader font-normal tracking-tight text-white mb-3 leading-[1.1]" style={{ fontSize: "clamp(1.875rem, 4.5vw, 3.25rem)" }}>
-          {title}
-          {titleAccent && <span className="text-accent"> {titleAccent}</span>}
-        </h1>
+        <HeroRevealItem>
+          <h1
+            className="font-newsreader font-normal text-white mb-3"
+            style={{ fontSize: "clamp(2.75rem, 5.5vw, 4.5rem)", lineHeight: 1.04, letterSpacing: "-0.02em" }}
+          >
+            {title}
+            {titleAccent && <span className="hero-accent text-accent"> {titleAccent}</span>}
+          </h1>
+        </HeroRevealItem>
         {subtitle && (
-          <p className="text-slate-400 max-w-xl leading-relaxed text-sm mt-2">{subtitle}</p>
+          <HeroRevealItem>
+            <p className="text-slate-400 mt-2" style={{ fontSize: "1.1875rem", lineHeight: 1.6, maxWidth: "46ch" }}>
+              {subtitle}
+            </p>
+          </HeroRevealItem>
         )}
-        {children && <div className="mt-5">{children}</div>}
-      </div>
+        {children && <HeroRevealItem className="mt-5">{children}</HeroRevealItem>}
+      </HeroReveal>
     </section>
   );
 }

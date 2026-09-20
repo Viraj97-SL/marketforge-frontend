@@ -112,6 +112,32 @@ body {
   box-shadow: 0 4px 12px rgba(0,0,0,0.08) !important;
 }
 
+/* ── Hero accent-word underline reveal ─────────────────────────────
+   2px underline that wipes in left-to-right 400ms after mount. Base
+   state is the FINISHED state (scaleX(1)) so prefers-reduced-motion
+   users see the underline immediately, never a hidden one — the
+   animation (scoped to the no-preference query) is what makes it
+   start hidden and wipe in for everyone else. */
+.hero-accent { position: relative; display: inline-block; }
+.hero-accent::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; bottom: -0.06em;
+  height: 2px;
+  background: var(--accent);
+  transform: scaleX(1);
+  transform-origin: left;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .hero-accent::after {
+    animation: heroAccentWipe 600ms cubic-bezier(0.16, 1, 0.3, 1) 400ms both;
+  }
+}
+@keyframes heroAccentWipe {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+
 /* ── Keyframes ──────────────────────────────────────────────────── */
 @keyframes fadeUp {
   from { opacity: 0; transform: translateY(20px); }

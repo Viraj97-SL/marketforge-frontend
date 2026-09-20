@@ -17,6 +17,8 @@ import { DashboardMockup } from "@/components/illustrations/dashboard-mockup";
 import { PipelineFlow }    from "@/components/illustrations/pipeline-flow";
 import { ChapterOpener }   from "@/components/ui/chapter-opener";
 import { MaskIcon }        from "@/components/ui/mask-icon";
+import { HeroImage }       from "@/components/layout/hero-image";
+import { HeroReveal, HeroRevealItem } from "@/components/layout/hero-reveal";
 
 // ─── Hero right-side stats grid ───────────────────────────────────────────────
 // Every value here comes from the API at request time — no plausible-looking
@@ -119,37 +121,41 @@ export default async function HomePage() {
         style={{ background: "linear-gradient(135deg, #141329 0%, #1E293B 60%, #141329 100%)" }}
       >
         {/* City of London skyline at dawn — gradient protects left text */}
-        <div className="absolute inset-0 opacity-[0.18]" aria-hidden="true">
-          <Image src="/images/hero.avif" alt="" fill priority sizes="100vw" className="object-cover" />
-        </div>
+        <HeroImage src="/images/hero.avif" opacity={0.18} priority />
         <div className="absolute inset-0 bg-gradient-to-r from-slate-900 via-slate-900/70 to-transparent pointer-events-none" />
         <div className="absolute inset-0 opacity-[0.04] pointer-events-none"
           style={{ backgroundImage: "radial-gradient(circle, rgba(255,255,255,1) 1px, transparent 1px)", backgroundSize: "32px 32px" }} />
-        <div className="absolute inset-x-0 bottom-0 h-[22vh] bg-gradient-to-t from-bg to-transparent pointer-events-none" />
+        <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-bg to-transparent pointer-events-none" />
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-24 w-full grid lg:grid-cols-2 gap-16 items-center">
-          <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-accent/30 bg-accent/10 text-xs font-semibold text-accent mb-8 animate-fade-up">
-              <span className="live-dot" />
-              Live data · Updated twice weekly
-            </div>
-            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.05] mb-6 text-white animate-fade-up animate-delay-100">
-              UK AI Job Market<br />
-              <span className="text-accent">Intelligence</span>
-            </h1>
-            <p className="text-slate-400 text-lg leading-relaxed mb-10 max-w-xl animate-fade-up animate-delay-200">
-              9 autonomous AI agents track hiring trends, skill demand, salary benchmarks,
-              and visa sponsorship across the UK AI/ML market — 24/7, zero manual curation.
-            </p>
-            <div className="flex flex-wrap gap-3 animate-fade-up animate-delay-300">
+          <HeroReveal>
+            <HeroRevealItem>
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-accent/30 bg-accent/10 text-xs font-semibold text-accent mb-8">
+                <span className="live-dot" />
+                Live data · Updated twice weekly
+              </div>
+            </HeroRevealItem>
+            <HeroRevealItem>
+              <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.05] mb-6 text-white">
+                UK AI Job Market<br />
+                <span className="hero-accent text-accent">Intelligence</span>
+              </h1>
+            </HeroRevealItem>
+            <HeroRevealItem>
+              <p className="text-slate-400 text-lg leading-relaxed mb-10 max-w-xl">
+                9 autonomous AI agents track hiring trends, skill demand, salary benchmarks,
+                and visa sponsorship across the UK AI/ML market — 24/7, zero manual curation.
+              </p>
+            </HeroRevealItem>
+            <HeroRevealItem className="flex flex-wrap gap-3">
               <Link href="/market" className="group flex items-center gap-2 px-7 py-3.5 rounded-xl bg-accent text-white font-semibold text-sm hover:bg-indigo-700 transition-colors duration-200 shadow-lg">
                 Explore Market Data <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
               </Link>
               <Link href="/career" className="flex items-center gap-2 px-7 py-3.5 rounded-xl border border-white/20 text-slate-300 font-semibold text-sm hover:border-white/40 hover:text-white hover:bg-white/5 transition-all duration-200">
                 Analyse My Profile <ChevronRight className="w-4 h-4" />
               </Link>
-            </div>
-          </div>
+            </HeroRevealItem>
+          </HeroReveal>
           <div className="animate-fade-in animate-delay-200 hidden lg:block">
             <HeroStats jobsTotal={jobsTotal} medianSalary={medianSalary} skillsCount={skillsCount} visaRate={visaRate} statusOk={statusOk} freshness={freshness} />
           </div>

@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { fmtK } from "@/lib/utils";
 import { JobFilters } from "./JobFilters";
+import { HeroReveal, HeroRevealItem } from "@/components/layout/hero-reveal";
 
 export const revalidate = 60;
 
@@ -211,29 +212,37 @@ export default async function JobsPage({ searchParams }: PageProps) {
 
   return (
     <div className="pt-14">
-      {/* Dark hero banner */}
-      <section className="relative w-full min-h-[88vh] flex items-center"
+      {/* Dark hero banner — no photograph yet, gradient + dot texture only */}
+      <section className="relative w-full min-h-[clamp(400px,52vh,560px)] flex items-center"
         style={{ background: "linear-gradient(135deg,#141329 0%,#1E1B4B 60%,#141329 100%)" }}>
         <div className="absolute inset-0 opacity-[0.04]"
           style={{ backgroundImage: "radial-gradient(circle,rgba(255,255,255,1) 1px,transparent 1px)", backgroundSize: "28px 28px" }} />
-        <div className="absolute inset-x-0 bottom-0 h-[22vh] bg-gradient-to-t from-bg to-transparent pointer-events-none" />
-        <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="flex items-start justify-between gap-8 flex-wrap">
-            <div>
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-accent/30 bg-accent/10 text-xs font-semibold text-accent mb-4">
-                <span className="w-2 h-2 rounded-full bg-ok animate-pulse" />
-                Live · Updated twice weekly
-              </div>
-              <h1 className="text-4xl sm:text-5xl font-bold tracking-tight text-white mb-3">
-                UK AI / ML Job Board
-              </h1>
-              <p className="text-slate-400 text-sm max-w-xl leading-relaxed">
-                Deduplicated listings from Adzuna, Reed, and specialist boards.
-                Salaries normalised. Visa sponsorship NLP-verified.
-              </p>
+        <HeroReveal className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+            <div className="min-w-0">
+              <HeroRevealItem>
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-accent/30 bg-accent/10 text-xs font-semibold text-accent mb-4 tracking-[0.18em]">
+                  <span className="w-2 h-2 rounded-full bg-ok animate-pulse" />
+                  Live · Updated twice weekly
+                </div>
+              </HeroRevealItem>
+              <HeroRevealItem>
+                <h1
+                  className="font-newsreader font-normal text-white mb-3"
+                  style={{ fontSize: "clamp(2.75rem, 5.5vw, 4.5rem)", lineHeight: 1.04, letterSpacing: "-0.02em" }}
+                >
+                  UK AI / ML Job Board
+                </h1>
+              </HeroRevealItem>
+              <HeroRevealItem>
+                <p className="text-slate-400" style={{ fontSize: "1.1875rem", lineHeight: 1.6, maxWidth: "46ch" }}>
+                  Deduplicated listings from Adzuna, Reed, and specialist boards.
+                  Salaries normalised. Visa sponsorship NLP-verified.
+                </p>
+              </HeroRevealItem>
             </div>
             {/* Live stats chips */}
-            <div className="flex flex-wrap gap-3 self-end pb-1">
+            <HeroRevealItem className="flex flex-wrap gap-3 max-w-full lg:max-w-md lg:justify-end shrink-0">
               {[
                 { Icon: Briefcase,  label: "Roles indexed",     value: hasJobs ? total.toLocaleString() : "—",          accent: "text-indigo-300", bg: "bg-indigo-500/15", border: "border-indigo-500/25" },
                 { Icon: Globe,      label: "Remote this page",  value: hasJobs ? `${remoteCount} / ${jobs.length}` : "—", accent: "text-emerald-300", bg: "bg-emerald-500/15", border: "border-emerald-500/25" },
@@ -248,9 +257,9 @@ export default async function JobsPage({ searchParams }: PageProps) {
                   </div>
                 </div>
               ))}
-            </div>
+            </HeroRevealItem>
           </div>
-        </div>
+        </HeroReveal>
       </section>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
