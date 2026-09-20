@@ -106,32 +106,32 @@ export default async function SalaryPage() {
 
   return (
     <div className="pt-14">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10">
-
-        {/* Hero */}
-        <PageHero
-          badge="Compensation Intelligence"
-          title="UK AI Salary"
-          titleAccent="Benchmarks"
-          subtitle="Salary percentiles derived from live job postings with stated compensation. All figures are gross annual salary in GBP. Updated each pipeline run."
-          imageSrc="/images/page-salary-hero.avif"
-        >
-          <div className="flex flex-wrap gap-3">
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/10 border border-white/20">
-              <span className="text-xl font-black text-white">{fmtK(medianSalary)}</span>
-              <div>
-                <p className="text-[10px] text-slate-300 font-semibold leading-none">Market Median</p>
-                <p className="text-[10px] text-slate-500">all roles · all seniorities</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/10 border border-white/20">
-              <span className="text-sm font-bold text-blue-300">{fmtK(snap?.salary_p25 ?? null)}</span>
-              <span className="text-slate-500 text-xs">–</span>
-              <span className="text-sm font-bold text-violet-300">{fmtK(snap?.salary_p75 ?? null)}</span>
-              <p className="text-[10px] text-slate-500">P25 – P75</p>
+      {/* Hero */}
+      <PageHero
+        badge="Compensation Intelligence"
+        title="UK AI Salary"
+        titleAccent="Benchmarks"
+        subtitle="Salary percentiles derived from live job postings with stated compensation. All figures are gross annual salary in GBP. Updated each pipeline run."
+        imageSrc="/images/page-salary-hero.avif"
+      >
+        <div className="flex flex-wrap gap-3">
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/10 border border-white/20">
+            <span className="text-xl font-black text-white">{fmtK(medianSalary)}</span>
+            <div>
+              <p className="text-[10px] text-slate-300 font-semibold leading-none">Market Median</p>
+              <p className="text-[10px] text-slate-500">all roles · all seniorities</p>
             </div>
           </div>
-        </PageHero>
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/10 border border-white/20">
+            <span className="text-sm font-bold text-blue-300">{fmtK(snap?.salary_p25 ?? null)}</span>
+            <span className="text-slate-500 text-xs">–</span>
+            <span className="text-sm font-bold text-violet-300">{fmtK(snap?.salary_p75 ?? null)}</span>
+            <p className="text-[10px] text-slate-500">P25 – P75</p>
+          </div>
+        </div>
+      </PageHero>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10">
 
         {/* Hero salary chart */}
         <div className="bg-s1 rounded-2xl border border-b1 p-8 mb-8 shadow-card animate-fade-up animate-delay-100">

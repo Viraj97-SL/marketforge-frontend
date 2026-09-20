@@ -89,26 +89,26 @@ export default async function SkillsPage() {
 
   return (
     <div className="pt-14">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-10">
+      {/* Hero */}
+      <PageHero
+        badge="Skill Intelligence"
+        title="UK AI Skills"
+        titleAccent="Demand"
+        subtitle="Which skills are UK AI employers actually hiring for right now? Ranked across our full pipeline history, derived from live NLP analysis of job descriptions."
+        imageSrc="/images/page-skills-hero.avif"
+      >
+        <div className="flex flex-wrap items-center gap-2 text-xs text-slate-400">
+          <span className="px-2.5 py-1 rounded-full bg-white/10 border border-white/20 font-semibold">
+            {hasLiveSkills ? `${topSkillsList.length} skills live` : "Skills tracked live"}
+          </span>
+          <span className="text-slate-600">·</span>
+          <span>3-gate NLP extraction</span>
+          <span className="text-slate-600">·</span>
+          <span>flashtext → BM25 → SBERT</span>
+        </div>
+      </PageHero>
 
-        {/* Hero */}
-        <PageHero
-          badge="Skill Intelligence"
-          title="UK AI Skills"
-          titleAccent="Demand"
-          subtitle="Which skills are UK AI employers actually hiring for right now? Ranked across our full pipeline history, derived from live NLP analysis of job descriptions."
-          imageSrc="/images/page-skills-hero.avif"
-        >
-          <div className="flex flex-wrap items-center gap-2 text-xs text-slate-400">
-            <span className="px-2.5 py-1 rounded-full bg-white/10 border border-white/20 font-semibold">
-              {hasLiveSkills ? `${topSkillsList.length} skills live` : "Skills tracked live"}
-            </span>
-            <span className="text-slate-600">·</span>
-            <span>3-gate NLP extraction</span>
-            <span className="text-slate-600">·</span>
-            <span>flashtext → BM25 → SBERT</span>
-          </div>
-        </PageHero>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-10">
 
         {/* Skill network illustration — real job counts + real co-occurrence */}
         <div className="bg-s1 rounded-2xl border border-b1 p-6 mb-6 shadow-card animate-fade-up animate-delay-50">

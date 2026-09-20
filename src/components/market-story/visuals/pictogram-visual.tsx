@@ -48,13 +48,13 @@ export function PictogramVisual({ qualifiersCount, academicYear, highlightPct, h
                 <User
                   className="w-full h-auto"
                   strokeWidth={1.5}
-                  style={{ color: lit ? "var(--story-accent)" : "var(--story-line)" }}
+                  style={{ color: lit ? "var(--duo-light)" : "var(--story-line)" }}
                 />
               </motion.div>
             ))}
           </div>
           <p className="text-xs mt-4 max-w-xs" style={{ color: "var(--story-text-dim)" }}>
-            <strong style={{ color: "var(--story-accent)" }}>{litCount} in every 100</strong> {highlightLabel}
+            <strong style={{ color: "var(--duo-light)" }}>{litCount} in every 100</strong> {highlightLabel}
           </p>
         </>
       )}

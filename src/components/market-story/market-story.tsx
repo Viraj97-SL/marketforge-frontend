@@ -135,19 +135,18 @@ export function MarketStory(props: MarketStoryProps) {
     },
   ];
 
-  // Brand-bridge bar: the site's own indigo accent fading into the story's
-  // amber, so the transition into editorial mode reads as this site's own
-  // section rather than a different product pasted in. Corner clipping for
-  // the whole wrapper is handled by .story-editorial's clip-path (see
-  // globals.css) rather than overflow-hidden, which would break
-  // position:sticky in StickyVisual.
+  // Brand-bridge bar: the site's own indigo accent fading into the
+  // duotone's cream highlight, so the transition into editorial mode
+  // reads as this site's own section rather than a different product
+  // pasted in. The section is now full-bleed (see .story-editorial in
+  // globals.css), so there's no corner clipping left to worry about.
   const bridgeBar = (
-    <div className="h-1" style={{ background: "linear-gradient(90deg, #4F46E5 0%, #E8A33D 100%)" }} />
+    <div className="h-1" style={{ background: "linear-gradient(90deg, #4F46E5 0%, #F5EFDC 100%)" }} />
   );
 
   if (prefersReducedMotion) {
     return (
-      <div className="story-editorial my-10 rounded-2xl shadow-card">
+      <div className="story-editorial">
         {bridgeBar}
         <div className="story-editorial-inner">
           {steps.map((s, i) => (
@@ -165,7 +164,7 @@ export function MarketStory(props: MarketStoryProps) {
 
   return (
     <StoryProvider>
-      <div className="story-editorial my-10 rounded-2xl shadow-card">
+      <div className="story-editorial">
         {bridgeBar}
         <div className="story-editorial-inner grid lg:grid-cols-2">
           <div>

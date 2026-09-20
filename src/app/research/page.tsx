@@ -130,29 +130,29 @@ const TIMELINE_STATUS: Record<string, string> = {
 export default function ResearchPage() {
   return (
     <div className="pt-14">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10">
+      {/* Hero */}
+      <PageHero
+        badge="Research Intelligence"
+        title="Emerging Tech"
+        titleAccent="Signals"
+        subtitle="Technologies tracked from arXiv, GitHub trending, and funding announcements — before they appear in UK job descriptions."
+        imageSrc="/images/page-research-hero.avif"
+      >
+        <div className="flex flex-wrap gap-2">
+          {[
+            { label: "87 papers monitored", color: "border-accent/20 bg-accent/5 text-accent" },
+            { label: "23 active signals",   color: "border-blue/20 bg-blue/5 text-blue" },
+            { label: "4 research domains",  color: "border-prp/20 bg-prp/5 text-prp" },
+            { label: "~8 months avg. time to job market", color: "border-ok/20 bg-ok/5 text-ok" },
+          ].map((c) => (
+            <span key={c.label} className={`text-[11px] font-semibold px-3 py-1 rounded-full border ${c.color}`}>
+              {c.label}
+            </span>
+          ))}
+        </div>
+      </PageHero>
 
-        {/* Hero */}
-        <PageHero
-          badge="Research Intelligence"
-          title="Emerging Tech"
-          titleAccent="Signals"
-          subtitle="Technologies tracked from arXiv, GitHub trending, and funding announcements — before they appear in UK job descriptions."
-          imageSrc="/images/page-research-hero.avif"
-        >
-          <div className="flex flex-wrap gap-2">
-            {[
-              { label: "87 papers monitored", color: "border-accent/20 bg-accent/5 text-accent" },
-              { label: "23 active signals",   color: "border-blue/20 bg-blue/5 text-blue" },
-              { label: "4 research domains",  color: "border-prp/20 bg-prp/5 text-prp" },
-              { label: "~8 months avg. time to job market", color: "border-ok/20 bg-ok/5 text-ok" },
-            ].map((c) => (
-              <span key={c.label} className={`text-[11px] font-semibold px-3 py-1 rounded-full border ${c.color}`}>
-                {c.label}
-              </span>
-            ))}
-          </div>
-        </PageHero>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10">
 
         {/* Signal of the Week — featured spotlight */}
         <div className="relative rounded-2xl overflow-hidden border border-accent/25 mb-8 animate-fade-up animate-delay-100">

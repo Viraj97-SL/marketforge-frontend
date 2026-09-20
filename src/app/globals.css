@@ -12,6 +12,7 @@
   --warn:   #D97706;
   --err:    #DC2626;
   --bg:     #F7F7FC;   /* page background — bands sit on this, not a dark block */
+  --hero:   #141329;
   --duo-dark:  #2A2472;
   --duo-light: #F5EFDC;
 }
@@ -239,30 +240,53 @@ body {
 }
 
 /* ── Editorial / scrollytelling mode (Data-Storytelling-Workshop style) ──
-   Dark, greyscale + one amber accent. Sharp corners / no shadows apply to
-   everything INSIDE the section (.story-editorial-inner), but the outer
-   .story-editorial frame keeps the site's own rounded-2xl + shadow-card +
-   brand-accent top border, so it reads as a section of this site rather
-   than a bolted-on separate product. */
+   Full-bleed, same family as the site's dark heroes: --story-bg is the
+   shared --hero colour and --story-accent is the shared indigo --accent,
+   not a bolted-on separate product's amber. Sharp corners / no shadows
+   apply to everything INSIDE the section (.story-editorial-inner); the
+   outer .story-editorial frame is edge-to-edge with no radius, matching
+   every other full-bleed hero/band on the site. */
 .story-editorial {
-  --story-bg:        #0A0A0B;
+  position: relative;
+  --story-bg:        var(--hero);
   --story-bg-alt:    #131315;
   --story-line:      #2A2A2D;
   --story-text:      #F2F2EF;
   --story-text-dim:  #8C8C88;
   --story-text-mute: #575754;
-  --story-accent:    #E8A33D;
+  --story-accent:    var(--accent);
   font-family: var(--font-ibm-plex-sans), system-ui, sans-serif;
   background: var(--story-bg);
   color: var(--story-text);
-  /* Clip to the rounded shape WITHOUT `overflow: hidden` — that property
-     turns this box into a scroll container and breaks position:sticky for
-     the StickyVisual panel inside it (content gets stuck relative to this
-     box instead of the viewport). clip-path clips visually but doesn't
-     affect the sticky containing-block chain, so tall content (e.g. the
-     100-icon pictogram) no longer pokes past the rounded corner into the
-     page background, and the sticky panel still switches per act. */
-  clip-path: inset(0 round 1rem);
+  /* No clip-path/overflow-hidden needed now that the section is square
+     and full-bleed — that was only ever there to keep tall content
+     (e.g. the 100-icon pictogram) from poking past a rounded corner.
+     position:sticky for the StickyVisual panel is unaffected either way. */
 }
 .story-editorial-inner * { border-radius: 0 !important; box-shadow: none !important; }
-.story-editorial ::selection { background: rgba(232,163,61,0.25); color: var(--story-text); }
+.story-editorial ::selection { background: rgba(79,70,229,0.25); color: var(--story-text); }
+
+/* Top/bottom dissolve into the page background — same technique as the
+   homepage hero's bottom fade, applied at both edges since this section
+   sits mid-page rather than at the top of the viewport. Negative z-index
+   keeps it behind the in-flow act content (text, charts, sticky panel)
+   instead of washing over it — the hero can put its dissolve above the
+   photo because the heading sits well clear of the bottom edge; here
+   copy runs closer to both edges, so the dissolve must stay a backdrop. */
+.story-editorial::before,
+.story-editorial::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  height: 22vh;
+  pointer-events: none;
+  z-index: -1;
+}
+.story-editorial::before {
+  top: 0;
+  background: linear-gradient(to bottom, var(--bg) 0%, transparent 100%);
+}
+.story-editorial::after {
+  bottom: 0;
+  background: linear-gradient(to bottom, transparent 0%, var(--bg) 100%);
+}

@@ -212,11 +212,12 @@ export default async function JobsPage({ searchParams }: PageProps) {
   return (
     <div className="pt-14">
       {/* Dark hero banner */}
-      <div className="relative"
+      <section className="relative w-full h-[44vh] min-h-[340px] flex items-center"
         style={{ background: "linear-gradient(135deg,#141329 0%,#1E1B4B 60%,#141329 100%)" }}>
         <div className="absolute inset-0 opacity-[0.04]"
           style={{ backgroundImage: "radial-gradient(circle,rgba(255,255,255,1) 1px,transparent 1px)", backgroundSize: "28px 28px" }} />
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-14">
+        <div className="absolute inset-x-0 bottom-0 h-[22vh] bg-gradient-to-t from-bg to-transparent pointer-events-none" />
+        <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6">
           <div className="flex items-start justify-between gap-8 flex-wrap">
             <div>
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-accent/30 bg-accent/10 text-xs font-semibold text-accent mb-4">
@@ -250,8 +251,7 @@ export default async function JobsPage({ searchParams }: PageProps) {
             </div>
           </div>
         </div>
-        <div className="h-6 bg-gradient-to-b from-transparent to-bg" />
-      </div>
+      </section>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
         {/* Filter bar — client component */}

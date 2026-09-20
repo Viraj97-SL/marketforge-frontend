@@ -110,30 +110,30 @@ export default async function MarketPage() {
 
   return (
     <div className="pt-14">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10">
-
-        {/* Hero */}
-        <PageHero
-          badge="Live Intelligence"
-          title="UK AI Job Market"
-          titleAccent="Overview"
-          subtitle="Real-time aggregate view of the UK AI/ML hiring landscape. Data refreshed twice weekly from Adzuna, Reed, and specialist boards."
-          imageSrc="/images/page-market-hero.avif"
-        >
-          <div className="flex flex-wrap items-center gap-3">
-            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-emerald-400/30 bg-emerald-400/10">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              <span className="text-[11px] font-semibold text-emerald-300">Live data</span>
-            </div>
-            {snap?.week_start && (
-              <span className="flex items-center gap-1.5 text-[11px] text-slate-400">
-                <Clock className="w-3 h-3" />
-                Week of {snap.week_start}
-              </span>
-            )}
-            <span className="text-[11px] text-slate-500">· 3 data sources · automated pipeline</span>
+      {/* Hero */}
+      <PageHero
+        badge="Live Intelligence"
+        title="UK AI Job Market"
+        titleAccent="Overview"
+        subtitle="Real-time aggregate view of the UK AI/ML hiring landscape. Data refreshed twice weekly from Adzuna, Reed, and specialist boards."
+        imageSrc="/images/page-market-hero.avif"
+      >
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-emerald-400/30 bg-emerald-400/10">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="text-[11px] font-semibold text-emerald-300">Live data</span>
           </div>
-        </PageHero>
+          {snap?.week_start && (
+            <span className="flex items-center gap-1.5 text-[11px] text-slate-400">
+              <Clock className="w-3 h-3" />
+              Week of {snap.week_start}
+            </span>
+          )}
+          <span className="text-[11px] text-slate-500">· 3 data sources · automated pipeline</span>
+        </div>
+      </PageHero>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10">
 
         {/* KPI cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
@@ -172,15 +172,19 @@ export default async function MarketPage() {
           />
         </div>
 
-        {/* Graduate-reality narrative */}
-        <MarketStory
-          graduateOutcomes={graduateOutcomes}
-          skillShift={skillShift}
-          universalSkills={universalSkills}
-          entryCompanyMix={entryCompanyMix}
-          juniorSalaryP25={juniorSalary?.salary_p25 ?? null}
-          asheBenchmark={asheBenchmark}
-        />
+      </div>
+
+      {/* Graduate-reality narrative — full-bleed, same family as the heroes */}
+      <MarketStory
+        graduateOutcomes={graduateOutcomes}
+        skillShift={skillShift}
+        universalSkills={universalSkills}
+        entryCompanyMix={entryCompanyMix}
+        juniorSalaryP25={juniorSalary?.salary_p25 ?? null}
+        asheBenchmark={asheBenchmark}
+      />
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10">
 
         {/* Full breakdown */}
         <div className="flex items-center gap-3 mb-6 mt-10">

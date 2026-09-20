@@ -11,10 +11,17 @@ interface PageHeroProps {
   children?: ReactNode;
 }
 
+/**
+ * Full-bleed page hero — MUST be rendered as a sibling of the page's
+ * max-w-7xl container, never nested inside it (same rule as the homepage
+ * hero and the ChapterOpener/EditorialBand bands). Fixed height, not
+ * content-driven, so every inner route reads consistently against the
+ * homepage's full-viewport hero.
+ */
 export function PageHero({ badge, title, titleAccent, subtitle, imageSrc, children }: PageHeroProps) {
   return (
-    <div
-      className="relative rounded-2xl overflow-hidden mb-10 animate-fade-up"
+    <section
+      className="relative w-full h-[44vh] min-h-[340px] flex items-center animate-fade-up"
       style={{ background: "linear-gradient(135deg, #141329 0%, #1E293B 60%, #141329 100%)" }}
     >
       {/* Full-bleed photo background */}
@@ -38,8 +45,11 @@ export function PageHero({ badge, title, titleAccent, subtitle, imageSrc, childr
         }}
       />
 
+      {/* Bottom dissolve into the page background */}
+      <div className="absolute inset-x-0 bottom-0 h-[22vh] bg-gradient-to-t from-bg to-transparent pointer-events-none" />
+
       {/* Content */}
-      <div className="relative z-10 px-8 py-12 sm:px-12 sm:py-14">
+      <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6">
         {badge && (
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-accent/20 border border-accent/30 mb-4">
             <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
@@ -55,6 +65,6 @@ export function PageHero({ badge, title, titleAccent, subtitle, imageSrc, childr
         )}
         {children && <div className="mt-5">{children}</div>}
       </div>
-    </div>
+    </section>
   );
 }
