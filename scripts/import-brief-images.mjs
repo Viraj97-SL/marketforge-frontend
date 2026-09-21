@@ -32,6 +32,13 @@ const MAP = {
   "Gemini_Generated_Image_7makf87makf87mak.jpg": "skills-close.avif",   // pegboard tool wall, every tool traced to its silhouette
   // Gemini_Generated_Image_eurrw4eurrw4eurr.jpg (workbench) is a spare/alt
   // take -- not imported, doesn't match any of the three brief bands.
+
+  // Salary page upgrade, Stage 8 bands:
+  "Gemini_Generated_Image_r4pm7mr4pm7mr4pm.jpg": "salary-stated.avif",  // open ledger, handwritten figures
+  "Gemini_Generated_Image_h131zxh131zxh131.jpg": "salary-regions.avif", // aerial UK terraced housing, not London
+  "Gemini_Generated_Image_a2ulvva2ulvva2ul.jpg": "salary-close.avif",   // brass balance scale, coins weighed
+  // Gemini_Generated_Image_yros67yros67yros.jpg (factory time-clock) is a
+  // spare/alt take -- not imported, doesn't match any of the three bands.
 };
 
 for (const [srcName, outName] of Object.entries(MAP)) {

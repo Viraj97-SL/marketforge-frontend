@@ -49,6 +49,20 @@ export interface SalaryData {
   week_start: string;
 }
 
+export interface SalaryHistogramBin {
+  min: number;
+  max: number | null;
+  count: number;
+}
+
+export interface SalaryHistogramData {
+  bins: SalaryHistogramBin[];
+  p25: number | null;
+  p50: number | null;
+  p75: number | null;
+  n: number;
+}
+
 export interface SnapshotData {
   week_start: string;
   role_category: string;
@@ -321,6 +335,7 @@ export const api = {
   vacancyTrend: () => get<VacancyTrendData>("/api/v1/market/external/vacancy-trend"),
   sponsorVerification: () => get<SponsorVerificationData>("/api/v1/market/external/sponsor-verification"),
   salaryBenchmark: () => get<SalaryBenchmarkData>("/api/v1/market/external/salary-benchmark"),
+  salaryHistogram: () => get<SalaryHistogramData>("/api/v1/market/salary-histogram"),
   graduateOutcomes: () => get<GraduateOutcomesData>("/api/v1/market/external/graduate-outcomes"),
   entryLevelSkillShift: () => get<EntryLevelSkillShiftData>("/api/v1/market/entry-level/skill-shift"),
   entryLevelUniversalSkills: () => get<EntryLevelUniversalSkillsData>("/api/v1/market/entry-level/universal-skills"),

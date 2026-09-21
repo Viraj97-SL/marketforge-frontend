@@ -13,6 +13,7 @@
   --err:    #DC2626;
   --bg:     #F7F7FC;   /* page background — bands sit on this, not a dark block */
   --hero:   #141329;
+  --hero-ink: #F5F4FB; /* text sitting directly on --hero — near-white, clears 4.5:1 */
   --duo-dark:  #2A2472;
   --duo-light: #F5EFDC;
 }
