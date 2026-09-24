@@ -93,6 +93,7 @@ export interface CareerProfile {
 
 export interface CareerReport {
   market_match_pct: number;
+  market_match_sample_size: number;
   match_distribution: { strong: number; moderate: number; weak: number };
   top_skill_gaps: { skill: string; market_demand: number; priority: string }[];
   sector_fit: { sector: string; fit_score: number; sponsorship_rate: number }[];
@@ -125,7 +126,10 @@ export interface CVAnalysisReport {
   skills_found: string[];
   skills_missing: string[];
   keyword_match_pct: number;
+  keyword_match_numerator: number;
+  keyword_match_denominator: number;
   market_match_pct: number;
+  market_match_sample_size: number;
   gap_plan: CVGapPlan;
   narrative_summary: string;
   pii_scrubbed: string[];

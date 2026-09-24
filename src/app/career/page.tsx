@@ -55,7 +55,7 @@ function ATSGauge({ score, grade }: { score: number; grade: string }) {
           />
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <span className="text-3xl font-black text-t1">{score}</span>
+          <span className="text-3xl font-black text-t1">{Math.round(score)}</span>
           <span className="text-xs text-t2">/ 100</span>
         </div>
       </div>
@@ -685,7 +685,7 @@ export default function CareerPage() {
                         <div key={dim}>
                           <div className="flex justify-between mb-1">
                             <span className="text-xs text-t2">{labels[dim] ?? dim}</span>
-                            <span className="text-xs font-bold text-t1">{val}</span>
+                            <span className="text-xs font-bold text-t1">{Math.round(val)}</span>
                           </div>
                           <div className="h-1.5 rounded-full bg-b1 overflow-hidden">
                             <div className={`h-full rounded-full ${colour} transition-all duration-700`} style={{ width: `${val}%` }} />
@@ -707,12 +707,38 @@ export default function CareerPage() {
                   <h3 className="text-sm font-bold text-t1">Market Alignment</h3>
                   <div className="grid grid-cols-2 gap-3 flex-1">
                     <div className="text-center p-4 rounded-xl bg-s2 border border-b1">
-                      <p className="text-3xl font-black text-accent">{cvReport.keyword_match_pct.toFixed(0)}%</p>
-                      <p className="text-xs text-t2 mt-1">Keyword match</p>
+                      {cvReport.keyword_match_denominator > 0 ? (
+                        <>
+                          <p className="text-3xl font-black text-accent">{cvReport.keyword_match_pct.toFixed(0)}%</p>
+                          <p className="text-xs text-t2 mt-1">Keyword match</p>
+                          <p className="text-[10px] text-t3 mt-0.5">
+                            {cvReport.keyword_match_numerator} of {cvReport.keyword_match_denominator} top skills
+                          </p>
+                        </>
+                      ) : (
+                        <>
+                          <p className="text-lg font-bold text-t3">Insufficient data</p>
+                          <p className="text-xs text-t2 mt-1">Keyword match</p>
+                          <p className="text-[10px] text-t3 mt-0.5">no market skill data for this role yet</p>
+                        </>
+                      )}
                     </div>
                     <div className="text-center p-4 rounded-xl bg-s2 border border-b1">
-                      <p className="text-3xl font-black text-blue">{cvReport.market_match_pct.toFixed(0)}%</p>
-                      <p className="text-xs text-t2 mt-1">Market match</p>
+                      {cvReport.market_match_sample_size > 0 ? (
+                        <>
+                          <p className="text-3xl font-black text-blue">{cvReport.market_match_pct.toFixed(0)}%</p>
+                          <p className="text-xs text-t2 mt-1">Market match</p>
+                          <p className="text-[10px] text-t3 mt-0.5">
+                            based on {cvReport.market_match_sample_size} postings
+                          </p>
+                        </>
+                      ) : (
+                        <>
+                          <p className="text-lg font-bold text-t3">Insufficient data</p>
+                          <p className="text-xs text-t2 mt-1">Market match</p>
+                          <p className="text-[10px] text-t3 mt-0.5">no postings sampled for this role yet</p>
+                        </>
+                      )}
                     </div>
                   </div>
                   {cvReport.pii_scrubbed.length > 0 && (
